@@ -208,6 +208,34 @@
   .leaflet-container { background: #0a0a0f; }
   .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
 
+  .runner-glow {
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+  }
+
+  .sort-row {
+    display: flex;
+    gap: 6px;
+    padding-top: 6px;
+  }
+  .sort-btn {
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1;
+    text-align: center;
+  }
+  .sort-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
   .station-popup { text-align: center; }
   .station-popup b { font-size: 13px; }
 </style>
@@ -231,6 +259,11 @@
       <button class="filter-btn" data-filter="weekday">Weekday</button>
       <button class="filter-btn" data-filter="weekend">Weekend</button>
     </div>
+    <div class="sort-row">
+      <button class="sort-btn active" data-sort="date">Recent</button>
+      <button class="sort-btn" data-sort="longest">Longest</button>
+      <button class="sort-btn" data-sort="fastest">Fastest</button>
+    </div>
     <div class="ride-count" id="rideCount"></div>
   </div>
 
@@ -253,6 +286,7 @@ const ROUTES = {"Lafayette St & E 8 St|E 17 St & Broadway": {"coordinates": [[-7
 let activeFilters = new Set(['all']);
 let searchQuery = '';
 let selectedRideId = null;
+let sortMode = "date";
 
 // ============================================================
 // MAP SETUP
@@ -302,65 +336,81 @@ function renderAllRoutes() {
 // ============================================================
 // SELECT A RIDE
 // ============================================================
+let rideAnimFrame = null;
+function stopRideAnim() {
+  if (rideAnimFrame) { cancelAnimationFrame(rideAnimFrame); rideAnimFrame = null; }
+}
+
 function selectRide(ride) {
+  stopRideAnim();
   selectedRideId = ride.rideId;
   activeRouteLayer.clearLayers();
   markersLayer.clearLayers();
 
   const routeKey = `${ride.startStation}|${ride.endStation}`;
   const route = ROUTES[routeKey];
+  const rideColor = ride.isEbike ? '#3b82f6' : '#22c55e';
 
   if (route) {
     const coords = route.coordinates.map(c => [c[1], c[0]]);
 
-    // Animated route line
-    const line = L.polyline(coords, {
-      color: ride.isEbike ? '#3b82f6' : '#22c55e',
-      weight: 4,
-      opacity: 0.9,
-      lineCap: 'round',
-      lineJoin: 'round'
-    }).addTo(activeRouteLayer);
-
-    // Glow effect
-    L.polyline(coords, {
-      color: ride.isEbike ? '#3b82f6' : '#22c55e',
-      weight: 10,
-      opacity: 0.2,
-    }).addTo(activeRouteLayer);
+    // Fit map first
+    map.fitBounds(L.latLngBounds(coords).pad(0.15), { maxZoom: 15 });
 
     // Start marker
     L.circleMarker(coords[0], {
-      radius: 8,
-      fillColor: '#22c55e',
-      fillOpacity: 1,
-      color: '#fff',
-      weight: 2
+      radius: 8, fillColor: '#22c55e', fillOpacity: 1, color: '#fff', weight: 2
     }).bindPopup(`<div class="station-popup"><b>Start</b><br>${ride.startStation}</div>`).addTo(markersLayer);
 
-    // End marker
-    L.circleMarker(coords[coords.length - 1], {
-      radius: 8,
-      fillColor: '#ef4444',
-      fillOpacity: 1,
-      color: '#fff',
-      weight: 2
-    }).bindPopup(`<div class="station-popup"><b>End</b><br>${ride.endStation}</div>`).addTo(markersLayer);
+    // Glow behind runner
+    const glow = L.circleMarker(coords[0], {
+      radius: 14, color: rideColor, fillColor: rideColor, fillOpacity: 0.3, weight: 0, className: 'runner-glow',
+    }).addTo(markersLayer);
 
-    // Direction arrow at midpoint
-    const mid = Math.floor(coords.length / 2);
-    if (coords[mid]) {
-      const arrow = L.marker(coords[mid], {
-        icon: L.divIcon({
-          className: '',
-          html: `<div style="color:white;font-size:18px;text-shadow:0 0 6px rgba(0,0,0,0.8);">&#x27A4;</div>`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10]
-        })
-      }).addTo(markersLayer);
+    // Runner dot
+    const runner = L.circleMarker(coords[0], {
+      radius: 6, color: '#fff', fillColor: rideColor, fillOpacity: 1, weight: 2,
+    }).addTo(markersLayer);
+
+    // Animated trail
+    const trail = L.polyline([], {
+      color: rideColor, weight: 4, opacity: 0.9, lineCap: 'round', lineJoin: 'round'
+    }).addTo(activeRouteLayer);
+
+    // Glow trail
+    const glowTrail = L.polyline([], {
+      color: rideColor, weight: 10, opacity: 0.15,
+    }).addTo(activeRouteLayer);
+
+    let idx = 0;
+    const totalPoints = coords.length;
+    const targetFrames = 150; // ~2.5 seconds at 60fps
+    const baseRate = Math.max(1, Math.ceil(totalPoints / targetFrames));
+
+    function step() {
+      const end = Math.min(idx + baseRate, totalPoints);
+      for (let i = idx; i < end; i++) {
+        trail.addLatLng(coords[i]);
+        glowTrail.addLatLng(coords[i]);
+      }
+      idx = end;
+      const pos = coords[idx - 1];
+      runner.setLatLng(pos);
+      glow.setLatLng(pos);
+
+      if (idx < totalPoints) {
+        rideAnimFrame = requestAnimationFrame(step);
+      } else {
+        // Done — end marker, remove runner + glow
+        markersLayer.removeLayer(glow);
+        markersLayer.removeLayer(runner);
+        L.circleMarker(coords[coords.length - 1], {
+          radius: 8, fillColor: '#ef4444', fillOpacity: 1, color: '#fff', weight: 2
+        }).bindPopup(`<div class="station-popup"><b>End</b><br>${ride.endStation}</div>`).addTo(markersLayer);
+      }
     }
+    rideAnimFrame = requestAnimationFrame(step);
 
-    map.fitBounds(line.getBounds(), { padding: [80, 80], maxZoom: 15 });
   } else {
     // Fallback to straight line
     if (ride.startLat && ride.endLat) {
@@ -421,6 +471,25 @@ function getFilteredRides() {
 
 function renderRideList() {
   const filtered = getFilteredRides();
+
+  // Sort
+  if (sortMode === "longest") {
+    filtered.sort((a, b) => {
+      const rA = ROUTES[`${a.startStation}|${a.endStation}`];
+      const rB = ROUTES[`${b.startStation}|${b.endStation}`];
+      return (rB ? rB.distance_m : 0) - (rA ? rA.distance_m : 0);
+    });
+  } else if (sortMode === "fastest") {
+    filtered.sort((a, b) => {
+      const rA = ROUTES[`${a.startStation}|${a.endStation}`];
+      const rB = ROUTES[`${b.startStation}|${b.endStation}`];
+      const speedA = rA && a.durationMin > 0 ? rA.distance_m / (a.durationMin * 60) : 0;
+      const speedB = rB && b.durationMin > 0 ? rB.distance_m / (b.durationMin * 60) : 0;
+      return speedB - speedA;
+    });
+  } else {
+    filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+  }
   document.getElementById('rideCount').textContent = `${filtered.length} rides`;
 
   const container = document.getElementById('rideList');
@@ -486,6 +555,16 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
       b.classList.toggle('active', activeFilters.has(b.dataset.filter));
     });
 
+    renderRideList();
+  });
+});
+
+// Sort buttons
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sortMode = btn.dataset.sort;
     renderRideList();
   });
 });

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides context for Claude when working on the CitiBike Bot project.
+This file provides context for Claude when working on the Activity Dashboard project.
 
 ## Your Role
 
@@ -18,145 +18,20 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ## Project Overview
 
-**One-liner**: A personal CitiBike ride data visualization tool -- turning 200+ rides of trip history into beautiful, insightful visualizations.
+**One-liner**: A personal activity dashboard -- turning CitiBike rides and Strava runs into beautiful, interactive visualizations.
 
 ### What We're Building
 
-A tool that helps a CitiBike member visualize and analyze their personal ride history. The user has 200+ rides worth of data they want to explore through interactive visualizations.
+A multi-sport activity dashboard for visualizing personal ride and run data. Live with CitiBike (318 rides) and Strava (79 runs, 362 miles).
 
-### Core Challenges
+### Tech Stack
 
-1. **Data Acquisition**: Getting personal ride history out of CitiBike/Lyft (no clean export exists)
-2. **Data Processing**: Parsing and enriching the ride data
-3. **Visualization**: Building compelling, interactive visualizations of ride patterns
-
----
-
-## Research: How to Access Personal CitiBike Ride Data
-
-There is **no official CitiBike API or export feature** for personal ride history. CitiBike (operated by Lyft) does not provide a public API endpoint for downloading your own trip data. The website and app let you view rides, but there is no CSV/JSON export button. The Bike Angels community has confirmed this limitation -- the feature used to exist but was removed. This means all approaches require some form of scraping, API reverse-engineering, or data request.
-
-### Approach 1: Browser Console Script via GraphQL -- BEST CURRENT APPROACH
-
-**fhoffa/code_snippets/baywheels** -- A browser-based JavaScript tool that runs in your browser console while logged into CitiBike.
-
-- **How it works**: Makes GraphQL queries to `/bikesharefe-gql` (the same API the CitiBike website itself uses) to retrieve ride summaries, then fetches individual ride details including addresses and payment info.
-- **Three phases**: (1) List fetching via paginated GraphQL queries using timestamps as cursors, (2) Detail enrichment for each ride, (3) JSON download.
-- **Output**: JSON file with rideId, timestamps, duration, pricing, start/end addresses, bike identifiers.
-- **Pros**: No external dependencies, runs in browser, uses the same API calls the website uses, no credentials leave your computer, built-in delays to avoid rate limiting.
-- **Cons**: Requires being logged in, manual browser console execution, may break if CitiBike changes their frontend.
-- **Repo**: https://github.com/fhoffa/code_snippets/tree/master/baywheels
-- **Works for**: CitiBike, Bay Wheels, Divvy, Capital Bikeshare, Bluebikes, BIKETOWN (all Lyft-operated systems).
-
-### Approach 2: Mobile App Traffic Interception -- MOST DETAILED DATA
-
-Documented by Erin at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
-
-- **How it works**: Android emulator + mitmproxy to intercept CitiBike app network traffic.
-- **Discovered endpoints**:
-  - `https://api.lyft.com/v1/triphistory` -- Trip history with pagination (protobuf serialized responses)
-  - `https://api.lyft.com/v1/last-mile/ride-history/{id}` -- Individual ride details with map image URLs
-- **Key finding**: Route GPS coordinates are embedded in Google Maps image URLs as "Google compressed polylines" -- variable-length encoded location sequences. These can be decoded to extract actual GPS trajectories for each ride.
-- **Pros**: Gets actual route polylines (not just station-to-station), most complete data available.
-- **Cons**: Complex setup (emulator, mitmproxy, APK decompilation via jadx), protobuf responses need schema reverse-engineering, TLS fingerprinting issues (CloudFront blocks TLS 1.3 mitmproxy fingerprints, works with TLS 1.2), fragile to app updates.
-
-### Approach 3: Python Scraper -- elwarren/citibike_trips
-
-- **How it works**: Python module that scrapes the CitiBike website using your username and password.
-- **Output**: JSON or CSV with trip data enriched with station coordinates and trip times in seconds.
-- **CLI usage**: `citibike_trips -u USERNAME -p PASSWORD -o csv`
-- **Config file**: `~/.citibike_trips.config` (JSON format)
-- **Features**: Also fetches account profile info, station data with geolocation, Bike Angels stats.
-- **Pros**: Simple Python interface, outputs clean CSV/JSON, adds station geo coordinates.
-- **Cons**: Last updated 2020, not on PyPI (install from GitHub via `pip install -r requirements.txt`), likely broken by website changes since.
-- **Repo**: https://github.com/elwarren/citibike_trips
-- **Related tools**: https://github.com/elwarren/citibiketools
-
-### Approach 4: Selenium Browser Automation
-
-**woodruffw/snippets/citibike-export** (Python 3):
-- Uses Selenium WebDriver (Firefox) to log into `https://member.citibikenyc.com/profile/login`
-- Navigates trip history pages, scrapes HTML tables via CSS selectors
-- Supports headless mode, env vars for credentials (`CITIBIKE_USERNAME`, `CITIBIKE_PASSWORD`)
-- Extracts: start/end dates, stations, duration, cost, Bike Angel points
-- Outputs JSON
-- Repo: https://github.com/woodruffw/snippets/blob/master/citibike-export/citibike-export
-
-**elikschultz/citibike-ride-analysis** (Python + R):
-- Uses Selenium with Chrome (chromedriver), requires phone number + SMS verification + email during execution
-- Three-script pipeline: `scraper.py` -> `get_station_gps_coordinates.py` -> `mapper.r`
-- Geocodes stations via Google Geocoding API, maps routes via Google Maps Static API
-- Outputs CSV, then R visualization with color gradients indicating ride frequency
-- Repo: https://github.com/elikschultz/citibike-ride-analysis
-
-### Approach 5: Ruby Scraper -- rgardner/citi-bike-scraper
-
-- Uses Ruby + Mechanize gem + Trollop gem
-- Accepts username, password, number of months via CLI
-- Outputs monthly CSV files in `data/` directory (format: `month-YYYY.csv`)
-- Fields: unique_trip_id, start_station, start_time, end_station, end_time, trip_duration
-- Repo: https://github.com/rgardner/citi-bike-scraper
-
-### Approach 6: Lyft Privacy Data Request
-
-- Lyft (CitiBike's operator) has a privacy portal at https://www.lyft.com/privacy/home
-- Under CCPA/privacy rights, you can request a copy of your personal data
-- FAQ includes "How can I access my information?" and "How can I exercise my local privacy rights?"
-- **Unclear** whether this includes CitiBike ride history specifically (Lyft's privacy policy covers rideshare; bikeshare may be handled separately)
-- Worth trying as a one-time bulk download approach -- Lyft has 45 days to respond under CCPA
-
-### Approach 7: Match Yourself in System-Wide Data -- FALLBACK
-
-- CitiBike publishes anonymized system-wide trip data at https://citibikenyc.com/system-data
-- Monthly CSV files (~400MB-1GB each) available at https://s3.amazonaws.com/tripdata/index.html
-- Data includes: ride_id, rideable_type, started_at, ended_at, start_station, end_station, member_casual
-- **No user IDs** -- but if you know your exact ride times, you could theoretically match yourself
-- Useful for supplementing personal data with broader context and comparison analytics
-
-### What GBFS Does NOT Provide
-
-The GBFS (General Bikeshare Feed Specification) feed is for **real-time station/bike availability only**. It explicitly excludes personal data by design (GDPR compliant, vehicle IDs rotate). Useful endpoints for enriching ride data with station info:
-- Auto-discovery: `https://gbfs.citibikenyc.com/gbfs/gbfs.json`
-- Station info (names, coordinates, capacity): `https://gbfs.citibikenyc.com/gbfs/en/station_information.json`
-- Station status (real-time availability): `https://gbfs.citibikenyc.com/gbfs/en/station_status.json`
-
-GBFS is essential for getting station names and coordinates to enrich personal ride data, but is not a source of personal data itself.
-
-### Existing npm/Python Packages (Public Data Only)
-
-These work with public system data, NOT personal account data:
-- **npm**: `gbfs-client` -- GBFS client, defaults to CitiBike NYC (`https://gbfs.citibikenyc.com/gbfs/en/`)
-- **npm**: `citibike` -- CitiBike station data
-- **Python (PyPI)**: `gbfs-client` -- GBFS feed client
-- **Python (PyPI)**: `python-citybikes` -- CityBikes API client (https://api.citybik.es)
-- **Python (GitHub)**: `python-citibike-data` -- https://github.com/adamdeprince/python-citibike-data
-
-### Recommended Strategy for This Project
-
-1. **Start with the browser console GraphQL approach** (fhoffa/baywheels) -- lowest friction, gets JSON data quickly, works today
-2. **Use GBFS station_information.json** to enrich ride data with station coordinates
-3. **If route polylines are needed**, investigate the mobile app interception approach (Erin's method) or use Google Maps Routes API to approximate routes between station pairs (like yangdanny97/citibike-heatmap does)
-4. **Consider the Lyft privacy data request** as a one-time bulk historical download
-5. **Build automation around approach 1** -- wrap the browser console script in a more robust tool (Playwright/Puppeteer) for repeatable data pulls
-
-### Key Technical Details
-
-- **GraphQL endpoint**: `https://account.citibikenyc.com/bikesharefe-gql` (Apollo, introspection disabled)
-- **Lyft API endpoints** (from mobile app): `https://api.lyft.com/v1/triphistory`, `https://api.lyft.com/v1/last-mile/ride-history/{id}`
-- **Old Motivate API** (documented by chrnola, likely outdated): `POST /mobile/v1/nyc/login`, `GET /map/v1/nyc/map-inventory` -- https://github.com/chrnola/citibike-api-docs
-- **Authentication**: Session/cookie-based (website), Bearer token (mobile API)
-- **Route data**: Not in ride history directly -- encoded as Google compressed polylines in map image URLs (from mobile API), or approximated via Google Maps Routes API between station pairs
-
-### Inspiration Projects
-
-| Project | What It Does | Link |
-|---------|-------------|------|
-| yangdanny97/citibike-heatmap | Strava-style heatmap from personal rides using Google Maps Routes API + D3.js | https://github.com/yangdanny97/citibike-heatmap |
-| Blog: Citibike Strava Heatmap | Detailed writeup of the heatmap project | https://yangdanny97.github.io/blog/2026/01/17/citibike-strava-heatmap |
-| Erin's labnotes | Deep reverse-engineering of CitiBike/Lyft APIs with GPS route extraction | https://www.imer.in/labnotes/01-citibike-citibike-citibike/ |
-| HN discussion | Community discussion with tips | https://news.ycombinator.com/item?id=46668215 |
-| elwarren/citibiketools | Collection of tools for CitiBike trip data analysis | https://github.com/elwarren/citibiketools |
-| toddwschneider/nyc-citibike-data | Large-scale NYC CitiBike system data analysis | https://github.com/toddwschneider/nyc-citibike-data |
+- **Frontend**: Vanilla HTML/CSS/JS (no build tools, no frameworks)
+- **Maps**: Leaflet.js with CartoDB dark tiles
+- **Charts**: Chart.js
+- **Heatmaps**: Leaflet.heat
+- **Routing**: OSRM (Open Source Routing Machine) for estimated bike routes
+- **Data**: Static JSON files, pre-processed with Python scripts
 
 ---
 
@@ -164,28 +39,215 @@ These work with public system data, NOT personal account data:
 
 ```
 citibike-bot/
-├── CLAUDE.md              <- You are here (START HERE, ALWAYS)
+├── index.html                  # Landing page (links to CitiBike + Strava)
+├── CLAUDE.md                   # Project context (you are here)
+├── .gitignore
+├── citibike/
+│   ├── index.html              # Main dashboard (stats, maps, charts, rankings)
+│   ├── explore.html            # Ride explorer (browse individual rides with route maps)
+│   ├── download_rides.js       # Browser console script to export rides from CitiBike account
+│   └── data/
+│       ├── citibike_rides_2026-02-27.json   # Raw ride data from GraphQL export (318 rides)
+│       ├── rides_enriched.json              # Processed rides with coordinates + metadata
+│       ├── routes.json                      # OSRM bike routes for 74 unique station pairs
+│       └── station_coords.json             # Station name -> lat/lon mapping from GBFS
+├── strava/
+│   ├── index.html              # Run explorer (animated routes, heatmap, timelapse)
+│   ├── fetch_activities.py     # OAuth + Strava API data fetcher
+│   ├── build_dashboard.py      # Builds static HTML with baked-in data
+│   └── data/
+│       ├── .strava_tokens.json          # OAuth tokens (gitignored)
+│       ├── activities_raw.json          # Raw API response (169 activities)
+│       └── activities_enriched.json     # Processed data for dashboard
+└── references/
+    └── tweet_animation
 ```
 
-*(Structure will be updated as the project grows)*
+### Key Architecture Decisions
+
+- **Data is baked into HTML**: The enriched JSON data is injected directly into `index.html` and `explore.html` at build time via Python. No server needed -- just open the HTML files.
+- **Routes are pre-fetched**: All 74 unique station-pair routes are fetched from OSRM once and stored in `routes.json`. The HTML files reference this cached data.
+- **No build system**: Everything is static files. Python scripts are used for one-time data processing, not as a runtime dependency.
 
 ---
 
-## Current State
+## CitiBike: Current State
 
-- **Phase**: Research & Planning
-- **Stack**: TBD
-- **Data Source**: Personal CitiBike ride history (acquisition method TBD -- see Research section above)
+### What's Built
+
+1. **Dashboard** (`citibike/index.html`)
+   - Header stats: total rides, hours, spending
+   - 6 stat cards: avg duration, avg cost, ebike %, unique stations, unique bikes, rides/week
+   - Side-by-side route map + heatmap (Leaflet)
+   - Day x Hour activity heatgrid
+   - Ebike vs Classic doughnut chart
+   - Monthly rides bar chart + monthly spending line chart
+   - Day of week breakdown + duration distribution
+   - Top start/end stations + top routes rankings
+
+2. **Ride Explorer** (`citibike/explore.html`)
+   - Scrollable ride list with search and filters (ebike/classic, weekday/weekend)
+   - Click any ride to see its estimated bike route on the map
+   - Green dot = start, red dot = end, glow effect on active route
+   - Detail overlay: time, stations, duration, distance (mi + km), cost, bike ID
+   - Keyboard navigation (arrow keys or j/k)
+   - Ghost layer showing all routes faintly in background
+
+3. **Data Pipeline**
+   - `download_rides.js`: Browser console script that hits CitiBike's GraphQL API to export all rides as JSON
+   - Python processing: enriches rides with station coordinates (from GBFS), computes metadata
+   - OSRM routing: fetches estimated bike routes for all 74 unique station pairs
+
+### Key Stats
+
+- 318 rides, Sep 2024 — Dec 2025
+- $669.26 total spent
+- 35.1 hours on bikes
+- 50 unique stations, 74 unique routes
+- 62% ebike rides
+- Home base: Lafayette St & E 8 St (134 starts)
+
+### Data Formats
+
+**Raw ride data** (`citibike_rides_2026-02-27.json`):
+```json
+{
+  "rideId": "...",
+  "startTimeMs": "1765576978474",
+  "endTimeMs": "1765577218474",
+  "price": { "formatted": "$1.09" },
+  "duration": 240000,
+  "rideableName": "522-1650",
+  "startAddress": "Lafayette St & E 8 St",
+  "endAddress": "E 17 St & Broadway",
+  "lineItems": [{ "title": "Ebike ride ($0.25 per min for 4 min)", "amount": { "formatted": "$1.00" } }]
+}
+```
+
+**Enriched ride data** (`rides_enriched.json`):
+```json
+{
+  "rideId": "...",
+  "startTime": "2025-12-12T17:02:58",
+  "startStation": "Lafayette St & E 8 St",
+  "endStation": "E 17 St & Broadway",
+  "startLat": 40.730, "startLon": -73.991,
+  "endLat": 40.737, "endLon": -73.990,
+  "durationMin": 4.0,
+  "price": 1.09,
+  "isEbike": true,
+  "dayOfWeek": "Friday",
+  "hour": 17,
+  "month": "2025-12",
+  "date": "2025-12-12"
+}
+```
+
+---
+
+## CitiBike: Data Acquisition Research
+
+There is **no official CitiBike API or export feature** for personal ride history. All approaches require scraping, API reverse-engineering, or data requests.
+
+### Approach 1: Browser Console Script via GraphQL — WHAT WE USED
+
+**fhoffa/code_snippets/baywheels** — runs in browser console while logged into `account.citibikenyc.com`.
+- GraphQL endpoint: `https://account.citibikenyc.com/bikesharefe-gql` (Apollo, introspection disabled)
+- Queries: `GetCurrentUserRides` (paginated list), `GetCurrentUserRideDetails` (per-ride details)
+- Uses session cookies for auth, 1s delay between requests
+- Repo: https://github.com/fhoffa/code_snippets/tree/master/baywheels
+- Works for all Lyft-operated bikeshare systems
+
+### Approach 2: Mobile App Traffic Interception — GETS GPS ROUTES
+
+Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
+- Android emulator + mitmproxy to capture app traffic
+- Lyft API endpoints: `api.lyft.com/v1/triphistory`, `api.lyft.com/v1/last-mile/ride-history/{id}`
+- Returns Google-encoded polylines (actual GPS routes)
+- Complex setup: TLS fingerprinting bypass, protobuf parsing, cert pinning
+
+### Other Approaches
+
+- **Lyft privacy data request**: https://www.lyft.com/privacy/home (unclear if CitiBike data included)
+- **Email**: `bike-data@lyft.com` for data subject access requests
+- **Python scrapers**: `elwarren/citibike_trips`, `woodruffw/citibike-export` (likely broken, pre-Lyft migration)
+- **System-wide data**: https://s3.amazonaws.com/tripdata/index.html (anonymized, no user IDs)
+- **GBFS**: Real-time station data only, not personal rides. Station info endpoint: `https://gbfs.citibikenyc.com/gbfs/en/station_information.json`
+
+---
+
+## Strava: Current State
+
+### What's Built
+
+1. **Run Explorer** (`strava/index.html`)
+   - Sidebar with all 79 runs: search, sort by date/distance/pace
+   - Click any run to see actual GPS route on map (green start, red end)
+   - **Route replay animation**: watch the run trace out in real-time with a moving dot
+   - **Timelapse mode**: watch all runs accumulate on the map chronologically
+   - Speed control (0.25x to 10x) for animations
+   - Heatmap view showing run density
+   - Ghost layer showing all routes faintly in background
+   - Per-mile split bars (color-coded: green=fast, orange=mid, red=slow)
+   - Detail overlay: distance, pace, duration, elevation, avg HR, calories
+   - Keyboard navigation (j/k, arrows, space to play/pause, Esc to deselect)
+
+2. **Data Pipeline**
+   - `strava/fetch_activities.py`: OAuth2 flow + full API pull (activities, details, streams)
+   - Tokens cached in `strava/data/.strava_tokens.json` (auto-refresh)
+   - `strava/build_dashboard.py`: builds static HTML with data baked in
+   - Raw data: `strava/data/activities_raw.json` (169 activities, all types)
+   - Enriched data: `strava/data/activities_enriched.json` (processed for dashboard)
+
+### Strava API Setup
+
+- **App ID**: 206236
+- **OAuth callback**: `http://localhost:8888/callback`
+- **Scopes**: `read,activity:read_all`
+- **Rate limits**: 100 read requests/15min, 1,000/day
+- **Token refresh**: automatic via saved refresh token
+
+### Key Stats
+
+- 169 total activities (79 runs, 74 rides, 10 weight training, 5 hikes, 1 walk)
+- 362 miles total running distance
+- 4.6 mi average run
+- 18.5 mi longest run (NYRR 18M)
+- Date range: Apr 2021 — Feb 2026
+- All 79 runs have GPS routes (latlng streams) and polylines
+
+### Data Format
+
+**Enriched activity** (`activities_enriched.json`):
+```json
+{
+  "id": 12345678,
+  "name": "Morning Run",
+  "type": "Run",
+  "startTime": "2025-06-15T08:30:00",
+  "distance_mi": 3.12,
+  "moving_time": 1523,
+  "pace": "8:08/mi",
+  "total_elevation_gain": 42.3,
+  "avg_heartrate": 155,
+  "polyline": "encoded_string",
+  "latlng": [[40.73, -73.99], ...],
+  "heartrate": [145, 148, ...],
+  "splits": [{"split": 1, "average_speed": 3.3, ...}],
+  "bestEfforts": [{"name": "1 mile", "moving_time": 480, ...}]
+}
+```
 
 ---
 
 ## Design Principles
 
 1. **Ship fast** -- Iterate quickly, get feedback early
-2. **Keep it simple** -- Avoid over-engineering
-3. **Own your data** -- Everything runs locally, no third-party services required for core functionality
+2. **Keep it simple** -- No build tools, no frameworks, static HTML files
+3. **Own your data** -- Everything runs locally, no third-party services required
 4. **Data tells the story** -- Let the numbers speak
 5. **Personal first** -- This is for one user's data, not a platform
+6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f, --accent: #3b82f6)
 
 ---
 
@@ -193,36 +255,30 @@ citibike-bot/
 
 | Problem | Likely Cause | Check |
 |---------|--------------|-------|
-| Flask app won't start on port 5000 | macOS AirPlay Receiver uses port 5000 | Use port 8000 instead |
-| CitiBike scraper returns no data | Website/API changed | Check if the login flow or GraphQL schema has been updated |
-| Station coordinates missing | GBFS feed URL may have changed | Verify `https://gbfs.citibikenyc.com/gbfs/en/station_information.json` is still live |
+| Map tiles too dark/bright | CSS filter on `.leaflet-tile-pane` | Adjust `brightness()` value in the style tag |
+| Station coordinates missing | GBFS feed URL changed | Verify `https://gbfs.citibikenyc.com/gbfs/en/station_information.json` |
+| OSRM routing fails | Rate limiting or API down | Add delays, check `router.project-osrm.org` status |
+| Data not showing in HTML | Data injection step was skipped | Re-run Python script to inject JSON into HTML |
 
 ---
 
 ## Personal Preferences
 
-- **Always use `python3`** -- Never use `python` command, always `python3`
-- **Always use `pip3`** -- Never use `pip` command, always `pip3`
-- **NEVER use port 5000 for Flask on macOS** -- Port 5000 conflicts with Apple's AirPlay Receiver service. Always use port 8000 or another port instead.
-- **Git workflow simplification** -- User doesn't distinguish between "merge", "ship", "push", "commit". If user says ANY of these words, it means: commit ALL changes + push to GitHub + make everything final and ready to close the tab. Don't ask which one they meant -- they all mean the same thing.
-- **Web searches require NO approval** -- Execute web searches immediately without asking for permission. Research is a core part of your job. Search freely and report findings.
+- **Always use `python3`** -- Never `python`
+- **Always use `pip3`** -- Never `pip`
+- **NEVER use port 5000 on macOS** -- Conflicts with AirPlay Receiver. Use 8000+.
+- **Git workflow**: "merge", "ship", "push", "commit" all mean the same thing — commit all changes + push to GitHub. Don't ask which one they meant.
+- **Web searches require NO approval** -- Search freely, report findings.
 
 ---
 
 ## Documentation Workflow
 
-### While Shipping (CONTINUOUS)
+CLAUDE.md is the single source of truth. Update it as you go:
 
-CLAUDE.md is the single source of truth for every Claude instance that touches this project. Update it as you go:
-
-- **New file created?** -- Add it to the Project Structure tree immediately
+- **New file created?** -- Add to Project Structure
 - **New endpoint?** -- Add to relevant section
-- **Changed data structures?** -- Update relevant sections
-- **New common issue discovered?** -- Add to Common Issues table
 - **Architecture change?** -- Update relevant sections
+- **New common issue?** -- Add to Common Issues table
 
 Don't batch these. A 30-second edit now saves 10 minutes of confusion for the next instance.
-
----
-
-CLAUDE.md = project context and research. Update it as the project evolves.
