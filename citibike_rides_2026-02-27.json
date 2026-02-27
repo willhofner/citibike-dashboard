@@ -1,0 +1,8732 @@
+[
+  {
+    "rideId": "2161540966585502828",
+    "startTimeMs": "1765576978474",
+    "endTimeMs": "1765577218474",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "522-1650",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2161537379487138008",
+    "startTimeMs": "1765576146047",
+    "endTimeMs": "1765576506047",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "522-1650",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2161175992536914892",
+    "startTimeMs": "1765492004052",
+    "endTimeMs": "1765492364052",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "641-9758",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2160884619360219698",
+    "startTimeMs": "1765424164164",
+    "endTimeMs": "1765424524164",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "502-8824",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2160324245617102268",
+    "startTimeMs": "1765293687589",
+    "endTimeMs": "1765294347589",
+    "price": {
+      "formatted": "$2.99"
+    },
+    "duration": 660000,
+    "rideableName": "648-0396",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Gramercy Park N & Gramercy Park E",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 11 min)",
+        "amount": {
+          "formatted": "$2.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.24"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2159342128731826742",
+    "startTimeMs": "1765065021329",
+    "endTimeMs": "1765065321329",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "482-2284",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2158962356638008536",
+    "startTimeMs": "1764976603487",
+    "endTimeMs": "1764977023487",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "247-8469",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2158607314348557286",
+    "startTimeMs": "1764893935880",
+    "endTimeMs": "1764894295880",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "725-0129",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2158254312489450388",
+    "startTimeMs": "1764811752159",
+    "endTimeMs": "1764812112159",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "247-0177",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2158177829707267944",
+    "startTimeMs": "1764793937092",
+    "endTimeMs": "1764794117092",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "666-9873",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2158177829707267944",
+    "startTimeMs": "1764793937092",
+    "endTimeMs": "1764794117092",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "666-9873",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2157547475028971498",
+    "startTimeMs": "1764647174575",
+    "endTimeMs": "1764647534575",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "663-1998",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2157329085599135860",
+    "startTimeMs": "1764596322754",
+    "endTimeMs": "1764596922754",
+    "price": {
+      "formatted": "$2.72"
+    },
+    "duration": 600000,
+    "rideableName": "301-6193",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Gramercy Park N & Gramercy Park E",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 10 min)",
+        "amount": {
+          "formatted": "$2.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.22"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2157110452266969952",
+    "startTimeMs": "1764545422448",
+    "endTimeMs": "1764545842448",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "424-0909",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2157085655022465528",
+    "startTimeMs": "1764539645579",
+    "endTimeMs": "1764539945579",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "897-1103",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2154934686142835264",
+    "startTimeMs": "1764038843682",
+    "endTimeMs": "1764039203682",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "611-0928",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2154753993960407052",
+    "startTimeMs": "1763996762805",
+    "endTimeMs": "1763997002805",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "694-9150",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2154123396948115166",
+    "startTimeMs": "1763849945085",
+    "endTimeMs": "1763850305085",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "668-1050",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153834186836578064",
+    "startTimeMs": "1763782609570",
+    "endTimeMs": "1763782909570",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "305-2651",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153684540170359376",
+    "startTimeMs": "1763747760515",
+    "endTimeMs": "1763747940515",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "390-3705",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153684540170359376",
+    "startTimeMs": "1763747760515",
+    "endTimeMs": "1763747940515",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "390-3705",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153466644163615402",
+    "startTimeMs": "1763697030589",
+    "endTimeMs": "1763697330589",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "845-7822",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153231680871478060",
+    "startTimeMs": "1763642321282",
+    "endTimeMs": "1763642561282",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "399-6162",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153044966441355924",
+    "startTimeMs": "1763598851291",
+    "endTimeMs": "1763599091291",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "668-0130",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "1 Ave & E 6 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2153004953690945496",
+    "startTimeMs": "1763589549331",
+    "endTimeMs": "1763590329331",
+    "price": {
+      "formatted": "$3.54"
+    },
+    "duration": 780000,
+    "rideableName": "778-9662",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 13 min)",
+        "amount": {
+          "formatted": "$3.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.29"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2152569572771614610",
+    "startTimeMs": "1763488163119",
+    "endTimeMs": "1763488403119",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "256-6792",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2152143564522270976",
+    "startTimeMs": "1763388974695",
+    "endTimeMs": "1763389274695",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "899-3131",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2151088667519307506",
+    "startTimeMs": "1763143363698",
+    "endTimeMs": "1763143663698",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "870-1096",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2150705925496520380",
+    "startTimeMs": "1763054253465",
+    "endTimeMs": "1763054613465",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "809-4468",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2150426656807409618",
+    "startTimeMs": "1762989229757",
+    "endTimeMs": "1762989649757",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "258-9604",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2150426656807409618",
+    "startTimeMs": "1762989229757",
+    "endTimeMs": "1762989649757",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "258-9604",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2150296284405963990",
+    "startTimeMs": "1762958870691",
+    "endTimeMs": "1762959110691",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "779-4761",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2150056416429203076",
+    "startTimeMs": "1762903029919",
+    "endTimeMs": "1762903329919",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "345-0897",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2149866604746736350",
+    "startTimeMs": "1762858829457",
+    "endTimeMs": "1762859069457",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "291-3770",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2149829220134352656",
+    "startTimeMs": "1762850128297",
+    "endTimeMs": "1762850428297",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "356-3590",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2149573177652718788",
+    "startTimeMs": "1762790536239",
+    "endTimeMs": "1762790776239",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "236-6060",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2148488279439174202",
+    "startTimeMs": "1762537913161",
+    "endTimeMs": "1762538153161",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "656-7853",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2148205698777092244",
+    "startTimeMs": "1762472122276",
+    "endTimeMs": "1762472182276",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "425-6657",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2148185596518888424",
+    "startTimeMs": "1762467442134",
+    "endTimeMs": "1762467922134",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "702-3989",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2148074071216633662",
+    "startTimeMs": "1762441472216",
+    "endTimeMs": "1762441712216",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "471-8235",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2148074071216633662",
+    "startTimeMs": "1762441472216",
+    "endTimeMs": "1762441712216",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "471-8235",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147891722766073566",
+    "startTimeMs": "1762399020514",
+    "endTimeMs": "1762399440514",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "17490",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147707991312574374",
+    "startTimeMs": "1762356237293",
+    "endTimeMs": "1762356477293",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "279-4469",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147458801840699734",
+    "startTimeMs": "1762298222972",
+    "endTimeMs": "1762298642972",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "763-8166",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147323128218421270",
+    "startTimeMs": "1762266634542",
+    "endTimeMs": "1762266874542",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "695-2881",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147107859662579150",
+    "startTimeMs": "1762216521069",
+    "endTimeMs": "1762216941069",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "667-5458",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2147009888228322106",
+    "startTimeMs": "1762193698735",
+    "endTimeMs": "1762193938735",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "445-0243",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2146942972462072076",
+    "startTimeMs": "1762178118947",
+    "endTimeMs": "1762178358947",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "777-8046",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "MacDougal St & Washington Sq",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2146356723777174644",
+    "startTimeMs": "1762041627777",
+    "endTimeMs": "1762041807777",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "763-2250",
+    "startAddress": "E 13 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2146354078291613634",
+    "startTimeMs": "1762041010308",
+    "endTimeMs": "1762041250308",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "383-6350",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 13 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2146354078291613634",
+    "startTimeMs": "1762041010308",
+    "endTimeMs": "1762041250308",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "383-6350",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 13 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145973978877967858",
+    "startTimeMs": "1761952507378",
+    "endTimeMs": "1761952867378",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "43440",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145823476995208154",
+    "startTimeMs": "1761917464971",
+    "endTimeMs": "1761917704971",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "416-5742",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145611513175353322",
+    "startTimeMs": "1761868115075",
+    "endTimeMs": "1761868595075",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "773-8289",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145440773499161728",
+    "startTimeMs": "1761828360845",
+    "endTimeMs": "1761828600845",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "819-0662",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145226207177069910",
+    "startTimeMs": "1761778404486",
+    "endTimeMs": "1761779124486",
+    "price": {
+      "formatted": "$3.27"
+    },
+    "duration": 720000,
+    "rideableName": "693-4590",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 12 min)",
+        "amount": {
+          "formatted": "$3.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.27"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2145085203907229706",
+    "startTimeMs": "1761745572124",
+    "endTimeMs": "1761746112124",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "544-2967",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Gramercy Park N & Gramercy Park E",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144856575221604936",
+    "startTimeMs": "1761692342423",
+    "endTimeMs": "1761692762423",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "831-1961",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144701383315983210",
+    "startTimeMs": "1761656206586",
+    "endTimeMs": "1761656506586",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "516-5386",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144462880621973364",
+    "startTimeMs": "1761600679816",
+    "endTimeMs": "1761601279816",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "369-7521",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride with low assist",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144462880621973364",
+    "startTimeMs": "1761600679816",
+    "endTimeMs": "1761601279816",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "369-7521",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride with low assist",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144351656813221778",
+    "startTimeMs": "1761574780367",
+    "endTimeMs": "1761575380367",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "73291",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144016280548736640",
+    "startTimeMs": "1761496699490",
+    "endTimeMs": "1761497359490",
+    "price": {
+      "formatted": "$2.99"
+    },
+    "duration": 660000,
+    "rideableName": "431-0397",
+    "startAddress": "Greenpoint Ave & Manhattan Ave",
+    "endAddress": "N 5 St & Northside Piers",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 11 min)",
+        "amount": {
+          "formatted": "$2.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.24"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2144016190281964116",
+    "startTimeMs": "1761496678085",
+    "endTimeMs": "1761497398085",
+    "price": {
+      "formatted": "$3.27"
+    },
+    "duration": 720000,
+    "rideableName": "234-6583",
+    "startAddress": "Greenpoint Ave & Manhattan Ave",
+    "endAddress": "N 5 St & Northside Piers",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 12 min)",
+        "amount": {
+          "formatted": "$3.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.27"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2143228300100892056",
+    "startTimeMs": "1761313234122",
+    "endTimeMs": "1761313414122",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 180000,
+    "rideableName": "41539",
+    "startAddress": "E 15 St & 5 Ave",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2143225112268362076",
+    "startTimeMs": "1761312490955",
+    "endTimeMs": "1761312730955",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "492-8487",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "University Pl & E 14 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142881393946723848",
+    "startTimeMs": "1761232457810",
+    "endTimeMs": "1761232877810",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "365-0926",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142649810520691006",
+    "startTimeMs": "1761178538182",
+    "endTimeMs": "1761178598182",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "82002",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142642368915211328",
+    "startTimeMs": "1761176812349",
+    "endTimeMs": "1761177352349",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 540000,
+    "rideableName": "82002",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142508808429922266",
+    "startTimeMs": "1761145708605",
+    "endTimeMs": "1761146008605",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "249-5281",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142508808429922266",
+    "startTimeMs": "1761145708605",
+    "endTimeMs": "1761146008605",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "249-5281",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142240416458253026",
+    "startTimeMs": "1761083221704",
+    "endTimeMs": "1761083641704",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "370-3485",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2142085149622304408",
+    "startTimeMs": "1761047068729",
+    "endTimeMs": "1761047308729",
+    "price": {
+      "formatted": "$0.22"
+    },
+    "duration": 240000,
+    "rideableName": "271-6843",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      },
+      {
+        "title": "Credit applied",
+        "amount": {
+          "formatted": "-$0.87"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141882988230013092",
+    "startTimeMs": "1761000010987",
+    "endTimeMs": "1761000130987",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "42575",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141876810912184776",
+    "startTimeMs": "1760998582449",
+    "endTimeMs": "1760998942449",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "664-4124",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      },
+      {
+        "title": "Credit applied",
+        "amount": {
+          "formatted": "-$1.63"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141806633676950772",
+    "startTimeMs": "1760982225275",
+    "endTimeMs": "1760982705275",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "354-5316",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141805716229225134",
+    "startTimeMs": "1760982011769",
+    "endTimeMs": "1760982071769",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "848-6615",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141508409356496808",
+    "startTimeMs": "1760912784881",
+    "endTimeMs": "1760913024881",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "725-1333",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 14 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2141064739488241580",
+    "startTimeMs": "1760809484759",
+    "endTimeMs": "1760809844759",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "73304",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140846969111908888",
+    "startTimeMs": "1760758780836",
+    "endTimeMs": "1760759140836",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "341-5874",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 14 St & 1 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140846969111908888",
+    "startTimeMs": "1760758780836",
+    "endTimeMs": "1760759140836",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "341-5874",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 14 St & 1 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140842700693571954",
+    "startTimeMs": "1760757787861",
+    "endTimeMs": "1760757907861",
+    "price": {
+      "formatted": "$0.54"
+    },
+    "duration": 120000,
+    "rideableName": "626-5490",
+    "startAddress": "4 Ave & E 12 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 2 min)",
+        "amount": {
+          "formatted": "$0.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.04"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140656774844669636",
+    "startTimeMs": "1760714497908",
+    "endTimeMs": "1760714737908",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "321-2214",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140410702085078114",
+    "startTimeMs": "1760657208130",
+    "endTimeMs": "1760657688130",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "454-0019",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140245759331591108",
+    "startTimeMs": "1760618801362",
+    "endTimeMs": "1760619161362",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "372-7138",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2140046174392538434",
+    "startTimeMs": "1760572335241",
+    "endTimeMs": "1760572695241",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "521-6643",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2139942059738257474",
+    "startTimeMs": "1760548090709",
+    "endTimeMs": "1760548330709",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "230-3543",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2139667769352289104",
+    "startTimeMs": "1760484232278",
+    "endTimeMs": "1760484712278",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "200-0297",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2139514714186785044",
+    "startTimeMs": "1760448591956",
+    "endTimeMs": "1760449011956",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "818-5415",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2139315145878409246",
+    "startTimeMs": "1760402131881",
+    "endTimeMs": "1760402431881",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "264-0902",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2139315145878409246",
+    "startTimeMs": "1760402131881",
+    "endTimeMs": "1760402431881",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "264-0902",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2137302220650316392",
+    "startTimeMs": "1759933455171",
+    "endTimeMs": "1759933755171",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "828-3699",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2137001597939005992",
+    "startTimeMs": "1759863461804",
+    "endTimeMs": "1759863761804",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "283-4703",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2136718871195585080",
+    "startTimeMs": "1759797637834",
+    "endTimeMs": "1759797937834",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "711-8490",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2136552258376132870",
+    "startTimeMs": "1759758840869",
+    "endTimeMs": "1759759500869",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 660000,
+    "rideableName": "751-2973",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135156167563712718",
+    "startTimeMs": "1759433792761",
+    "endTimeMs": "1759434092761",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "776-6686",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135154127489040006",
+    "startTimeMs": "1759433312816",
+    "endTimeMs": "1759433552816",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "344-4486",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135113043785713498",
+    "startTimeMs": "1759423753159",
+    "endTimeMs": "1759423873159",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "543-2158",
+    "startAddress": "E 6 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135110366833701020",
+    "startTimeMs": "1759423125427",
+    "endTimeMs": "1759423185427",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "83009",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135093263866632862",
+    "startTimeMs": "1759419144148",
+    "endTimeMs": "1759419264148",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "766-5037",
+    "startAddress": "E 6 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135093263866632862",
+    "startTimeMs": "1759419144148",
+    "endTimeMs": "1759419264148",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "766-5037",
+    "startAddress": "E 6 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135090422243321094",
+    "startTimeMs": "1759418490751",
+    "endTimeMs": "1759418610751",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "73345",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135079092565593276",
+    "startTimeMs": "1759415844528",
+    "endTimeMs": "1759415964528",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "17839",
+    "startAddress": "E 6 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2135074616079336510",
+    "startTimeMs": "1759414805400",
+    "endTimeMs": "1759414925400",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "832-9724",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2134716862985405112",
+    "startTimeMs": "1759331504077",
+    "endTimeMs": "1759331984077",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "686-5950",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2134323556170262404",
+    "startTimeMs": "1759239931645",
+    "endTimeMs": "1759240291645",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "570-9100",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2134095421012884436",
+    "startTimeMs": "1759186817629",
+    "endTimeMs": "1759187237629",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "774-2075",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133998988241866536",
+    "startTimeMs": "1759164360323",
+    "endTimeMs": "1759164660323",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "820-3341",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133739496922930552",
+    "startTimeMs": "1759103946834",
+    "endTimeMs": "1759104366834",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "231-9341",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "W 4 St & 7 Ave S",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133494710586598198",
+    "startTimeMs": "1759046950817",
+    "endTimeMs": "1759047130817",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 180000,
+    "rideableName": "499-6534",
+    "startAddress": "Broadway & E 14 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133494710586598198",
+    "startTimeMs": "1759046950817",
+    "endTimeMs": "1759047130817",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 180000,
+    "rideableName": "499-6534",
+    "startAddress": "Broadway & E 14 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133259100598195164",
+    "startTimeMs": "1758992109574",
+    "endTimeMs": "1758993189574",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 1080000,
+    "rideableName": "840-4501",
+    "startAddress": "6 Ave & W 33 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133032414244242388",
+    "startTimeMs": "1758939314930",
+    "endTimeMs": "1758939674930",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "224-1255",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2133012988750577500",
+    "startTimeMs": "1758934791722",
+    "endTimeMs": "1758936291722",
+    "price": {
+      "formatted": "$6.80"
+    },
+    "duration": 1500000,
+    "rideableName": "600-9294",
+    "startAddress": "South St & Gouverneur Ln",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 25 min)",
+        "amount": {
+          "formatted": "$6.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.55"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2132806559857417922",
+    "startTimeMs": "1758886728319",
+    "endTimeMs": "1758887028319",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "814-2564",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2132630165025083760",
+    "startTimeMs": "1758845664830",
+    "endTimeMs": "1758846024830",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "675-9120",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2132227178807647662",
+    "startTimeMs": "1758751835363",
+    "endTimeMs": "1758751955363",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "360-0392",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2132200357516627152",
+    "startTimeMs": "1758745587429",
+    "endTimeMs": "1758745947429",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "247-7842",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2132087011340986988",
+    "startTimeMs": "1758719196166",
+    "endTimeMs": "1758719496166",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "73345",
+    "startAddress": "E 10 St & 5 Ave",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2131852056490370042",
+    "startTimeMs": "1758664495396",
+    "endTimeMs": "1758664855396",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "497-8672",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2131852056490370042",
+    "startTimeMs": "1758664495396",
+    "endTimeMs": "1758664855396",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "497-8672",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2131851948304190250",
+    "startTimeMs": "1758664471405",
+    "endTimeMs": "1758664531405",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "525-0824",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2131734214495617446",
+    "startTimeMs": "1758637052835",
+    "endTimeMs": "1758637472835",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "451-9369",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2128320284362252208",
+    "startTimeMs": "1757842183614",
+    "endTimeMs": "1757842363614",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 180000,
+    "rideableName": "552-5050",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 14 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2127034132015226208",
+    "startTimeMs": "1757542733458",
+    "endTimeMs": "1757543213458",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "540-3597",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2127034006506110768",
+    "startTimeMs": "1757542701782",
+    "endTimeMs": "1757542761782",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "679-5082",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2126545567335461172",
+    "startTimeMs": "1757428977605",
+    "endTimeMs": "1757429217605",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "825-3510",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2126292836717000434",
+    "startTimeMs": "1757370140966",
+    "endTimeMs": "1757370500966",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "640-7944",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2126155672950546480",
+    "startTimeMs": "1757338196400",
+    "endTimeMs": "1757338856400",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 660000,
+    "rideableName": "799-2399",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2125196801210789994",
+    "startTimeMs": "1757114949671",
+    "endTimeMs": "1757115669671",
+    "price": {
+      "formatted": "$3.27"
+    },
+    "duration": 720000,
+    "rideableName": "496-1496",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "8 Ave & W 31 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 12 min)",
+        "amount": {
+          "formatted": "$3.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.27"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2125196801210789994",
+    "startTimeMs": "1757114949671",
+    "endTimeMs": "1757115669671",
+    "price": {
+      "formatted": "$3.27"
+    },
+    "duration": 720000,
+    "rideableName": "496-1496",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "8 Ave & W 31 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 12 min)",
+        "amount": {
+          "formatted": "$3.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.27"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2125179646339395356",
+    "startTimeMs": "1757110950798",
+    "endTimeMs": "1757111370798",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "357-2302",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2125063136851698182",
+    "startTimeMs": "1757083821489",
+    "endTimeMs": "1757084181489",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "641-6267",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2124702292935493116",
+    "startTimeMs": "1756999806864",
+    "endTimeMs": "1757000106864",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "742-9673",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2124290127784350240",
+    "startTimeMs": "1756903840665",
+    "endTimeMs": "1756904200665",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "683-1234",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2123905172515349878",
+    "startTimeMs": "1756814213084",
+    "endTimeMs": "1756814453084",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "877-7245",
+    "startAddress": "4 Ave & E 12 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2122624681657656688",
+    "startTimeMs": "1756516076217",
+    "endTimeMs": "1756516556217",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "40588",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2122489534689312580",
+    "startTimeMs": "1756484608169",
+    "endTimeMs": "1756484908169",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "42084",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2122146686697978864",
+    "startTimeMs": "1756404785028",
+    "endTimeMs": "1756405085028",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "532-2128",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2122068968549891352",
+    "startTimeMs": "1756386687542",
+    "endTimeMs": "1756386987542",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "619-1894",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2122068968549891352",
+    "startTimeMs": "1756386687542",
+    "endTimeMs": "1756386987542",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "619-1894",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121859881488007666",
+    "startTimeMs": "1756338007422",
+    "endTimeMs": "1756338307422",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "478-2025",
+    "startAddress": "Washington Pl & 6 Ave",
+    "endAddress": "Mercer St & Spring St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121843533603103062",
+    "startTimeMs": "1756334203131",
+    "endTimeMs": "1756334563131",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "588-6650",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Washington Pl & 6 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121839144905499746",
+    "startTimeMs": "1756333181979",
+    "endTimeMs": "1756333601979",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "515-3184",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121691425962781032",
+    "startTimeMs": "1756298784203",
+    "endTimeMs": "1756299084203",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "514-8200",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121479366561726484",
+    "startTimeMs": "1756249418623",
+    "endTimeMs": "1756250738623",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1320000,
+    "rideableName": "649-5790",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Montague St & Hicks St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121473094063877064",
+    "startTimeMs": "1756247954618",
+    "endTimeMs": "1756248314618",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "349-4077",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121323709385926086",
+    "startTimeMs": "1756213172677",
+    "endTimeMs": "1756213472677",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "275-7276",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2121085637251811004",
+    "startTimeMs": "1756157744820",
+    "endTimeMs": "1756158224820",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "855-4339",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2120993954094155162",
+    "startTimeMs": "1756136391568",
+    "endTimeMs": "1756136571568",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "393-0054",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2120993954094155162",
+    "startTimeMs": "1756136391568",
+    "endTimeMs": "1756136571568",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "393-0054",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2119557783725822402",
+    "startTimeMs": "1755802013281",
+    "endTimeMs": "1755802433281",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "281-5710",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2119554678554978642",
+    "startTimeMs": "1755801289330",
+    "endTimeMs": "1755801589330",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "281-5710",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2118889401719319046",
+    "startTimeMs": "1755646389972",
+    "endTimeMs": "1755646749972",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "845-0264",
+    "startAddress": "E 17 St & Broadway",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2118734086536459098",
+    "startTimeMs": "1755610225771",
+    "endTimeMs": "1755610645771",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "42915",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2117420893980207802",
+    "startTimeMs": "1755304476101",
+    "endTimeMs": "1755305016101",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 540000,
+    "rideableName": "247-4351",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2117264722540424700",
+    "startTimeMs": "1755268111381",
+    "endTimeMs": "1755268471381",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "544-4484",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2117096745033213118",
+    "startTimeMs": "1755229000514",
+    "endTimeMs": "1755229360514",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "43917",
+    "startAddress": "E 14 St & 1 Ave",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2117068276496517800",
+    "startTimeMs": "1755222390533",
+    "endTimeMs": "1755222750533",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "743-8740",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 13 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116951860623427898",
+    "startTimeMs": "1755195267194",
+    "endTimeMs": "1755195507194",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "83369",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116951860623427898",
+    "startTimeMs": "1755195267194",
+    "endTimeMs": "1755195507194",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "83369",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116524661089190560",
+    "startTimeMs": "1755095808217",
+    "endTimeMs": "1755096048217",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "608-8074",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116295931238055946",
+    "startTimeMs": "1755042554735",
+    "endTimeMs": "1755043874735",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1320000,
+    "rideableName": "348-9168",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "Atlantic Ave & Furman St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116281117396108186",
+    "startTimeMs": "1755039104866",
+    "endTimeMs": "1755039524866",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "278-7182",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2116164569201562998",
+    "startTimeMs": "1755011961918",
+    "endTimeMs": "1755012201918",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "235-5139",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2115906654174832972",
+    "startTimeMs": "1754951914168",
+    "endTimeMs": "1754952514168",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "795-3144",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 4 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2115756378845577254",
+    "startTimeMs": "1754916924436",
+    "endTimeMs": "1754917224436",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "557-2623",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2114829915111337772",
+    "startTimeMs": "1754701217094",
+    "endTimeMs": "1754701577094",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "230-7916",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2114665218482020832",
+    "startTimeMs": "1754662867374",
+    "endTimeMs": "1754663227374",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "738-3284",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2114281007786744920",
+    "startTimeMs": "1754573411054",
+    "endTimeMs": "1754573711054",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "593-9814",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2114281007786744920",
+    "startTimeMs": "1754573411054",
+    "endTimeMs": "1754573711054",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "593-9814",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2114063213020787448",
+    "startTimeMs": "1754522705154",
+    "endTimeMs": "1754523125154",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "576-8890",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113946495045835938",
+    "startTimeMs": "1754495531114",
+    "endTimeMs": "1754496011114",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "279-3297",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113710129530398076",
+    "startTimeMs": "1754440496350",
+    "endTimeMs": "1754441696350",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1200000,
+    "rideableName": "351-2134",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Montague St & Hicks St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113709973884849860",
+    "startTimeMs": "1754440461234",
+    "endTimeMs": "1754440521234",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "490-6459",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113703491020667934",
+    "startTimeMs": "1754438952353",
+    "endTimeMs": "1754439372353",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "237-9311",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113567484481286922",
+    "startTimeMs": "1754407283665",
+    "endTimeMs": "1754407583665",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "633-8826",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2113160572499994958",
+    "startTimeMs": "1754312543147",
+    "endTimeMs": "1754312903147",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "769-2262",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2112939802817395598",
+    "startTimeMs": "1754261146577",
+    "endTimeMs": "1754261446577",
+    "price": {
+      "formatted": "$1.36"
+    },
+    "duration": 300000,
+    "rideableName": "652-1660",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Mott St & Prince St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.11"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2112197550578719094",
+    "startTimeMs": "1754088326471",
+    "endTimeMs": "1754088746471",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "683-5235",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2112197550578719094",
+    "startTimeMs": "1754088326471",
+    "endTimeMs": "1754088746471",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "683-5235",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2112085767124253570",
+    "startTimeMs": "1754062295623",
+    "endTimeMs": "1754062535623",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "396-8237",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2111711769374080208",
+    "startTimeMs": "1753975215039",
+    "endTimeMs": "1753975515039",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "86648",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2111474489981806650",
+    "startTimeMs": "1753919973479",
+    "endTimeMs": "1753920273479",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "86574",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2111324449721815066",
+    "startTimeMs": "1753885036554",
+    "endTimeMs": "1753885336554",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "327-7894",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2111091190402047188",
+    "startTimeMs": "1753830724166",
+    "endTimeMs": "1753832404166",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1680000,
+    "rideableName": "291-7128",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Henry St & Atlantic Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2111086696316135896",
+    "startTimeMs": "1753829679042",
+    "endTimeMs": "1753830099042",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "312-9020",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2110962314835500972",
+    "startTimeMs": "1753800719953",
+    "endTimeMs": "1753801199953",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "585-6075",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 16 St & Irving Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2110711517921404280",
+    "startTimeMs": "1753742326587",
+    "endTimeMs": "1753742926587",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "251-1863",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "1 Ave & E 6 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2109637625376800514",
+    "startTimeMs": "1753492296056",
+    "endTimeMs": "1753492896056",
+    "price": {
+      "formatted": "$2.72"
+    },
+    "duration": 600000,
+    "rideableName": "602-3071",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 33 St & 1 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 10 min)",
+        "amount": {
+          "formatted": "$2.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.22"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2109637625376800514",
+    "startTimeMs": "1753492296056",
+    "endTimeMs": "1753492896056",
+    "price": {
+      "formatted": "$2.72"
+    },
+    "duration": 600000,
+    "rideableName": "602-3071",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 33 St & 1 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 10 min)",
+        "amount": {
+          "formatted": "$2.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.22"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2109603570129981080",
+    "startTimeMs": "1753484365063",
+    "endTimeMs": "1753484965063",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "42137",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2109473003809200258",
+    "startTimeMs": "1753453967976",
+    "endTimeMs": "1753454327976",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "86093",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2109089047347044042",
+    "startTimeMs": "1753364573285",
+    "endTimeMs": "1753364873285",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "207-9242",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2108902036719843726",
+    "startTimeMs": "1753321027173",
+    "endTimeMs": "1753321507173",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "578-4665",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2108737005310792288",
+    "startTimeMs": "1753282605183",
+    "endTimeMs": "1753283385183",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 780000,
+    "rideableName": "41380",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2108388279555395768",
+    "startTimeMs": "1753201409254",
+    "endTimeMs": "1753201829254",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "834-1422",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2108118518691361560",
+    "startTimeMs": "1753138605007",
+    "endTimeMs": "1753139085007",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "737-5652",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 6 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2107759982609442272",
+    "startTimeMs": "1753055126181",
+    "endTimeMs": "1753055786181",
+    "price": {
+      "formatted": "$2.99"
+    },
+    "duration": 660000,
+    "rideableName": "310-7786",
+    "startAddress": "W 20 St & 8 Ave",
+    "endAddress": "University Pl & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 11 min)",
+        "amount": {
+          "formatted": "$2.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.24"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2106884562517467688",
+    "startTimeMs": "1752851298828",
+    "endTimeMs": "1752851658828",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "675-9476",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2106884562517467688",
+    "startTimeMs": "1752851298828",
+    "endTimeMs": "1752851658828",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "675-9476",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2106491422531946402",
+    "startTimeMs": "1752759765550",
+    "endTimeMs": "1752760065550",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "786-8169",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2106276260336165832",
+    "startTimeMs": "1752709668994",
+    "endTimeMs": "1752710208994",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 540000,
+    "rideableName": "419-7646",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2106133905291142624",
+    "startTimeMs": "1752676526065",
+    "endTimeMs": "1752677006065",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "645-4607",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 21 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2105824619098481356",
+    "startTimeMs": "1752604508321",
+    "endTimeMs": "1752604808321",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "683-1960",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2105397148746189734",
+    "startTimeMs": "1752504978765",
+    "endTimeMs": "1752505818765",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 840000,
+    "rideableName": "858-6554",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 20 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104763679019224152",
+    "startTimeMs": "1752357489942",
+    "endTimeMs": "1752357729942",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "237-9758",
+    "startAddress": "E 11 St & 1 Ave",
+    "endAddress": "E 22 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104762549141065606",
+    "startTimeMs": "1752357224702",
+    "endTimeMs": "1752357404702",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "237-9758",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "E 11 St & 1 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104759410298445434",
+    "startTimeMs": "1752356494333",
+    "endTimeMs": "1752356734333",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "741-2331",
+    "startAddress": "E 22 St & 2 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104592791114026992",
+    "startTimeMs": "1752317697866",
+    "endTimeMs": "1752319137866",
+    "price": {
+      "formatted": "$6.53"
+    },
+    "duration": 1440000,
+    "rideableName": "508-4413",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 72 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 24 min)",
+        "amount": {
+          "formatted": "$6.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.53"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104592791114026992",
+    "startTimeMs": "1752317697866",
+    "endTimeMs": "1752319137866",
+    "price": {
+      "formatted": "$6.53"
+    },
+    "duration": 1440000,
+    "rideableName": "508-4413",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 72 St & Park Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 24 min)",
+        "amount": {
+          "formatted": "$6.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.53"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2104265770417357212",
+    "startTimeMs": "1752241559023",
+    "endTimeMs": "1752241919023",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "479-3105",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2103923578883786554",
+    "startTimeMs": "1752161887593",
+    "endTimeMs": "1752162247593",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "579-0092",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2103522271635796410",
+    "startTimeMs": "1752068450777",
+    "endTimeMs": "1752068930777",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "794-0869",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2103310501128705184",
+    "startTimeMs": "1752019142337",
+    "endTimeMs": "1752020702337",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1560000,
+    "rideableName": "610-9672",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Atlantic Ave & Furman St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2103306301148529134",
+    "startTimeMs": "1752018165044",
+    "endTimeMs": "1752018525044",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "680-6434",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2103145054128317596",
+    "startTimeMs": "1751980634062",
+    "endTimeMs": "1751980994062",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "208-7989",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Broadway & E 19 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2102889687230783664",
+    "startTimeMs": "1751921166962",
+    "endTimeMs": "1751921526962",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "276-5592",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2102767691395417932",
+    "startTimeMs": "1751892761621",
+    "endTimeMs": "1751893061621",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "696-4936",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2101281146903940932",
+    "startTimeMs": "1751546667474",
+    "endTimeMs": "1751546907474",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "273-1248",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2101281146903940932",
+    "startTimeMs": "1751546667474",
+    "endTimeMs": "1751546907474",
+    "price": {
+      "formatted": "$1.09"
+    },
+    "duration": 240000,
+    "rideableName": "273-1248",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 4 min)",
+        "amount": {
+          "formatted": "$1.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.09"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2100940338836908124",
+    "startTimeMs": "1751467296213",
+    "endTimeMs": "1751467596213",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "562-0174",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2100567078185922540",
+    "startTimeMs": "1751380400167",
+    "endTimeMs": "1751380700167",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "534-1581",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2100377211982961474",
+    "startTimeMs": "1751336182298",
+    "endTimeMs": "1751336482298",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "607-2680",
+    "startAddress": "E 14 St & 1 Ave",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2100335542154626530",
+    "startTimeMs": "1751326485079",
+    "endTimeMs": "1751326845079",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "346-8113",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "1 Ave & E 18 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2100192435952417570",
+    "startTimeMs": "1751293166060",
+    "endTimeMs": "1751293466060",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 300000,
+    "rideableName": "55635",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2098358904336844190",
+    "startTimeMs": "1750866265025",
+    "endTimeMs": "1750866625025",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "653-4630",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2098033563543954952",
+    "startTimeMs": "1750790511495",
+    "endTimeMs": "1750790751495",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "708-8556",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2097617258667094770",
+    "startTimeMs": "1750693579993",
+    "endTimeMs": "1750693819993",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 240000,
+    "rideableName": "33519",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "E 17 St & Broadway",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2091463338874974854",
+    "startTimeMs": "1749260766213",
+    "endTimeMs": "1749261306213",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "744-2999",
+    "startAddress": "E 6 St & Ave D",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2091463338874974854",
+    "startTimeMs": "1749260766213",
+    "endTimeMs": "1749261306213",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "744-2999",
+    "startAddress": "E 6 St & Ave D",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2089797431198531130",
+    "startTimeMs": "1748872902849",
+    "endTimeMs": "1748873442849",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "468-7380",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "E 16 St & Irving Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088443797725460778",
+    "startTimeMs": "1748557733997",
+    "endTimeMs": "1748557913997",
+    "price": {
+      "formatted": "$0.82"
+    },
+    "duration": 180000,
+    "rideableName": "383-6350",
+    "startAddress": "Ave A & E 14 St",
+    "endAddress": "St Marks Pl & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 3 min)",
+        "amount": {
+          "formatted": "$0.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.07"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088440746984052492",
+    "startTimeMs": "1748557015138",
+    "endTimeMs": "1748557555138",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "230-3527",
+    "startAddress": "W 4 St & 7 Ave S",
+    "endAddress": "Ave A & E 14 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088326685352444640",
+    "startTimeMs": "1748530465383",
+    "endTimeMs": "1748530825383",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "841-9665",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088326540302968172",
+    "startTimeMs": "1748530417279",
+    "endTimeMs": "1748530477279",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "16599",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088326297643474626",
+    "startTimeMs": "1748530363349",
+    "endTimeMs": "1748530423349",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 60000,
+    "rideableName": "40509",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2088073741334176962",
+    "startTimeMs": "1748471561394",
+    "endTimeMs": "1748472101394",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "515-6237",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2087989110273204758",
+    "startTimeMs": "1748451869566",
+    "endTimeMs": "1748452229566",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "640-8678",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2087557200848861052",
+    "startTimeMs": "1748351294659",
+    "endTimeMs": "1748351714659",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "581-5857",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2087557200848861052",
+    "startTimeMs": "1748351294659",
+    "endTimeMs": "1748351714659",
+    "price": {
+      "formatted": "$1.91"
+    },
+    "duration": 420000,
+    "rideableName": "581-5857",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.16"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2086091503759243280",
+    "startTimeMs": "1748010035352",
+    "endTimeMs": "1748010515352",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "838-7854",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2085844138475778274",
+    "startTimeMs": "1747952445534",
+    "endTimeMs": "1747952925534",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "426-4339",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2085718847057706410",
+    "startTimeMs": "1747923268003",
+    "endTimeMs": "1747923628003",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "464-2047",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2085479555289431088",
+    "startTimeMs": "1747867559564",
+    "endTimeMs": "1747868099564",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "346-6778",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2085387221316598750",
+    "startTimeMs": "1747846070207",
+    "endTimeMs": "1747846430207",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "679-8946",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2084976385268788254",
+    "startTimeMs": "1747750414378",
+    "endTimeMs": "1747750894378",
+    "price": {
+      "formatted": "$2.18"
+    },
+    "duration": 480000,
+    "rideableName": "268-2326",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.18"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2084723781517939182",
+    "startTimeMs": "1747691590215",
+    "endTimeMs": "1747692130215",
+    "price": {
+      "formatted": "$2.45"
+    },
+    "duration": 540000,
+    "rideableName": "824-5037",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.20"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2084623227388929514",
+    "startTimeMs": "1747668178699",
+    "endTimeMs": "1747668598699",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "750-3147",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "Ebike minutes used (7 min)",
+        "amount": {
+          "formatted": "-$1.75"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2084622780638564842",
+    "startTimeMs": "1747668069632",
+    "endTimeMs": "1747668189632",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "848-7886",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2084622780638564842",
+    "startTimeMs": "1747668069632",
+    "endTimeMs": "1747668189632",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 120000,
+    "rideableName": "848-7886",
+    "startAddress": "Cooper Square & Astor Pl",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2083702528325967202",
+    "startTimeMs": "1747453821425",
+    "endTimeMs": "1747454301425",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "43217",
+    "startAddress": "Washington Pl & 6 Ave",
+    "endAddress": "8 Ave & W 16 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2083606608251725740",
+    "startTimeMs": "1747431476585",
+    "endTimeMs": "1747432076585",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 600000,
+    "rideableName": "606-2483",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Cooper Square & Astor Pl",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 10 min)",
+        "amount": {
+          "formatted": "$2.50"
+        }
+      },
+      {
+        "title": "Ebike minutes used (10 min)",
+        "amount": {
+          "formatted": "-$2.50"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2083520481184527352",
+    "startTimeMs": "1747411422179",
+    "endTimeMs": "1747411782179",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "703-8946",
+    "startAddress": "E 9 St & 5 Ave",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "Ebike minutes used (6 min)",
+        "amount": {
+          "formatted": "-$1.50"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2083245057366453400",
+    "startTimeMs": "1747347292598",
+    "endTimeMs": "1747347772598",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "741-8866",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.00"
+        }
+      },
+      {
+        "title": "Ebike minutes used (8 min)",
+        "amount": {
+          "formatted": "-$2.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2083131901526759508",
+    "startTimeMs": "1747320944975",
+    "endTimeMs": "1747321304975",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 360000,
+    "rideableName": "288-7735",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "Ebike minutes used (6 min)",
+        "amount": {
+          "formatted": "-$1.50"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2082745579235594434",
+    "startTimeMs": "1747230997176",
+    "endTimeMs": "1747231417176",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "707-5351",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "Ebike minutes used (7 min)",
+        "amount": {
+          "formatted": "-$1.75"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2082513503617939284",
+    "startTimeMs": "1747176979314",
+    "endTimeMs": "1747177519314",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 540000,
+    "rideableName": "359-8919",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 9 min)",
+        "amount": {
+          "formatted": "$2.25"
+        }
+      },
+      {
+        "title": "Ebike minutes used (9 min)",
+        "amount": {
+          "formatted": "-$2.25"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2082381925766866378",
+    "startTimeMs": "1747146328832",
+    "endTimeMs": "1747146748832",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "783-6398",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2081997155892048772",
+    "startTimeMs": "1747056741276",
+    "endTimeMs": "1747057161276",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "260-8990",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "Ebike minutes used (7 min)",
+        "amount": {
+          "formatted": "-$1.75"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2081997155892048772",
+    "startTimeMs": "1747056741276",
+    "endTimeMs": "1747057161276",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 420000,
+    "rideableName": "260-8990",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 7 min)",
+        "amount": {
+          "formatted": "$1.75"
+        }
+      },
+      {
+        "title": "Ebike minutes used (7 min)",
+        "amount": {
+          "formatted": "-$1.75"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2080259997001250294",
+    "startTimeMs": "1746652294509",
+    "endTimeMs": "1746653554509",
+    "price": {
+      "formatted": "$5.44"
+    },
+    "duration": 1260000,
+    "rideableName": "761-7434",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "S 2 St & Kent Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min, up to $5.00)",
+        "amount": {
+          "formatted": "$5.00"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.44"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2080176167239408174",
+    "startTimeMs": "1746632759673",
+    "endTimeMs": "1746633119673",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "606-0883",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2079785313376917094",
+    "startTimeMs": "1746541757259",
+    "endTimeMs": "1746542117259",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "399-3672",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2079449197079431218",
+    "startTimeMs": "1746463499659",
+    "endTimeMs": "1746463859659",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "445-3510",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2077730442623431340",
+    "startTimeMs": "1746063336933",
+    "endTimeMs": "1746064236933",
+    "price": {
+      "formatted": "$4.08"
+    },
+    "duration": 900000,
+    "rideableName": "248-1877",
+    "startAddress": "St Marks Pl & 2 Ave",
+    "endAddress": "S 2 St & Kent Ave",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 15 min)",
+        "amount": {
+          "formatted": "$3.75"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.33"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2077552180289413192",
+    "startTimeMs": "1746021814812",
+    "endTimeMs": "1746022174812",
+    "price": {
+      "formatted": "$1.63"
+    },
+    "duration": 360000,
+    "rideableName": "759-6109",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.25 per min for 6 min)",
+        "amount": {
+          "formatted": "$1.50"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.13"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2075310574244515590",
+    "startTimeMs": "1745499900551",
+    "endTimeMs": "1745500380551",
+    "price": {
+      "formatted": "$0.00"
+    },
+    "duration": 480000,
+    "rideableName": "270-4500",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Free unlock",
+        "amount": {
+          "formatted": "$0.00"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2075074864955455182",
+    "startTimeMs": "1745445021227",
+    "endTimeMs": "1745445441227",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "403-2470",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2074991931211611064",
+    "startTimeMs": "1745425709343",
+    "endTimeMs": "1745426069343",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "478-5226",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2074991931211611064",
+    "startTimeMs": "1745425709343",
+    "endTimeMs": "1745426069343",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "478-5226",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2074346813484394710",
+    "startTimeMs": "1745275510584",
+    "endTimeMs": "1745276170584",
+    "price": {
+      "formatted": "$9.98"
+    },
+    "duration": 660000,
+    "rideableName": "339-8450",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "E 4 St & 2 Ave",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 11 min)",
+        "amount": {
+          "formatted": "$4.18"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.81"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2074208690014521614",
+    "startTimeMs": "1745243347706",
+    "endTimeMs": "1745243767706",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "676-8832",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2073733555368747682",
+    "startTimeMs": "1745132736444",
+    "endTimeMs": "1745133216444",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 480000,
+    "rideableName": "666-9832",
+    "startAddress": "Christopher St & Greenwich St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 8 min)",
+        "amount": {
+          "formatted": "$3.04"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2073533462868222586",
+    "startTimeMs": "1745086136562",
+    "endTimeMs": "1745086556562",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "896-2722",
+    "startAddress": "Broadway & E 19 St",
+    "endAddress": "E 10 St & Ave A",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2073283526229997698",
+    "startTimeMs": "1745027958435",
+    "endTimeMs": "1745028318435",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "853-4844",
+    "startAddress": "E 20 St & 2 Ave",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2071967886811752280",
+    "startTimeMs": "1744721620176",
+    "endTimeMs": "1744722040176",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "711-0679",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2071604330343964034",
+    "startTimeMs": "1744636972598",
+    "endTimeMs": "1744637332598",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "209-5313",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2070609778073472570",
+    "startTimeMs": "1744405428099",
+    "endTimeMs": "1744406088099",
+    "price": {
+      "formatted": "$9.98"
+    },
+    "duration": 660000,
+    "rideableName": "728-5455",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 11 min)",
+        "amount": {
+          "formatted": "$4.18"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.81"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2070124197087268574",
+    "startTimeMs": "1744292353213",
+    "endTimeMs": "1744292833213",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 480000,
+    "rideableName": "768-0507",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 8 min)",
+        "amount": {
+          "formatted": "$3.04"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2070124197087268574",
+    "startTimeMs": "1744292353213",
+    "endTimeMs": "1744292833213",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 480000,
+    "rideableName": "768-0507",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 8 min)",
+        "amount": {
+          "formatted": "$3.04"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2069368680926887198",
+    "startTimeMs": "1744116444829",
+    "endTimeMs": "1744116864829",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "368-0444",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2069060266400412744",
+    "startTimeMs": "1744044637141",
+    "endTimeMs": "1744045057141",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "241-4886",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2067517451176020284",
+    "startTimeMs": "1743685421794",
+    "endTimeMs": "1743685781794",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "402-0855",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2067150433630294260",
+    "startTimeMs": "1743599969352",
+    "endTimeMs": "1743600389352",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "471-9928",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2066771760971515348",
+    "startTimeMs": "1743511804087",
+    "endTimeMs": "1743512164087",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "255-4814",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2066401880512847110",
+    "startTimeMs": "1743425682488",
+    "endTimeMs": "1743426102488",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "822-6565",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2056767395043946892",
+    "startTimeMs": "1741182479933",
+    "endTimeMs": "1741182839933",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "259-4919",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2056078489833319230",
+    "startTimeMs": "1741022081342",
+    "endTimeMs": "1741022441342",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "398-0117",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2055046245144126646",
+    "startTimeMs": "1740781759493",
+    "endTimeMs": "1740782239493",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 480000,
+    "rideableName": "454-2031",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 8 min)",
+        "amount": {
+          "formatted": "$3.04"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2055046245144126646",
+    "startTimeMs": "1740781759493",
+    "endTimeMs": "1740782239493",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 480000,
+    "rideableName": "454-2031",
+    "startAddress": "Greenwich St & Perry St",
+    "endAddress": "Lafayette St & E 8 St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 8 min)",
+        "amount": {
+          "formatted": "$3.04"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2054911234916348550",
+    "startTimeMs": "1740750308065",
+    "endTimeMs": "1740750668065",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "343-0022",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2051966954917997512",
+    "startTimeMs": "1740064789006",
+    "endTimeMs": "1740065149006",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "556-0263",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2051247546210779002",
+    "startTimeMs": "1739897289921",
+    "endTimeMs": "1739897649921",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "731-9452",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2049721480943039564",
+    "startTimeMs": "1739541974389",
+    "endTimeMs": "1739542394389",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "406-9340",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2049353812711352222",
+    "startTimeMs": "1739456386854",
+    "endTimeMs": "1739456686854",
+    "price": {
+      "formatted": "$7.50"
+    },
+    "duration": 300000,
+    "rideableName": "338-7214",
+    "startAddress": "E 9 St & 5 Ave",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 5 min)",
+        "amount": {
+          "formatted": "$1.90"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.61"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2041237530782145224",
+    "startTimeMs": "1737566651925",
+    "endTimeMs": "1737567011925",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "617-7109",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2038634640558900964",
+    "startTimeMs": "1736960619712",
+    "endTimeMs": "1736960979712",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "249-9234",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2037863463856830482",
+    "startTimeMs": "1736781065560",
+    "endTimeMs": "1736781425560",
+    "price": {
+      "formatted": "$7.92"
+    },
+    "duration": 360000,
+    "rideableName": "898-8248",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.28"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2036027608212855756",
+    "startTimeMs": "1736353622662",
+    "endTimeMs": "1736354042662",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "535-9096",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2036027608212855756",
+    "startTimeMs": "1736353622662",
+    "endTimeMs": "1736354042662",
+    "price": {
+      "formatted": "$8.33"
+    },
+    "duration": 420000,
+    "rideableName": "535-9096",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.99"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.38 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.66"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2034148523753746338",
+    "startTimeMs": "1735916114990",
+    "endTimeMs": "1735916654990",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 540000,
+    "rideableName": "288-3742",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Bank St & Washington St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 9 min)",
+        "amount": {
+          "formatted": "$3.24"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2033771870459149840",
+    "startTimeMs": "1735828417106",
+    "endTimeMs": "1735828777106",
+    "price": {
+      "formatted": "$7.57"
+    },
+    "duration": 360000,
+    "rideableName": "745-5959",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.16"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.62"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2032741203447068716",
+    "startTimeMs": "1735588445093",
+    "endTimeMs": "1735588865093",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "724-2043",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2026373372395623360",
+    "startTimeMs": "1734105819284",
+    "endTimeMs": "1734106299284",
+    "price": {
+      "formatted": "$8.35"
+    },
+    "duration": 480000,
+    "rideableName": "372-3624",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Carmine St & 6 Ave",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.88"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2025987112073114152",
+    "startTimeMs": "1734015887101",
+    "endTimeMs": "1734016247101",
+    "price": {
+      "formatted": "$7.57"
+    },
+    "duration": 360000,
+    "rideableName": "439-0480",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.16"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.62"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2025272020564362910",
+    "startTimeMs": "1733849395561",
+    "endTimeMs": "1733849755561",
+    "price": {
+      "formatted": "$7.57"
+    },
+    "duration": 360000,
+    "rideableName": "455-3426",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.16"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.62"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2024870959550508690",
+    "startTimeMs": "1733756012742",
+    "endTimeMs": "1733756372742",
+    "price": {
+      "formatted": "$7.57"
+    },
+    "duration": 360000,
+    "rideableName": "297-6892",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.16"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.62"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2024669454357471540",
+    "startTimeMs": "1733709096562",
+    "endTimeMs": "1733709516562",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "899-5318",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Carmine St & 6 Ave",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2013403802080107646",
+    "startTimeMs": "1731086107402",
+    "endTimeMs": "1731086527402",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "784-0002",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2013403802080107646",
+    "startTimeMs": "1731086107402",
+    "endTimeMs": "1731086527402",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "784-0002",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2012623295098424202",
+    "startTimeMs": "1730904380346",
+    "endTimeMs": "1730904740346",
+    "price": {
+      "formatted": "$7.57"
+    },
+    "duration": 360000,
+    "rideableName": "332-0264",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 6 min)",
+        "amount": {
+          "formatted": "$2.16"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.62"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2007465170219159282",
+    "startTimeMs": "1729703411002",
+    "endTimeMs": "1729703831002",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "339-0440",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2004835400004523652",
+    "startTimeMs": "1729091120169",
+    "endTimeMs": "1729091540169",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "458-4686",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "2004466079709522946",
+    "startTimeMs": "1729005148673",
+    "endTimeMs": "1729005688673",
+    "price": {
+      "formatted": "$8.74"
+    },
+    "duration": 540000,
+    "rideableName": "268-5196",
+    "startAddress": "E 9 St & 5 Ave",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 9 min)",
+        "amount": {
+          "formatted": "$3.24"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.71"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "1997757574316102072",
+    "startTimeMs": "1727443185081",
+    "endTimeMs": "1727443605081",
+    "price": {
+      "formatted": "$7.96"
+    },
+    "duration": 420000,
+    "rideableName": "363-2510",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 7 min)",
+        "amount": {
+          "formatted": "$2.52"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.65"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "1994055909517908830",
+    "startTimeMs": "1726581324709",
+    "endTimeMs": "1726581804709",
+    "price": {
+      "formatted": "$8.35"
+    },
+    "duration": 480000,
+    "rideableName": "701-0044",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Greenwich St & Perry St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "Ebike ride ($0.36 per min for 8 min)",
+        "amount": {
+          "formatted": "$2.88"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.68"
+        }
+      }
+    ]
+  },
+  {
+    "rideId": "1991451768073933308",
+    "startTimeMs": "1725974999552",
+    "endTimeMs": "1725975539552",
+    "price": {
+      "formatted": "$5.22"
+    },
+    "duration": 540000,
+    "rideableName": "738-1759",
+    "startAddress": "Lafayette St & E 8 St",
+    "endAddress": "Christopher St & Greenwich St",
+    "lineItems": [
+      {
+        "title": "Unlock fee",
+        "amount": {
+          "formatted": "$4.79"
+        }
+      },
+      {
+        "title": "NYC Sales Tax",
+        "amount": {
+          "formatted": "$0.43"
+        }
+      }
+    ]
+  }
+]
