@@ -52,6 +52,7 @@ citibike-bot/
 │       ├── routes.json                      # OSRM bike routes for 74 unique station pairs
 │       └── station_coords.json             # Station name -> lat/lon mapping from GBFS
 ├── strava/
+│   ├── dashboard.html          # Overview dashboard (stats, charts, trends, rankings)
 │   ├── index.html              # Run explorer (animated routes, heatmap, timelapse)
 │   ├── fetch_activities.py     # OAuth + Strava API data fetcher
 │   ├── build_dashboard.py      # Builds static HTML with baked-in data
@@ -60,7 +61,8 @@ citibike-bot/
 │       ├── activities_raw.json          # Raw API response (169 activities)
 │       └── activities_enriched.json     # Processed data for dashboard
 └── references/
-    └── tweet_animation
+    ├── tweet_animation
+    └── new_dashboards_spec.md  # Specs for Uber/Lyft, Apple Watch, Subway dashboards
 ```
 
 ### Key Architecture Decisions

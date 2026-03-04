@@ -272,6 +272,94 @@
     outline: 1px solid var(--text);
   }
 
+
+  /* Explore CTA banner */
+  .explore-cta {
+    margin: 20px 40px;
+    background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(251,146,60,0.08));
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 12px;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .explore-cta:hover { border-color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+  .explore-cta .cta-text h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .explore-cta .cta-text p {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .explore-cta .cta-btn {
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Run of the Day */
+  .run-of-day {
+    margin: 0 40px 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .run-of-day::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .run-of-day .rod-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .run-of-day .rod-header h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+  .run-of-day .rod-header .rod-date {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .run-of-day .rod-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .run-of-day .rod-stats {
+    display: flex;
+    gap: 24px;
+  }
+  .rod-stat .rod-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .rod-stat .rod-lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
   /* Footer */
   .footer {
     padding: 24px 40px;
@@ -301,6 +389,9 @@
 </div>
 
 <div class="stats-row" id="statsRow"></div>
+
+<div class="run-of-day" id="runOfDay"></div>
+
 
 <div class="map-section">
   <div class="map-container">
@@ -368,9 +459,16 @@
   </div>
 </div>
 
+<a href="index.html" class="explore-cta">
+  <div class="cta-text">
+    <h3>Explore Individual Runs</h3>
+    <p>Browse all runs with animated route replay, pace splits, heatmaps, and timelapse</p>
+  </div>
+  <div class="cta-btn">Open Run Explorer &rarr;</div>
+</a>
+
 <div class="footer">
-  Built with <span id="footerCount"></span> runs of Strava data &nbsp;|&nbsp;
-  <a href="index.html">Explore Individual Runs &rarr;</a>
+  Built with <span id="footerCount"></span> runs of Strava data
 </div>
 
 <script>
@@ -841,9 +939,43 @@ function renderRankings() {
 }
 
 // ============================================================
+// ============================================================
+// RUN OF THE DAY
+// ============================================================
+function renderRunOfDay() {
+  // Seed random by today's date so it's consistent within a day but changes daily
+  const today = new Date().toISOString().split('T')[0];
+  let hash = 0;
+  for (let i = 0; i < today.length; i++) { hash = ((hash << 5) - hash) + today.charCodeAt(i); hash |= 0; }
+  const idx = Math.abs(hash) % RUNS.length;
+  const run = RUNS[idx];
+
+  const d = new Date(run.startTime);
+  const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  const elevFt = run.total_elevation_gain ? Math.round(run.total_elevation_gain * 3.281) : null;
+
+  document.getElementById('runOfDay').innerHTML = `
+    <div class="rod-header">
+      <h3>Run of the Day</h3>
+      <div class="rod-date">${dateStr} at ${timeStr}</div>
+    </div>
+    <div class="rod-name">${run.name || 'Run'}</div>
+    <div class="rod-stats">
+      <div class="rod-stat"><div class="rod-val">${run.distance_mi} mi</div><div class="rod-lbl">Distance</div></div>
+      <div class="rod-stat"><div class="rod-val">${run.pace || '--'}</div><div class="rod-lbl">Pace</div></div>
+      <div class="rod-stat"><div class="rod-val">${fmtDuration(run.moving_time)}</div><div class="rod-lbl">Duration</div></div>
+      ${elevFt ? `<div class="rod-stat"><div class="rod-val">${elevFt} ft</div><div class="rod-lbl">Elevation</div></div>` : ''}
+      ${run.calories ? `<div class="rod-stat"><div class="rod-val">${Math.round(run.calories)}</div><div class="rod-lbl">Calories</div></div>` : ''}
+    </div>
+  `;
+}
+
 // INIT
 // ============================================================
 renderHeader();
+renderRunOfDay();
 renderRouteMap();
 renderHeatMap();
 renderDayHourGrid();

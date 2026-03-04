@@ -288,6 +288,108 @@
     outline: 1px solid var(--text);
   }
 
+
+  /* Nav links */
+  .header .nav-links {
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+  }
+  .header .nav-links a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .header .nav-links a:hover { text-decoration: underline; }
+
+  /* Explore CTA banner */
+  .explore-cta {
+    margin: 20px 40px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(6,182,212,0.08));
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 12px;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .explore-cta:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .explore-cta .cta-text h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .explore-cta .cta-text p {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .explore-cta .cta-btn {
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Ride of the Day */
+  .ride-of-day {
+    margin: 0 40px 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ride-of-day::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .ride-of-day .rod-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .ride-of-day .rod-header h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+  .ride-of-day .rod-header .rod-date {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .ride-of-day .rod-route {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .ride-of-day .rod-route .arrow { color: var(--accent); margin: 0 8px; }
+  .ride-of-day .rod-stats {
+    display: flex;
+    gap: 24px;
+  }
+  .rod-stat .rod-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .rod-stat .rod-lbl {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
   /* Footer */
   .footer {
     padding: 24px 40px;
@@ -313,11 +415,15 @@
   <div>
     <h1>Citi<span>Bike</span> Dashboard</h1>
     <div class="subtitle" id="dateRange"></div>
+    <div class="nav-links"><a href="../index.html">&larr; Home</a> <a href="explore.html">Ride Explorer &rarr;</a></div>
   </div>
   <div class="header-stats" id="headerStats"></div>
 </div>
 
 <div class="stats-row" id="statsRow"></div>
+
+<div class="ride-of-day" id="rideOfDay"></div>
+
 
 <div class="map-section">
   <div class="map-container">
@@ -379,8 +485,17 @@
   </div>
 </div>
 
+<a href="explore.html" class="explore-cta">
+  <div class="cta-text">
+    <h3>Explore Individual Rides</h3>
+    <p>Browse all 318 rides with route maps, filters, and keyboard navigation</p>
+  </div>
+  <div class="cta-btn">Open Ride Explorer &rarr;</div>
+</a>
+
 <div class="footer">
-  Built with 318 rides of real CitiBike data &nbsp;|&nbsp; <a href="explore.html" style="color:var(--accent)">Explore Individual Rides &rarr;</a>
+  Built with 318 rides of real CitiBike data
+</div>
 </div>
 
 <script>
@@ -443,7 +558,7 @@ function renderHeader() {
     <div class="stat-card"><div class="label">Avg Cost</div><div class="value">$${avgPrice}</div></div>
     <div class="stat-card"><div class="label">Ebike Rides</div><div class="value">${ebikePercent}%</div><div class="detail">${ebikeCount} of ${RIDES.length}</div></div>
     <div class="stat-card"><div class="label">Unique Stations</div><div class="value">${uniqueStations}</div></div>
-    <div class="stat-card"><div class="label">Unique Bikes</div><div class="value">${uniqueBikes}</div></div>
+    <div class="stat-card"><div class="label">Manhattan Stations</div><div class="value">6.3%</div><div class="detail">44 of 704 stations</div></div>
     <div class="stat-card"><div class="label">Rides / Week</div><div class="value">${ridesPerWeek}</div><div class="detail">${uniqueDays} active days</div></div>
   `;
 }
@@ -787,9 +902,42 @@ function renderRankings() {
 }
 
 // ============================================================
+// ============================================================
+// RIDE OF THE DAY
+// ============================================================
+function renderRideOfDay() {
+  // Seed random by today's date so it's consistent within a day but changes daily
+  const today = new Date().toISOString().split('T')[0];
+  let hash = 0;
+  for (let i = 0; i < today.length; i++) { hash = ((hash << 5) - hash) + today.charCodeAt(i); hash |= 0; }
+  const idx = Math.abs(hash) % RIDES.length;
+  const ride = RIDES[idx];
+
+  const d = new Date(ride.startTime);
+  const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  document.getElementById('rideOfDay').innerHTML = `
+    <div class="rod-header">
+      <h3>Ride of the Day</h3>
+      <div class="rod-date">${dateStr} at ${timeStr}</div>
+    </div>
+    <div class="rod-route">
+      ${ride.startStation} <span class="arrow">&rarr;</span> ${ride.endStation}
+    </div>
+    <div class="rod-stats">
+      <div class="rod-stat"><div class="rod-val">${ride.durationMin} min</div><div class="rod-lbl">Duration</div></div>
+      <div class="rod-stat"><div class="rod-val">$${ride.price.toFixed(2)}</div><div class="rod-lbl">Cost</div></div>
+      <div class="rod-stat"><div class="rod-val">${ride.isEbike ? 'Ebike' : 'Classic'}</div><div class="rod-lbl">Bike Type</div></div>
+      <div class="rod-stat"><div class="rod-val">${ride.bikeName}</div><div class="rod-lbl">Bike ID</div></div>
+    </div>
+  `;
+}
+
 // INIT
 // ============================================================
 renderHeader();
+renderRideOfDay();
 renderRouteMap();
 renderHeatMap();
 renderDayHourGrid();
