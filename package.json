@@ -1,0 +1,8 @@
+{
+  "name": "willhofner-activity-dashboard",
+  "version": "1.0.0",
+  "description": "Personal activity dashboard — CitiBike rides and Strava runs",
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}
