@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofBeats — Heart Rate Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #ef4444;
+    --accent2: #f87171;
+    --accent-dim: rgba(239,68,68,0.3);
+    --zone-rest: #3b82f6;
+    --zone-light: #22c55e;
+    --zone-moderate: #fbbf24;
+    --zone-vigorous: #f97316;
+    --zone-peak: #ef4444;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  .header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .nav-links {
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+  }
+  .header-stat {
+    text-align: right;
+  }
+  .header-stat .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .header-stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Stat cards */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 20px 40px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat-card .detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Chart sections */
+  .section {
+    padding: 20px 40px;
+  }
+  .section-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .section-grid.two { grid-template-columns: 1fr 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-card canvas { width: 100% !important; }
+
+  /* Toggle buttons */
+  .toggle-group {
+    display: flex;
+    gap: 4px;
+  }
+  .toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+  .toggle-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* Heatgrid */
+  .heatgrid {
+    display: grid;
+    grid-template-columns: 60px repeat(24, 1fr);
+    gap: 2px;
+    font-size: 10px;
+  }
+  .heatgrid .row-label {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding-right: 8px;
+    justify-content: flex-end;
+  }
+  .heatgrid .col-label {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 10px;
+    padding-bottom: 4px;
+  }
+  .heatgrid .cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    position: relative;
+    cursor: default;
+    min-height: 20px;
+  }
+  .heatgrid .cell:hover {
+    outline: 1px solid var(--text-dim);
+    z-index: 1;
+  }
+  .heatgrid .cell .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,15,0.95);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 100;
+    color: var(--text);
+  }
+  .heatgrid .cell:hover .tooltip { display: block; }
+
+  @media (max-width: 900px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .section-grid.two { grid-template-columns: 1fr; }
+    .section { padding: 16px 20px; }
+    .stats-row { padding: 16px 20px; }
+    .header { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Hof<span>Beats</span></h1>
+    <div class="subtitle">Apple Watch heart rate data — every heartbeat since Oct 2021</div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="steps.html">Steps Dashboard</a>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="value" id="hTotal">—</div><div class="label">Total Readings</div></div>
+    <div class="header-stat"><div class="value" id="hDays">—</div><div class="label">Days Tracked</div></div>
+    <div class="header-stat"><div class="value" id="hResting">—</div><div class="label">Resting BPM</div></div>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Resting Heart Rate Trend -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>
+        Resting Heart Rate Trend
+        <div class="toggle-group">
+          <button class="toggle-btn active" onclick="setRestingView('daily', this)">Daily</button>
+          <button class="toggle-btn" onclick="setRestingView('weekly', this)">Weekly</button>
+          <button class="toggle-btn" onclick="setRestingView('monthly', this)">Monthly</button>
+        </div>
+      </h3>
+      <canvas id="restingChart" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- HRV Trend -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>
+        Heart Rate Variability (HRV) Trend
+        <div class="toggle-group">
+          <button class="toggle-btn active" onclick="setHrvView('daily', this)">Daily</button>
+          <button class="toggle-btn" onclick="setHrvView('weekly', this)">Weekly</button>
+          <button class="toggle-btn" onclick="setHrvView('monthly', this)">Monthly</button>
+        </div>
+      </h3>
+      <canvas id="hrvChart" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- VO2 Max Trend -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>VO2 Max Trend</h3>
+      <canvas id="vo2Chart" height="80"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Daily HR Range -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>
+        Daily Heart Rate Range
+        <div class="toggle-group">
+          <button class="toggle-btn" onclick="setRangeView(30, this)">30 Days</button>
+          <button class="toggle-btn active" onclick="setRangeView(90, this)">90 Days</button>
+          <button class="toggle-btn" onclick="setRangeView(365, this)">1 Year</button>
+          <button class="toggle-btn" onclick="setRangeView(0, this)">All Time</button>
+        </div>
+      </h3>
+      <canvas id="rangeChart" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Heart Rate Zones -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Heart Rate Zone Distribution</h3>
+      <canvas id="zoneDoughnut" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Heart Rate Zone Counts</h3>
+      <canvas id="zoneBar" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Hour of Day + Heatgrid -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Average HR by Hour of Day</h3>
+      <canvas id="hourChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Day x Hour Heatgrid</h3>
+      <div class="heatgrid" id="heatgrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BPM Distribution -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>BPM Distribution</h3>
+      <canvas id="bpmHistChart" height="80"></canvas>
+    </div>
+  </div>
+</div>
+
+<div style="height: 40px;"></div>
+
+<script>
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels = { display: false };
+
+const TOOLTIP_OPTS = {
+  backgroundColor: 'rgba(10,10,15,0.95)',
+  borderColor: '#1e1e2e',
+  borderWidth: 1,
+  titleColor: '#e0e0e8',
+  bodyColor: '#e0e0e8',
+};
+
+let DATA;
+let restingChart, hrvChartObj, vo2ChartObj, rangeChartObj, zoneDoughnutObj, zoneBarObj, hourChartObj, bpmHistObj;
+let currentRestingView = 'daily';
+let currentHrvView = 'daily';
+let currentRangeDays = 90;
+
+fetch('data/heartrate_enriched.json')
+  .then(r => r.json())
+  .then(data => { DATA = data; init(); });
+
+function init() {
+  renderHeader();
+  renderStats();
+  renderRestingChart();
+  renderHrvChart();
+  renderVo2Chart();
+  renderRangeChart();
+  renderZones();
+  renderHourChart();
+  renderHeatgrid();
+  renderBpmHistogram();
+}
+
+// ===== HEADER =====
+function renderHeader() {
+  const s = DATA.summary;
+  document.getElementById('hTotal').textContent = (s.totalReadings / 1e3).toFixed(0) + 'K';
+  document.getElementById('hDays').textContent = s.daysTracked.toLocaleString();
+  document.getElementById('hResting').textContent = s.avgRestingHR.toFixed(1);
+}
+
+// ===== STAT CARDS =====
+function renderStats() {
+  const s = DATA.summary;
+  const cards = [
+    { label: 'Overall Avg', value: Math.round(s.overallAvg) + ' bpm', detail: 'all readings' },
+    { label: 'Overall Min', value: Math.round(s.overallMin) + ' bpm', detail: 'lowest recorded' },
+    { label: 'Overall Max', value: Math.round(s.overallMax) + ' bpm', detail: 'highest recorded' },
+    { label: 'Avg HRV', value: s.avgHRV.toFixed(1) + ' ms', detail: s.hrvCount.toLocaleString() + ' readings' },
+    { label: 'Latest VO2 Max', value: s.latestVO2Max + ' ml/kg/min', detail: s.vo2maxCount.toLocaleString() + ' readings' },
+    { label: 'HRV Readings', value: s.hrvCount.toLocaleString(), detail: 'since Oct 2021' },
+  ];
+
+  document.getElementById('statsRow').innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="detail">${c.detail}</div>
+    </div>
+  `).join('');
+}
+
+// ===== RESTING HR TREND =====
+function setRestingView(view, btn) {
+  currentRestingView = view;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRestingChart();
+}
+
+function renderRestingChart() {
+  const ctx = document.getElementById('restingChart');
+  if (restingChart) restingChart.destroy();
+
+  let labels, values, rolling;
+  const rhr = DATA.restingHR;
+
+  if (currentRestingView === 'daily') {
+    labels = rhr.map(d => d.date);
+    values = rhr.map(d => d.value);
+    // 14-day rolling average
+    rolling = values.map((_, i) => {
+      const start = Math.max(0, i - 13);
+      const slice = values.slice(start, i + 1);
+      return +(slice.reduce((a,b) => a+b, 0) / slice.length).toFixed(1);
+    });
+  } else if (currentRestingView === 'weekly') {
+    const weeks = {};
+    rhr.forEach(d => {
+      const dt = new Date(d.date + 'T00:00:00');
+      const ws = new Date(dt);
+      ws.setDate(dt.getDate() - ((dt.getDay() + 6) % 7));
+      const key = ws.toISOString().slice(0, 10);
+      if (!weeks[key]) weeks[key] = [];
+      weeks[key].push(d.value);
+    });
+    const sorted = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => +(v.reduce((a,b) => a+b, 0) / v.length).toFixed(1));
+    rolling = values.map((_, i) => {
+      const start = Math.max(0, i - 3);
+      const slice = values.slice(start, i + 1);
+      return +(slice.reduce((a,b) => a+b, 0) / slice.length).toFixed(1);
+    });
+  } else {
+    const months = {};
+    rhr.forEach(d => {
+      const key = d.date.slice(0, 7);
+      if (!months[key]) months[key] = [];
+      months[key].push(d.value);
+    });
+    const sorted = Object.entries(months).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => +(v.reduce((a,b) => a+b, 0) / v.length).toFixed(1));
+    rolling = null;
+  }
+
+  const datasets = [{
+    label: 'Resting HR',
+    data: values,
+    borderColor: 'rgba(239,68,68,0.6)',
+    backgroundColor: 'rgba(239,68,68,0.08)',
+    borderWidth: currentRestingView === 'daily' ? 1 : 2,
+    pointRadius: currentRestingView === 'monthly' ? 3 : 0,
+    pointHoverRadius: 4,
+    tension: 0.3,
+    fill: true,
+    order: 2,
+  }];
+
+  if (rolling) {
+    datasets.push({
+      label: 'Rolling Average',
+      data: rolling,
+      borderColor: '#ffffff',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.3,
+      fill: false,
+      order: 1,
+    });
+  }
+
+  restingChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: !!rolling, labels: { color: '#8888a0', font: { size: 11 } } },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + ' bpm' }
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v + ' bpm' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== HRV TREND =====
+function setHrvView(view, btn) {
+  currentHrvView = view;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHrvChart();
+}
+
+function renderHrvChart() {
+  const ctx = document.getElementById('hrvChart');
+  if (hrvChartObj) hrvChartObj.destroy();
+
+  let labels, values, rolling;
+  const hrv = DATA.hrv;
+
+  if (currentHrvView === 'daily') {
+    labels = hrv.map(d => d.date);
+    values = hrv.map(d => d.value);
+    rolling = values.map((_, i) => {
+      const start = Math.max(0, i - 13);
+      const slice = values.slice(start, i + 1);
+      return +(slice.reduce((a,b) => a+b, 0) / slice.length).toFixed(1);
+    });
+  } else if (currentHrvView === 'weekly') {
+    const weeks = {};
+    hrv.forEach(d => {
+      const dt = new Date(d.date + 'T00:00:00');
+      const ws = new Date(dt);
+      ws.setDate(dt.getDate() - ((dt.getDay() + 6) % 7));
+      const key = ws.toISOString().slice(0, 10);
+      if (!weeks[key]) weeks[key] = [];
+      weeks[key].push(d.value);
+    });
+    const sorted = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => +(v.reduce((a,b) => a+b, 0) / v.length).toFixed(1));
+    rolling = values.map((_, i) => {
+      const start = Math.max(0, i - 3);
+      const slice = values.slice(start, i + 1);
+      return +(slice.reduce((a,b) => a+b, 0) / slice.length).toFixed(1);
+    });
+  } else {
+    const months = {};
+    hrv.forEach(d => {
+      const key = d.date.slice(0, 7);
+      if (!months[key]) months[key] = [];
+      months[key].push(d.value);
+    });
+    const sorted = Object.entries(months).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => +(v.reduce((a,b) => a+b, 0) / v.length).toFixed(1));
+    rolling = null;
+  }
+
+  const datasets = [{
+    label: 'HRV',
+    data: values,
+    borderColor: 'rgba(168,85,247,0.6)',
+    backgroundColor: 'rgba(168,85,247,0.08)',
+    borderWidth: currentHrvView === 'daily' ? 1 : 2,
+    pointRadius: currentHrvView === 'monthly' ? 3 : 0,
+    pointHoverRadius: 4,
+    tension: 0.3,
+    fill: true,
+    order: 2,
+  }];
+
+  if (rolling) {
+    datasets.push({
+      label: 'Rolling Average',
+      data: rolling,
+      borderColor: '#ffffff',
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.3,
+      fill: false,
+      order: 1,
+    });
+  }
+
+  hrvChartObj = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: !!rolling, labels: { color: '#8888a0', font: { size: 11 } } },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + ' ms' }
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v + ' ms' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== VO2 MAX TREND =====
+function renderVo2Chart() {
+  const ctx = document.getElementById('vo2Chart');
+  if (vo2ChartObj) vo2ChartObj.destroy();
+
+  const vo2 = DATA.vo2max;
+  const labels = vo2.map(d => d.date);
+  const values = vo2.map(d => d.value);
+
+  vo2ChartObj = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'VO2 Max',
+        data: values,
+        borderColor: 'rgba(59,130,246,0.8)',
+        backgroundColor: 'rgba(59,130,246,0.08)',
+        borderWidth: 2,
+        pointRadius: values.length < 100 ? 3 : 1,
+        pointBackgroundColor: 'rgba(59,130,246,0.8)',
+        pointHoverRadius: 5,
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: { label: c => c.parsed.y + ' ml/kg/min' }
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v + ' ml/kg/min' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== DAILY HR RANGE =====
+function setRangeView(days, btn) {
+  currentRangeDays = days;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRangeChart();
+}
+
+function renderRangeChart() {
+  const ctx = document.getElementById('rangeChart');
+  if (rangeChartObj) rangeChartObj.destroy();
+
+  let days = DATA.dailyStats;
+  if (currentRangeDays > 0) {
+    days = days.slice(-currentRangeDays);
+  }
+
+  const labels = days.map(d => d.date);
+  // Floating bars: [min, max] for each day
+  const ranges = days.map(d => [d.min, d.max]);
+  const avgs = days.map(d => d.avg);
+
+  rangeChartObj = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'HR Range',
+          data: ranges,
+          backgroundColor: 'rgba(239,68,68,0.3)',
+          borderColor: 'rgba(239,68,68,0.5)',
+          borderWidth: 1,
+          borderRadius: 2,
+          barPercentage: currentRangeDays <= 90 ? 0.8 : 1.0,
+          categoryPercentage: currentRangeDays <= 90 ? 0.8 : 1.0,
+          order: 2,
+        },
+        {
+          label: 'Average',
+          data: avgs,
+          type: 'line',
+          borderColor: '#ffffff',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: 0.3,
+          fill: false,
+          order: 1,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, labels: { color: '#8888a0', font: { size: 11 } } },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: {
+            label: c => {
+              if (c.datasetIndex === 0) {
+                const [min, max] = c.raw;
+                return 'Range: ' + Math.round(min) + ' - ' + Math.round(max) + ' bpm';
+              }
+              return 'Avg: ' + Math.round(c.parsed.y) + ' bpm';
+            }
+          }
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v + ' bpm' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== HEART RATE ZONES =====
+function renderZones() {
+  const z = DATA.zones;
+  const zoneNames = ['Rest (<60)', 'Light (60-100)', 'Moderate (100-140)', 'Vigorous (140-170)', 'Peak (170+)'];
+  const zoneKeys = ['rest', 'light', 'moderate', 'vigorous', 'peak'];
+  const zoneColors = ['#3b82f6', '#22c55e', '#fbbf24', '#f97316', '#ef4444'];
+  const zoneCounts = zoneKeys.map(k => z[k]);
+  const total = zoneCounts.reduce((a,b) => a+b, 0);
+
+  // Doughnut
+  zoneDoughnutObj = new Chart(document.getElementById('zoneDoughnut'), {
+    type: 'doughnut',
+    data: {
+      labels: zoneNames,
+      datasets: [{
+        data: zoneCounts,
+        backgroundColor: zoneColors,
+        borderColor: '#12121a',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '60%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: '#e0e0e8', font: { size: 11 }, padding: 12 }
+        },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: {
+            label: c => {
+              const val = c.parsed;
+              const pct = (val / total * 100).toFixed(1);
+              return c.label + ': ' + val.toLocaleString() + ' (' + pct + '%)';
+            }
+          }
+        },
+      }
+    }
+  });
+
+  // Bar
+  zoneBarObj = new Chart(document.getElementById('zoneBar'), {
+    type: 'bar',
+    data: {
+      labels: zoneNames,
+      datasets: [{
+        data: zoneCounts,
+        backgroundColor: zoneColors.map(c => c + 'cc'),
+        borderRadius: 6,
+        datalabels: {
+          display: true,
+          anchor: 'end',
+          align: 'end',
+          color: '#8888a0',
+          font: { size: 9, weight: 600 },
+          formatter: v => v >= 1000 ? (v/1000).toFixed(1) + 'K' : v,
+          offset: 2,
+        },
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: {
+            label: c => {
+              const pct = (c.parsed.y / total * 100).toFixed(1);
+              return c.parsed.y.toLocaleString() + ' readings (' + pct + '%)';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v >= 1000 ? (v/1000) + 'K' : v },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== HOUR OF DAY =====
+function renderHourChart() {
+  const ha = DATA.hourlyAvg;
+  const labels = Array.from({length: 24}, (_, i) => i + ':00');
+  const values = Array.from({length: 24}, (_, i) => ha[String(i)] || 0);
+  const maxVal = Math.max(...values);
+
+  hourChartObj = new Chart(document.getElementById('hourChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: values.map(v => {
+          if (v >= 80) return 'rgba(239,68,68,0.6)';
+          if (v >= 70) return 'rgba(251,191,36,0.6)';
+          return 'rgba(59,130,246,0.6)';
+        }),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: { label: c => c.parsed.y.toFixed(1) + ' avg bpm' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+        y: {
+          beginAtZero: false,
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v + ' bpm' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== HEATGRID =====
+function renderHeatgrid() {
+  const grid = document.getElementById('heatgrid');
+  const dowNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Build dow x hour matrix from dailyStats
+  const matrix = {};
+  const counts = {};
+  for (let dow = 0; dow <= 6; dow++) {
+    matrix[dow] = {};
+    counts[dow] = {};
+    for (let h = 0; h < 24; h++) {
+      matrix[dow][h] = 0;
+      counts[dow][h] = 0;
+    }
+  }
+
+  DATA.dailyStats.forEach(d => {
+    const dow = d.dayOfWeekNum;
+    if (d.hourly) {
+      for (let h = 0; h < 24; h++) {
+        const val = d.hourly[String(h)];
+        if (val !== undefined && val !== null) {
+          matrix[dow][h] += val;
+          counts[dow][h]++;
+        }
+      }
+    }
+  });
+
+  // Compute averages and find global min/max for color scaling
+  let globalMin = Infinity, globalMax = 0;
+  const avgs = {};
+  for (let dow = 0; dow <= 6; dow++) {
+    avgs[dow] = {};
+    for (let h = 0; h < 24; h++) {
+      avgs[dow][h] = counts[dow][h] > 0 ? matrix[dow][h] / counts[dow][h] : 0;
+      if (avgs[dow][h] > 0 && avgs[dow][h] < globalMin) globalMin = avgs[dow][h];
+      if (avgs[dow][h] > globalMax) globalMax = avgs[dow][h];
+    }
+  }
+
+  // Color function: lower HR = blue, higher HR = red
+  function hrColor(val) {
+    if (val === 0) return 'rgba(255,255,255,0.03)';
+    const t = (val - globalMin) / (globalMax - globalMin || 1);
+    // Blue to red through warm tones
+    const r = Math.round(59 + t * (239 - 59));
+    const g = Math.round(130 + t * (68 - 130));
+    const b = Math.round(246 + t * (68 - 246));
+    return `rgba(${r},${g},${b},${0.3 + t * 0.6})`;
+  }
+
+  // Header row
+  let html = '<div class="row-label"></div>';
+  for (let h = 0; h < 24; h++) {
+    html += `<div class="col-label">${h}</div>`;
+  }
+
+  // Data rows (dayOfWeekNum: 0=Mon, 1=Tue, ..., 6=Sun)
+  for (let dow = 0; dow <= 6; dow++) {
+    html += `<div class="row-label">${dowNames[dow]}</div>`;
+    for (let h = 0; h < 24; h++) {
+      const val = avgs[dow][h];
+      const color = hrColor(val);
+      html += `<div class="cell" style="background:${color}">
+        <div class="tooltip">${dowNames[dow]} ${h}:00 — ${val > 0 ? val.toFixed(1) + ' avg bpm' : 'No data'}</div>
+      </div>`;
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+// ===== BPM DISTRIBUTION =====
+function renderBpmHistogram() {
+  const ctx = document.getElementById('bpmHistChart');
+  if (bpmHistObj) bpmHistObj.destroy();
+
+  const hist = DATA.bpmHistogram;
+  const labels = hist.map(b => b.bpm + '-' + (b.bpm + 4));
+  const values = hist.map(b => b.count);
+  const maxVal = Math.max(...values);
+
+  // Gradient coloring based on BPM range
+  const colors = hist.map(b => {
+    if (b.bpm < 60) return 'rgba(59,130,246,0.6)';
+    if (b.bpm < 100) return 'rgba(34,197,94,0.6)';
+    if (b.bpm < 140) return 'rgba(251,191,36,0.6)';
+    if (b.bpm < 170) return 'rgba(249,115,22,0.6)';
+    return 'rgba(239,68,68,0.6)';
+  });
+
+  bpmHistObj = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderRadius: 2,
+        barPercentage: 1.0,
+        categoryPercentage: 1.0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_OPTS,
+          callbacks: {
+            title: c => c[0].label + ' bpm',
+            label: c => c.parsed.y.toLocaleString() + ' readings'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 45, maxTicksLimit: 20 },
+          grid: { display: false }
+        },
+        y: {
+          ticks: {
+            color: '#8888a0',
+            font: { size: 11 },
+            callback: v => v >= 1000 ? (v/1000).toFixed(0) + 'K' : v
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== UTILS =====
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
+</body>
+</html>

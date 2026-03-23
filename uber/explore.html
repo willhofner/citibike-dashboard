@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uber Ride Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #a855f7;
+    --accent2: #c084fc;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f59e0b;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Left panel */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .sidebar-header h1 span { color: var(--accent); }
+  .sidebar-header .nav-links {
+    display: flex;
+    gap: 12px;
+  }
+  .sidebar-header .back-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .sidebar-header .back-link:hover { text-decoration: underline; }
+
+  /* Filters */
+  .filters {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .ride-count {
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0 2px;
+  }
+
+  /* Ride list */
+  .ride-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .ride-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .ride-item:hover { background: rgba(168,85,247,0.05); }
+  .ride-item.active { background: rgba(168,85,247,0.1); border-left: 3px solid var(--accent); }
+
+  .ride-item .ride-date {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .ride-item .ride-stations {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ride-item .ride-arrow {
+    color: var(--accent);
+    margin: 0 4px;
+  }
+  .ride-item .ride-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+    align-items: center;
+  }
+  .ride-item .ride-meta .tag {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .tag-uberx { background: rgba(168,85,247,0.2); color: var(--accent); }
+  .tag-uberxl { background: rgba(245,158,11,0.2); color: var(--orange); }
+  .tag-other { background: rgba(136,136,160,0.2); color: var(--text-dim); }
+
+  /* Right panel — map */
+  .map-panel {
+    position: relative;
+    height: 100vh;
+  }
+  #rideMap { height: 100%; width: 100%; }
+  .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
+
+  .ride-detail-overlay {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 280px;
+    max-width: 340px;
+    display: none;
+  }
+  .ride-detail-overlay.visible { display: block; }
+
+  .ride-detail-overlay h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .detail-label { color: var(--text-dim); }
+  .detail-row .detail-value { font-weight: 500; text-align: right; max-width: 180px; }
+
+  .all-routes-hint {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .sort-row {
+    display: flex;
+    gap: 6px;
+  }
+  .sort-btn {
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sort-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .no-rides {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; height: 100dvh; }
+    .sidebar { height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .map-panel { height: auto; }
+    .ride-detail-overlay { top: auto; bottom: 12px; right: 12px; left: 12px; min-width: unset; max-width: unset; }
+    .all-routes-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>Ride <span>Explorer</span></h1>
+    <div class="nav-links">
+      <a href="../index.html" class="back-link">Home</a>
+      <a href="dashboard.html" class="back-link">Dashboard</a>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search locations...">
+
+    <div class="filter-row" id="productFilter">
+      <button class="filter-btn active" data-product="all">All</button>
+      <button class="filter-btn" data-product="uberx">UberX</button>
+      <button class="filter-btn" data-product="uberxl">UberXL</button>
+      <button class="filter-btn" data-product="other">Other</button>
+    </div>
+
+    <div class="filter-row" id="dayFilter">
+      <button class="filter-btn active" data-day="all">All Days</button>
+      <button class="filter-btn" data-day="weekday">Weekday</button>
+      <button class="filter-btn" data-day="weekend">Weekend</button>
+    </div>
+
+    <div class="sort-row" id="sortRow">
+      <button class="sort-btn active" data-sort="recent">Recent</button>
+      <button class="sort-btn" data-sort="farthest">Farthest</button>
+      <button class="sort-btn" data-sort="priciest">Priciest</button>
+    </div>
+
+    <div class="ride-count" id="rideCount">Loading...</div>
+  </div>
+
+  <div class="ride-list" id="rideList"></div>
+</div>
+
+<div class="map-panel">
+  <div id="rideMap"></div>
+
+  <div class="ride-detail-overlay" id="detailOverlay">
+    <h3 id="detailTitle">Ride Details</h3>
+    <div id="detailRows"></div>
+  </div>
+
+  <div class="all-routes-hint" id="allRoutesHint">
+    220 pickup locations shown — click a ride to view route
+  </div>
+</div>
+
+<script>
+let RIDES = [];
+let selectedRideId = null;
+let ghostLayer = null;
+let routeLayer = null;
+let startMarker = null;
+let endMarker = null;
+
+// Filters state
+let productFilter = 'all';
+let dayFilter = 'all';
+let sortMode = 'recent';
+let searchQuery = '';
+
+// Init map
+const map = L.map('rideMap', {
+  center: [40.7128, -73.98],
+  zoom: 12,
+  zoomControl: true
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// Load data
+fetch('data/rides_enriched.json')
+  .then(r => r.json())
+  .then(data => {
+    RIDES = data.rides.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    document.getElementById('allRoutesHint').textContent =
+      `${RIDES.length} pickup locations shown — click a ride to view route`;
+    renderGhostLayer();
+    renderList();
+    if (RIDES.length > 0) selectRide(RIDES[0]);
+  })
+  .catch(err => {
+    console.error('Failed to load ride data:', err);
+    document.getElementById('rideList').innerHTML = '<div class="no-rides">Failed to load ride data</div>';
+  });
+
+// Ghost layer: all pickup points
+function renderGhostLayer() {
+  if (ghostLayer) map.removeLayer(ghostLayer);
+  ghostLayer = L.layerGroup();
+  RIDES.forEach(r => {
+    if (r.startLat && r.startLon) {
+      L.circleMarker([r.startLat, r.startLon], {
+        radius: 2.5,
+        fillColor: '#a855f7',
+        fillOpacity: 0.15,
+        stroke: false
+      }).addTo(ghostLayer);
+    }
+  });
+  ghostLayer.addTo(map);
+}
+
+// Normalize product name for filtering
+function normalizeProduct(p) {
+  const lower = p.toLowerCase();
+  if (lower === 'uberx' || lower === 'uberx to nyc') return 'uberx';
+  if (lower === 'uberxl') return 'uberxl';
+  return 'other';
+}
+
+// Product tag class
+function productTagClass(p) {
+  const norm = normalizeProduct(p);
+  if (norm === 'uberx') return 'tag-uberx';
+  if (norm === 'uberxl') return 'tag-uberxl';
+  return 'tag-other';
+}
+
+// Filter + sort rides
+function getFilteredRides() {
+  let filtered = RIDES.filter(r => {
+    // Product filter
+    if (productFilter !== 'all' && normalizeProduct(r.product) !== productFilter) return false;
+    // Day filter
+    if (dayFilter === 'weekday' && ['Saturday', 'Sunday'].includes(r.dayOfWeek)) return false;
+    if (dayFilter === 'weekend' && !['Saturday', 'Sunday'].includes(r.dayOfWeek)) return false;
+    // Search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const searchable = `${r.startAddress} ${r.endAddress} ${r.city} ${r.product}`.toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  if (sortMode === 'recent') filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+  else if (sortMode === 'farthest') filtered.sort((a, b) => (b.distanceMi || 0) - (a.distanceMi || 0));
+  else if (sortMode === 'priciest') filtered.sort((a, b) => (b.fare || 0) - (a.fare || 0));
+
+  return filtered;
+}
+
+// Format helpers
+function formatDate(dt) {
+  const d = new Date(dt);
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatTime(dt) {
+  const d = new Date(dt);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function formatDuration(min) {
+  if (min < 60) return `${Math.round(min)} min`;
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return `${h}h ${m}m`;
+}
+
+function formatFare(fare) {
+  return fare != null ? `$${fare.toFixed(2)}` : '—';
+}
+
+function formatWaitTime(sec) {
+  if (sec == null || sec === 0) return '—';
+  if (sec < 60) return `${sec}s`;
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
+
+function truncateAddr(addr, max) {
+  if (!addr) return '—';
+  return addr.length > max ? addr.substring(0, max) + '...' : addr;
+}
+
+// Render ride list
+function renderList() {
+  const filtered = getFilteredRides();
+  const container = document.getElementById('rideList');
+  document.getElementById('rideCount').textContent = `${filtered.length} ride${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="no-rides">No rides match your filters</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(r => `
+    <div class="ride-item ${r.id === selectedRideId ? 'active' : ''}" data-ride-id="${r.id}" onclick="selectRide(RIDES.find(x=>x.id===${r.id}))">
+      <div class="ride-date">
+        <span>${formatDate(r.startTime)}</span>
+        <span>${formatTime(r.startTime)}</span>
+      </div>
+      <div class="ride-stations">
+        ${truncateAddr(r.startAddress, 40)}
+        <span class="ride-arrow">&rarr;</span>
+        ${truncateAddr(r.endAddress, 40)}
+      </div>
+      <div class="ride-meta">
+        <span class="tag ${productTagClass(r.product)}">${r.product}</span>
+        <span>${r.distanceMi != null ? r.distanceMi.toFixed(1) + ' mi' : '—'}</span>
+        <span>${formatDuration(r.durationMin)}</span>
+        <span>${formatFare(r.fare)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Select a ride
+function selectRide(ride) {
+  if (!ride) return;
+  selectedRideId = ride.id;
+
+  // Update active state in list
+  document.querySelectorAll('.ride-item').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.rideId) === ride.id);
+  });
+
+  // Scroll active into view
+  const activeEl = document.querySelector('.ride-item.active');
+  if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Clear previous route
+  if (routeLayer) map.removeLayer(routeLayer);
+  if (startMarker) map.removeLayer(startMarker);
+  if (endMarker) map.removeLayer(endMarker);
+
+  // Draw route if coordinates exist
+  if (ride.startLat && ride.startLon && ride.endLat && ride.endLon) {
+    const start = [ride.startLat, ride.startLon];
+    const end = [ride.endLat, ride.endLon];
+
+    // Dashed purple line
+    routeLayer = L.polyline([start, end], {
+      color: '#a855f7',
+      weight: 3,
+      opacity: 0.8,
+      dashArray: '8, 6'
+    }).addTo(map);
+
+    // Start marker (green)
+    startMarker = L.circleMarker(start, {
+      radius: 7,
+      fillColor: '#22c55e',
+      fillOpacity: 1,
+      color: '#22c55e',
+      weight: 2,
+      opacity: 0.5
+    }).addTo(map);
+
+    // End marker (red)
+    endMarker = L.circleMarker(end, {
+      radius: 7,
+      fillColor: '#ef4444',
+      fillOpacity: 1,
+      color: '#ef4444',
+      weight: 2,
+      opacity: 0.5
+    }).addTo(map);
+
+    // Fit bounds
+    const bounds = L.latLngBounds([start, end]);
+    map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });
+  }
+
+  // Update detail overlay
+  const overlay = document.getElementById('detailOverlay');
+  const title = document.getElementById('detailTitle');
+  const rows = document.getElementById('detailRows');
+
+  title.textContent = `${formatDate(ride.startTime)}`;
+
+  const detailData = [
+    ['Time', formatTime(ride.startTime) + ' — ' + formatTime(ride.endTime)],
+    ['From', ride.startAddress || '—'],
+    ['To', ride.endAddress || '—'],
+    ['Product', ride.product],
+    ['Distance', ride.distanceMi != null ? ride.distanceMi.toFixed(1) + ' mi' : '—'],
+    ['Duration', formatDuration(ride.durationMin)],
+    ['Fare', formatFare(ride.fare)],
+    ['City', ride.city || '—'],
+    ['Wait Time', formatWaitTime(ride.waitTimeSec)],
+    ['Surge', ride.isSurged ? ride.surgeMultiplier + 'x' : 'None']
+  ];
+
+  rows.innerHTML = detailData.map(([label, value]) => `
+    <div class="detail-row">
+      <span class="detail-label">${label}</span>
+      <span class="detail-value">${value}</span>
+    </div>
+  `).join('');
+
+  overlay.classList.add('visible');
+}
+
+// Deselect
+function deselectRide() {
+  selectedRideId = null;
+  if (routeLayer) map.removeLayer(routeLayer);
+  if (startMarker) map.removeLayer(startMarker);
+  if (endMarker) map.removeLayer(endMarker);
+  document.getElementById('detailOverlay').classList.remove('visible');
+  document.querySelectorAll('.ride-item').forEach(el => el.classList.remove('active'));
+  // Reset map view
+  map.setView([40.7128, -73.98], 12);
+}
+
+// Filter button handlers
+document.querySelectorAll('#productFilter .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#productFilter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    productFilter = btn.dataset.product;
+    renderList();
+  });
+});
+
+document.querySelectorAll('#dayFilter .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#dayFilter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    dayFilter = btn.dataset.day;
+    renderList();
+  });
+});
+
+document.querySelectorAll('#sortRow .sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#sortRow .sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sortMode = btn.dataset.sort;
+    renderList();
+  });
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderList();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const filtered = getFilteredRides();
+  if (filtered.length === 0) return;
+
+  const currentIdx = filtered.findIndex(r => r.id === selectedRideId);
+
+  if (e.key === 'ArrowDown' || e.key === 'j') {
+    e.preventDefault();
+    const next = Math.min(currentIdx + 1, filtered.length - 1);
+    selectRide(filtered[next]);
+  } else if (e.key === 'ArrowUp' || e.key === 'k') {
+    e.preventDefault();
+    const prev = Math.max(currentIdx - 1, 0);
+    selectRide(filtered[prev]);
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    deselectRide();
+  }
+});
+</script>
+</body>
+</html>

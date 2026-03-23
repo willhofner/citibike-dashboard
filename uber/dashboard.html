@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofRides — Uber Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #a855f7;
+    --accent2: #c084fc;
+    --accent-dim: rgba(168,85,247,0.3);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  .header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .nav-links {
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+  }
+  .header-stat {
+    text-align: right;
+  }
+  .header-stat .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .header-stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Stat cards */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 20px 40px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat-card .detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Chart sections */
+  .section {
+    padding: 20px 40px;
+  }
+  .section-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .section-grid.two { grid-template-columns: 1fr 1fr; }
+  .section-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-card canvas { width: 100% !important; }
+
+  /* Heatgrid */
+  .heatgrid {
+    display: grid;
+    grid-template-columns: 60px repeat(24, 1fr);
+    gap: 2px;
+    font-size: 10px;
+  }
+  .heatgrid .row-label {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding-right: 8px;
+    justify-content: flex-end;
+  }
+  .heatgrid .col-label {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 10px;
+    padding-bottom: 4px;
+  }
+  .heatgrid .cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    position: relative;
+    cursor: default;
+    min-height: 20px;
+  }
+  .heatgrid .cell:hover {
+    outline: 1px solid var(--text-dim);
+    z-index: 1;
+  }
+  .heatgrid .cell .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,15,0.95);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 100;
+    color: var(--text);
+  }
+  .heatgrid .cell:hover .tooltip { display: block; }
+
+  /* Leaderboard */
+  .leaderboard {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .leaderboard::-webkit-scrollbar { width: 6px; }
+  .leaderboard::-webkit-scrollbar-track { background: transparent; }
+  .leaderboard::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .lb-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .lb-item:last-child { border-bottom: none; }
+  .lb-rank {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-item:nth-child(1) .lb-rank { color: #fbbf24; }
+  .lb-item:nth-child(2) .lb-rank { color: #c0c0c0; }
+  .lb-item:nth-child(3) .lb-rank { color: #cd7f32; }
+  .lb-bar {
+    flex: 1;
+    height: 28px;
+    background: rgba(168,85,247,0.08);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lb-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0.7;
+  }
+  .lb-bar-text {
+    position: absolute;
+    top: 0;
+    left: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .lb-count {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 70px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .section-grid.two, .section-grid.three { grid-template-columns: 1fr; }
+    .section { padding: 16px 20px; }
+    .stats-row { padding: 16px 20px; }
+    .header { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Hof<span>Rides</span></h1>
+    <div class="subtitle">Uber ride data — every ride since Dec 2016</div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="#">Ride Explorer</a>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="value" id="hRides">—</div><div class="label">Total Rides</div></div>
+    <div class="header-stat"><div class="value" id="hSpent">—</div><div class="label">Total Spent</div></div>
+    <div class="header-stat"><div class="value" id="hTime">—</div><div class="label">Ride Time</div></div>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Spending section -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Monthly Spending</h3>
+      <canvas id="spendChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Monthly Ride Count</h3>
+      <canvas id="rideCountChart" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Heatgrid -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>Day of Week × Hour Heatgrid</h3>
+      <div class="heatgrid" id="heatgrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Distribution charts -->
+<div class="section">
+  <div class="section-grid three">
+    <div class="chart-card">
+      <h3>Distance Distribution</h3>
+      <canvas id="distDistChart" height="160"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Duration Distribution</h3>
+      <canvas id="durDistChart" height="160"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Cost Distribution</h3>
+      <canvas id="costDistChart" height="160"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Breakdown charts -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Rides by Hour of Day</h3>
+      <canvas id="hourChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Rides by Day of Week</h3>
+      <canvas id="dowChart" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- City breakdown -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Top Cities by Ride Count</h3>
+      <div class="leaderboard" id="cityLeaderboard"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Product Type Breakdown</h3>
+      <canvas id="productChart" height="260"></canvas>
+    </div>
+  </div>
+</div>
+
+<div style="height: 40px;"></div>
+
+<script>
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels = { display: false };
+
+const DATALABEL_OPTS = {
+  display: true,
+  anchor: 'end',
+  align: 'end',
+  color: '#8888a0',
+  font: { size: 9, weight: 600 },
+  offset: 2,
+};
+
+const TOOLTIP_STYLE = {
+  backgroundColor: 'rgba(10,10,15,0.95)',
+  borderColor: '#1e1e2e',
+  borderWidth: 1,
+  titleColor: '#e0e0e8',
+  bodyColor: '#e0e0e8',
+};
+
+const ACCENT_RGB = '168,85,247';
+
+let DATA;
+
+fetch('data/rides_enriched.json')
+  .then(r => r.json())
+  .then(data => { DATA = data; init(); });
+
+function init() {
+  renderHeader();
+  renderStats();
+  renderSpendChart();
+  renderRideCountChart();
+  renderHeatgrid();
+  renderDistDistChart();
+  renderDurDistChart();
+  renderCostDistChart();
+  renderHourChart();
+  renderDowChart();
+  renderCityLeaderboard();
+  renderProductChart();
+}
+
+// ===== HEADER =====
+function renderHeader() {
+  const s = DATA.summary;
+  document.getElementById('hRides').textContent = s.totalRides.toLocaleString();
+  document.getElementById('hSpent').textContent = '$' + Math.round(s.totalFare).toLocaleString();
+  document.getElementById('hTime').textContent = s.totalDurationHr.toFixed(1) + 'h';
+}
+
+// ===== STAT CARDS =====
+function renderStats() {
+  const s = DATA.summary;
+  const surgePct = Math.round(s.surgedRides / s.totalRides * 100);
+  const avgWaitMin = (s.avgWaitTimeSec / 60).toFixed(1);
+
+  const cards = [
+    { label: 'Avg Fare', value: '$' + s.avgFare.toFixed(2), detail: 'per ride' },
+    { label: 'Avg Distance', value: s.avgDistanceMi.toFixed(2) + ' mi', detail: Math.round(s.totalDistanceMi).toLocaleString() + ' mi total' },
+    { label: 'Avg Duration', value: s.avgDurationMin.toFixed(1) + ' min', detail: 'per ride' },
+    { label: 'Cities', value: s.cityCount, detail: 'unique cities' },
+    { label: 'Avg Wait', value: avgWaitMin + ' min', detail: s.avgWaitTimeSec + ' sec' },
+    { label: 'Surge Rides', value: s.surgedRides, detail: surgePct + '% of all rides' },
+  ];
+
+  const row = document.getElementById('statsRow');
+  row.innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="detail">${c.detail}</div>
+    </div>
+  `).join('');
+}
+
+// ===== MONTHLY SPENDING =====
+function renderSpendChart() {
+  const byMonth = {};
+  DATA.rides.forEach(r => {
+    if (!byMonth[r.month]) byMonth[r.month] = 0;
+    byMonth[r.month] += r.fare;
+  });
+  const sorted = Object.entries(byMonth).sort((a, b) => a[0].localeCompare(b[0]));
+  const labels = sorted.map(([k]) => k);
+  const values = sorted.map(([, v]) => Math.round(v * 100) / 100);
+
+  new Chart(document.getElementById('spendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: `rgba(${ACCENT_RGB},0.8)`,
+        backgroundColor: `rgba(${ACCENT_RGB},0.15)`,
+        borderWidth: 2,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: { label: ctx => '$' + ctx.parsed.y.toFixed(2) }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: {
+            color: '#8888a0', font: { size: 11 },
+            callback: v => '$' + v,
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== MONTHLY RIDE COUNT =====
+function renderRideCountChart() {
+  const byMonth = {};
+  DATA.rides.forEach(r => {
+    if (!byMonth[r.month]) byMonth[r.month] = 0;
+    byMonth[r.month]++;
+  });
+  const sorted = Object.entries(byMonth).sort((a, b) => a[0].localeCompare(b[0]));
+  const labels = sorted.map(([k]) => k);
+  const values = sorted.map(([, v]) => v);
+
+  new Chart(document.getElementById('rideCountChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: `rgba(${ACCENT_RGB},0.5)`,
+        borderRadius: 4,
+        barPercentage: 0.85,
+        categoryPercentage: 0.85,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: { label: ctx => ctx.parsed.y + ' rides' }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8888a0', font: { size: 10 }, maxTicksLimit: 12, maxRotation: 45 },
+          grid: { display: false },
+        },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== HEATGRID =====
+function renderHeatgrid() {
+  const grid = document.getElementById('heatgrid');
+  const dowNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dowMap = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 7 };
+
+  const matrix = {};
+  for (let dow = 1; dow <= 7; dow++) {
+    matrix[dow] = {};
+    for (let h = 0; h < 24; h++) matrix[dow][h] = 0;
+  }
+
+  DATA.rides.forEach(r => {
+    const dow = dowMap[r.dayOfWeek];
+    if (dow && r.hour !== undefined) matrix[dow][r.hour]++;
+  });
+
+  let maxVal = 0;
+  for (let dow = 1; dow <= 7; dow++) {
+    for (let h = 0; h < 24; h++) {
+      if (matrix[dow][h] > maxVal) maxVal = matrix[dow][h];
+    }
+  }
+
+  let html = '<div class="row-label"></div>';
+  for (let h = 0; h < 24; h++) html += `<div class="col-label">${h}</div>`;
+
+  for (let dow = 1; dow <= 7; dow++) {
+    html += `<div class="row-label">${dowNames[dow - 1]}</div>`;
+    for (let h = 0; h < 24; h++) {
+      const val = matrix[dow][h];
+      const intensity = maxVal > 0 ? val / maxVal : 0;
+      const alpha = val === 0 ? 0.03 : (0.1 + intensity * 0.8);
+      const color = `rgba(${ACCENT_RGB},${alpha.toFixed(2)})`;
+      html += `<div class="cell" style="background:${color}">
+        <div class="tooltip">${dowNames[dow - 1]} ${h}:00 — ${val} ride${val !== 1 ? 's' : ''}</div>
+      </div>`;
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+// ===== DISTRIBUTION HELPERS =====
+function renderHistogram(canvasId, buckets, data, unit) {
+  const counts = buckets.map(b =>
+    data.filter(v => v >= b.min && v < b.max).length
+  );
+  const maxCount = Math.max(...counts);
+  const total = data.length;
+
+  new Chart(document.getElementById(canvasId), {
+    type: 'bar',
+    data: {
+      labels: buckets.map(b => b.label),
+      datasets: [{
+        data: counts,
+        backgroundColor: counts.map(v => v === maxCount ? `rgba(${ACCENT_RGB},0.8)` : `rgba(${ACCENT_RGB},0.4)`),
+        borderRadius: 4,
+        datalabels: { ...DATALABEL_OPTS, formatter: v => v },
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 16 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: {
+            label: ctx => ctx.parsed.y + ' rides (' + Math.round(ctx.parsed.y / total * 100) + '%)'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 10 } }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== DISTANCE DISTRIBUTION =====
+function renderDistDistChart() {
+  const buckets = [
+    { label: '0–2 mi', min: 0, max: 2 },
+    { label: '2–5 mi', min: 2, max: 5 },
+    { label: '5–10 mi', min: 5, max: 10 },
+    { label: '10–20 mi', min: 10, max: 20 },
+    { label: '20+ mi', min: 20, max: Infinity },
+  ];
+  renderHistogram('distDistChart', buckets, DATA.rides.map(r => r.distanceMi));
+}
+
+// ===== DURATION DISTRIBUTION =====
+function renderDurDistChart() {
+  const buckets = [
+    { label: '0–5 min', min: 0, max: 5 },
+    { label: '5–10 min', min: 5, max: 10 },
+    { label: '10–20 min', min: 10, max: 20 },
+    { label: '20–30 min', min: 20, max: 30 },
+    { label: '30+ min', min: 30, max: Infinity },
+  ];
+  renderHistogram('durDistChart', buckets, DATA.rides.map(r => r.durationMin));
+}
+
+// ===== COST DISTRIBUTION =====
+function renderCostDistChart() {
+  const buckets = [
+    { label: '$0–10', min: 0, max: 10 },
+    { label: '$10–20', min: 10, max: 20 },
+    { label: '$20–40', min: 20, max: 40 },
+    { label: '$40–60', min: 40, max: 60 },
+    { label: '$60+', min: 60, max: Infinity },
+  ];
+  renderHistogram('costDistChart', buckets, DATA.rides.map(r => r.fare));
+}
+
+// ===== HOUR OF DAY =====
+function renderHourChart() {
+  const byHour = {};
+  for (let h = 0; h < 24; h++) byHour[h] = 0;
+  DATA.rides.forEach(r => byHour[r.hour]++);
+
+  const labels = Array.from({ length: 24 }, (_, i) => i + ':00');
+  const values = Array.from({ length: 24 }, (_, i) => byHour[i]);
+  const maxVal = Math.max(...values);
+
+  new Chart(document.getElementById('hourChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: values.map(v => v === maxVal ? `rgba(${ACCENT_RGB},0.8)` : `rgba(${ACCENT_RGB},0.4)`),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: { label: ctx => ctx.parsed.y + ' rides' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== DAY OF WEEK =====
+function renderDowChart() {
+  const dowOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const dowShort = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const byDow = {};
+  dowOrder.forEach(d => byDow[d] = 0);
+  DATA.rides.forEach(r => byDow[r.dayOfWeek]++);
+
+  const values = dowOrder.map(d => byDow[d]);
+  const maxVal = Math.max(...values);
+
+  new Chart(document.getElementById('dowChart'), {
+    type: 'bar',
+    data: {
+      labels: dowShort,
+      datasets: [{
+        data: values,
+        backgroundColor: values.map(v => v === maxVal ? `rgba(${ACCENT_RGB},0.8)` : `rgba(${ACCENT_RGB},0.4)`),
+        borderRadius: 6,
+        datalabels: { ...DATALABEL_OPTS, formatter: v => v },
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: { label: ctx => ctx.parsed.y + ' rides' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 11 } }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== CITY LEADERBOARD =====
+function renderCityLeaderboard() {
+  const byCity = {};
+  DATA.rides.forEach(r => {
+    if (!byCity[r.city]) byCity[r.city] = 0;
+    byCity[r.city]++;
+  });
+
+  const sorted = Object.entries(byCity)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  const maxCount = sorted[0][1];
+
+  const lb = document.getElementById('cityLeaderboard');
+  lb.innerHTML = sorted.map(([city, count], i) => {
+    const pct = (count / maxCount * 100).toFixed(1);
+    return `
+      <div class="lb-item">
+        <div class="lb-rank">${i + 1}</div>
+        <div class="lb-bar">
+          <div class="lb-bar-fill" style="width:${pct}%"></div>
+          <div class="lb-bar-text">${city}</div>
+        </div>
+        <div class="lb-count">${count}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== PRODUCT TYPE DOUGHNUT =====
+function renderProductChart() {
+  const byProduct = {};
+  DATA.rides.forEach(r => {
+    if (!byProduct[r.product]) byProduct[r.product] = 0;
+    byProduct[r.product]++;
+  });
+
+  const sorted = Object.entries(byProduct).sort((a, b) => b[1] - a[1]);
+  const labels = sorted.map(([k]) => k);
+  const values = sorted.map(([, v]) => v);
+
+  const colors = [
+    'rgba(168,85,247,0.8)',
+    'rgba(192,132,252,0.8)',
+    'rgba(139,92,246,0.8)',
+    'rgba(124,58,237,0.7)',
+    'rgba(109,40,217,0.6)',
+    'rgba(91,33,182,0.5)',
+    'rgba(76,29,149,0.5)',
+    'rgba(168,85,247,0.4)',
+    'rgba(192,132,252,0.4)',
+    'rgba(139,92,246,0.4)',
+  ];
+
+  new Chart(document.getElementById('productChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors.slice(0, labels.length),
+        borderColor: '#12121a',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '55%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: '#e0e0e8',
+            font: { size: 12 },
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 10,
+          }
+        },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: {
+            label: ctx => {
+              const pct = Math.round(ctx.parsed / DATA.rides.length * 100);
+              return ctx.label + ': ' + ctx.parsed + ' rides (' + pct + '%)';
+            }
+          }
+        },
+        datalabels: {
+          display: ctx => {
+            const pct = ctx.dataset.data[ctx.dataIndex] / DATA.rides.length * 100;
+            return pct >= 5;
+          },
+          color: '#fff',
+          font: { size: 11, weight: 600 },
+          formatter: (v) => Math.round(v / DATA.rides.length * 100) + '%',
+        }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>

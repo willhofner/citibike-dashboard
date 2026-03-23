@@ -18,11 +18,11 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ## Project Overview
 
-**One-liner**: A personal activity dashboard -- turning CitiBike rides and Strava runs into beautiful, interactive visualizations.
+**One-liner**: A personal activity dashboard -- turning CitiBike rides, Strava runs, Uber rides, and Apple Watch data into beautiful, interactive visualizations.
 
 ### What We're Building
 
-A multi-sport activity dashboard for visualizing personal ride and run data. Live with CitiBike (318 rides) and Strava (79 runs, 362 miles).
+A multi-sport activity dashboard for visualizing personal activity data. Live with CitiBike (318 rides), Strava (79 runs, 362 miles), Uber (220 rides, $7.7K spent, 23 cities), and Apple Watch heart rate (508K readings, 4.5 years).
 
 ### Tech Stack
 
@@ -39,7 +39,7 @@ A multi-sport activity dashboard for visualizing personal ride and run data. Liv
 
 ```
 citibike-bot/
-├── index.html                  # Landing page (links to CitiBike + Strava)
+├── index.html                  # Landing page (links to all dashboards)
 ├── CLAUDE.md                   # Project context (you are here)
 ├── .gitignore
 ├── citibike/
@@ -60,6 +60,19 @@ citibike-bot/
 │       ├── .strava_tokens.json          # OAuth tokens (gitignored)
 │       ├── activities_raw.json          # Raw API response (169 activities)
 │       └── activities_enriched.json     # Processed data for dashboard
+├── uber/
+│   ├── explore.html            # Ride explorer (browse Uber rides with map)
+│   ├── dashboard.html          # Spending dashboard (stats, charts, heatmaps, city breakdown)
+│   ├── parse_rides.py          # CSV parser → enriched JSON
+│   └── data/
+│       └── rides_enriched.json          # Processed Uber rides (220 rides, 23 cities)
+├── health/
+│   ├── steps.html              # HofWalks — steps dashboard
+│   ├── heartrate.html          # HofBeats — heart rate dashboard (RHR, HRV, VO2 Max, zones)
+│   ├── parse_heartrate.py      # Apple Health XML parser → enriched JSON
+│   └── data/
+│       ├── steps_enriched.json          # Daily step data (2,636 days)
+│       └── heartrate_enriched.json      # Heart rate data (508K readings, 1,499 days)
 └── references/
     ├── tweet_animation
     └── new_dashboards_spec.md  # Specs for Uber/Lyft, Apple Watch, Subway dashboards
@@ -242,6 +255,183 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
 
 ---
 
+## Uber (HofRides): Current State
+
+### What's Built
+
+1. **Ride Explorer** (`uber/explore.html`)
+   - Two-panel layout: scrollable ride list + Leaflet map
+   - Search locations, filter by product type (UberX/UberXL/Other), weekday/weekend
+   - Sort: Recent, Farthest, Priciest
+   - Click any ride to see straight-line route on map (purple dashed line)
+   - Green marker = pickup, red marker = dropoff
+   - Ghost layer: all 220 pickup points as faded purple circles
+   - Detail overlay: date, time, addresses, product, distance, duration, fare, city, wait time, surge
+   - Keyboard navigation (j/k, arrows, Escape)
+   - Accent color: purple (#a855f7)
+
+2. **Dashboard** (`uber/dashboard.html`)
+   - Header stats: total rides, total spent, ride time
+   - 6 stat cards: avg fare, avg distance, avg duration, cities, avg wait, surge rides
+   - Monthly spending line chart + monthly ride count bar chart
+   - Day × Hour heatgrid (purple intensity)
+   - Distribution histograms: distance, duration, cost (3 side-by-side)
+   - Hour of day + day of week bar charts
+   - Top 10 cities leaderboard
+   - Product type doughnut chart
+
+3. **Data Pipeline**
+   - `uber/parse_rides.py`: parses CSV export → enriched JSON
+   - Source: Uber privacy data export (CSV)
+
+### Key Stats
+
+- 220 completed rides, Dec 2016 — Mar 2026
+- $7,685.80 total spent
+- 1,359.5 total miles
+- 61.7 hours of ride time
+- 23 cities (NYC: 83, Columbus: 52, Chicago: 14, Mexico City: 14)
+- 73 surge rides (33%)
+- Top product: UberX (177 rides, 80%)
+
+### Data Source: Uber Privacy Export
+
+Downloaded from Uber's privacy portal. Export includes full ride history CSV with:
+- Pickup/dropoff lat/lng and addresses
+- Trip distance, duration, fare breakdown
+- Product type, surge multiplier, wait time
+- City, timezone, currency
+
+### Data Formats
+
+**Raw data** (`Uber_Ride_History.csv`):
+```csv
+city_name,currency_code,timezone,flow,product_type_name,global_product_name,
+request_timestamp_local,request_timestamp_utc,request_lat,request_lng,
+begintrip_timestamp_local,begintrip_timestamp_utc,begintrip_lat,begintrip_lng,begintrip_address,
+dropoff_timestamp_local,dropoff_timestamp_utc,dropoff_lat,dropoff_lng,dropoff_address,
+trip_distance_miles,trip_duration_seconds,status,is_completed,fare_amount,
+surge_multiplier,is_surged,is_pool_matched,...
+```
+
+**Enriched ride data** (`uber/data/rides_enriched.json`):
+```json
+{
+  "summary": {
+    "totalRides": 220,
+    "totalFare": 7685.80,
+    "totalDistanceMi": 1359.5,
+    "totalDurationHr": 61.7,
+    "avgFare": 34.94,
+    "avgDistanceMi": 6.18,
+    "avgDurationMin": 16.8,
+    "cityCount": 23,
+    "surgedRides": 73
+  },
+  "rides": [{
+    "id": 220,
+    "city": "New York City",
+    "product": "uberX",
+    "startTime": "2026-03-17T20:02:09",
+    "startLat": 40.72876, "startLon": -73.98759,
+    "endLat": 40.72139, "endLon": -73.98769,
+    "startAddress": "132 2nd Ave, New York City, NY 10002, US",
+    "endAddress": "132 2nd Ave, New York City, NY 10002, US",
+    "distanceMi": 0.7,
+    "durationMin": 5.6,
+    "fare": 13.53,
+    "isSurged": false,
+    "dayOfWeek": "Tuesday",
+    "hour": 20,
+    "month": "2026-03",
+    "date": "2026-03-17"
+  }]
+}
+```
+
+---
+
+## Heart Rate (HofBeats): Current State
+
+### What's Built
+
+1. **Dashboard** (`health/heartrate.html`)
+   - Header stats: total readings, days tracked, resting BPM
+   - 6 stat cards: overall avg/min/max, avg HRV, latest VO2 Max, HRV readings
+   - Resting Heart Rate trend (line chart with Daily/Weekly/Monthly toggles + rolling average)
+   - HRV trend (line chart with toggles)
+   - VO2 Max trend (line chart)
+   - Daily HR range (floating bar chart: min-to-max with avg overlay, 30d/90d/1yr/all toggles)
+   - Heart Rate zones (doughnut + bar chart side-by-side)
+   - Hour of day pattern + Day × Hour heatgrid
+   - BPM distribution histogram
+   - Accent color: red (#ef4444)
+
+2. **Data Pipeline**
+   - `health/parse_heartrate.py`: parses Apple Health XML → enriched JSON
+   - Source: Apple Health export (XML)
+   - Extracts: HeartRate, RestingHeartRate, HRV (SDNN), VO2Max, WalkingHeartRateAverage
+
+### Key Stats
+
+- 508,148 heart rate readings, Oct 2021 — Mar 2026
+- 1,499 days tracked
+- Avg resting HR: 59.7 bpm
+- Avg HRV: 40.0 ms
+- 5,487 HRV measurements
+- 528 VO2 Max measurements
+- 1,355 walking HR averages
+
+### Data Source: Apple Health Export
+
+Exported from iPhone Health app (Settings → Health → Export All Health Data). Produces `Apple_Health.xml` (~5.8M lines). The parser uses `iterparse` for memory-efficient streaming.
+
+### Data Formats
+
+**Raw data** (`Apple_Health.xml`):
+```xml
+<Record type="HKQuantityTypeIdentifierHeartRate"
+  sourceName="Will's Apple Watch" unit="count/min"
+  startDate="2024-11-21 18:40:02 -0400" value="65"/>
+
+<Record type="HKQuantityTypeIdentifierRestingHeartRate"
+  sourceName="Will's Apple Watch" unit="count/min"
+  startDate="2025-01-27 10:34:26 -0400" value="59"/>
+
+<Record type="HKQuantityTypeIdentifierHeartRateVariabilitySDNN"
+  sourceName="Will's Apple Watch" unit="ms"
+  startDate="2021-10-10 22:52:18 -0400" value="22.8062"/>
+```
+
+**Enriched data** (`health/data/heartrate_enriched.json`):
+```json
+{
+  "summary": {
+    "totalReadings": 508148,
+    "dateRange": ["2021-10-10", "2026-03-15"],
+    "daysTracked": 1499,
+    "overallAvg": 78.3,
+    "avgRestingHR": 59.7,
+    "avgHRV": 40.0,
+    "latestVO2Max": 42.5
+  },
+  "dailyStats": [{
+    "date": "2021-10-10",
+    "min": 45.0, "max": 180.0, "avg": 72.5,
+    "count": 340,
+    "hourly": { "0": 62.3, "8": 78.1 }
+  }],
+  "restingHR": [{ "value": 59, "date": "2025-01-27" }],
+  "hrv": [{ "value": 22.8, "date": "2021-10-10" }],
+  "vo2max": [{ "value": 42.5, "date": "..." }],
+  "hourlyAvg": { "0": 65.2, "1": 63.1, "23": 68.4 },
+  "zones": { "rest": 50000, "light": 300000, "moderate": 100000, "vigorous": 40000, "peak": 18000 },
+  "bpmHistogram": [{ "bpm": 40, "count": 500 }]
+}
+```
+
+---
+
 ## Design Principles
 
 1. **Ship fast** -- Iterate quickly, get feedback early
@@ -249,7 +439,7 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
 3. **Own your data** -- Everything runs locally, no third-party services required
 4. **Data tells the story** -- Let the numbers speak
 5. **Personal first** -- This is for one user's data, not a platform
-6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f, --accent: #3b82f6)
+6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444
 
 ---
 
