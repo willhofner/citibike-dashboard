@@ -125,6 +125,13 @@
   .card.citibike .card-links a:hover { color: var(--accent); }
   .card.strava .card-links a:hover { color: var(--orange); }
 
+  @media (max-width: 640px) {
+    .container { padding: 24px 20px; }
+    h1 { font-size: 26px; }
+    .subtitle { margin-bottom: 28px; }
+    .cards { grid-template-columns: 1fr; }
+  }
+
   .card-stat-row {
     display: flex;
     gap: 16px;

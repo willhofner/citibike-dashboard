@@ -184,6 +184,15 @@
   .leaflet-container { background: #0a0a0f; }
   .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
 
+  @media (max-width: 640px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; height: 100dvh; }
+    .sidebar { height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .map-panel { height: auto; }
+    .run-detail-overlay { bottom: 12px; left: 12px; right: 12px; padding: 14px 16px; }
+    .detail-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; }
+    .detail-stat .d-val { font-size: 16px; }
+  }
+
   /* Runner glow pulse */
   .runner-glow {
     animation: pulse 1s ease-in-out infinite;

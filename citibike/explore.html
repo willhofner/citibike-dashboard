@@ -238,6 +238,14 @@
 
   .station-popup { text-align: center; }
   .station-popup b { font-size: 13px; }
+
+  @media (max-width: 640px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; height: 100dvh; }
+    .sidebar { height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .map-panel { height: auto; }
+    .ride-detail-overlay { top: auto; bottom: 12px; right: 12px; left: 12px; min-width: unset; }
+    .all-routes-hint { display: none; }
+  }
 </style>
 </head>
 <body>
