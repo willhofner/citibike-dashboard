@@ -16,6 +16,8 @@
     --accent: #3b82f6;
     --green: #22c55e;
     --orange: #f97316;
+    --purple: #a855f7;
+    --red: #ef4444;
   }
 
   body {
@@ -29,7 +31,7 @@
   }
 
   .container {
-    max-width: 800px;
+    max-width: 900px;
     width: 100%;
     padding: 40px;
   }
@@ -51,7 +53,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-    margin-bottom: 16px;
   }
 
   .card {
@@ -69,33 +70,26 @@
 
   .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59,130,246,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   }
 
-  .card.citibike:hover { border-color: var(--accent); }
-  .card.strava:hover { border-color: var(--orange); }
+  .card.bikes:hover { border-color: var(--accent); box-shadow: 0 8px 24px rgba(59,130,246,0.15); }
+  .card.runs:hover { border-color: var(--orange); box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
+  .card.walks:hover { border-color: var(--green); box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
+  .card.beats:hover { border-color: var(--red); box-shadow: 0 8px 24px rgba(239,68,68,0.15); }
 
-  .card .icon {
-    font-size: 36px;
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 16px;
   }
 
-  .card h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .card p {
-    font-size: 13px;
-    color: var(--text-dim);
-    line-height: 1.5;
+  .card .icon {
+    font-size: 36px;
   }
 
   .card .badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -109,27 +103,34 @@
     color: var(--green);
   }
 
-  .card-links {
-    margin-top: 12px;
-    display: flex;
-    gap: 16px;
-    font-size: 12px;
+  .badge-new {
+    background: rgba(168,85,247,0.15);
+    color: var(--purple);
   }
 
-  .card-links a {
+  .card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .card .brand {
+    font-size: 11px;
     color: var(--text-dim);
-    text-decoration: none;
-    transition: color 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
   }
 
-  .card.citibike .card-links a:hover { color: var(--accent); }
-  .card.strava .card-links a:hover { color: var(--orange); }
+  .card.bikes .brand { color: rgba(59,130,246,0.6); }
+  .card.runs .brand { color: rgba(249,115,22,0.6); }
+  .card.walks .brand { color: rgba(34,197,94,0.6); }
+  .card.beats .brand { color: rgba(239,68,68,0.6); }
 
-  @media (max-width: 640px) {
-    .container { padding: 24px 20px; }
-    h1 { font-size: 26px; }
-    .subtitle { margin-bottom: 28px; }
-    .cards { grid-template-columns: 1fr; }
+  .card p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
   }
 
   .card-stat-row {
@@ -150,8 +151,10 @@
     font-weight: 700;
   }
 
-  .card.citibike .card-stat .val { color: var(--accent); }
-  .card.strava .card-stat .val { color: var(--orange); }
+  .card.bikes .card-stat .val { color: var(--accent); }
+  .card.runs .card-stat .val { color: var(--orange); }
+  .card.walks .card-stat .val { color: var(--green); }
+  .card.beats .card-stat .val { color: var(--red); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -159,18 +162,46 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
+
+  .card-links {
+    margin-top: 12px;
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .card-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .card.bikes .card-links a:hover { color: var(--accent); }
+  .card.runs .card-links a:hover { color: var(--orange); }
+  .card.walks .card-links a:hover { color: var(--green); }
+  .card.beats .card-links a:hover { color: var(--red); }
+
+  @media (max-width: 640px) {
+    .container { padding: 24px 20px; }
+    h1 { font-size: 26px; }
+    .subtitle { margin-bottom: 28px; }
+    .cards { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>Activity Dashboard</h1>
-  <p class="subtitle">Personal ride and run data — CitiBike, Strava, and more</p>
+  <p class="subtitle">Personal activity data — bikes, runs, walks, and heart rate</p>
 
   <div class="cards">
-    <div onclick="location.href='citibike/explore.html'" class="card citibike">
-      <span class="badge badge-live">Live</span>
-      <div class="icon">🚲</div>
-      <h2>CitiBike</h2>
+    <div onclick="location.href='citibike/explore.html'" class="card bikes">
+      <div class="card-top">
+        <div class="icon">🚲</div>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <h2>HofBikes</h2>
+      <div class="brand">CitiBike</div>
       <p>Route maps, heatmaps, station analytics, and ride explorer</p>
       <div class="card-stat-row">
         <div class="card-stat"><div class="val">318</div><div class="lbl">Rides</div></div>
@@ -183,11 +214,14 @@
       </div>
     </div>
 
-    <div onclick="location.href='strava/index.html'" class="card strava">
-      <span class="badge badge-live">Live</span>
-      <div class="icon">🏃</div>
-      <h2>Strava Runs</h2>
-      <p>Stats, animated route replay, heatmaps, pace splits, and timelapse</p>
+    <div onclick="location.href='strava/index.html'" class="card runs">
+      <div class="card-top">
+        <div class="icon">🏃</div>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <h2>HofRuns</h2>
+      <div class="brand">Strava</div>
+      <p>Animated route replay, heatmaps, pace splits, and timelapse</p>
       <div class="card-stat-row">
         <div class="card-stat"><div class="val">79</div><div class="lbl">Runs</div></div>
         <div class="card-stat"><div class="val">362 mi</div><div class="lbl">Distance</div></div>
@@ -196,6 +230,36 @@
       <div class="card-links">
         <a href="strava/index.html" onclick="event.stopPropagation()">Run Explorer</a>
         <a href="strava/dashboard.html" onclick="event.stopPropagation()">Dashboard</a>
+      </div>
+    </div>
+
+    <div onclick="location.href='health/steps.html'" class="card walks">
+      <div class="card-top">
+        <div class="icon">🚶</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofWalks</h2>
+      <div class="brand">Apple Health</div>
+      <p>Daily step trends, distribution charts, leaderboards, and heatgrids</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">30M</div><div class="lbl">Steps</div></div>
+        <div class="card-stat"><div class="val">7.2yr</div><div class="lbl">Tracked</div></div>
+        <div class="card-stat"><div class="val">11.4K</div><div class="lbl">Avg/Day</div></div>
+      </div>
+    </div>
+
+    <div onclick="location.href='health/heartrate.html'" class="card beats">
+      <div class="card-top">
+        <div class="icon">❤️</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofBeats</h2>
+      <div class="brand">Apple Watch</div>
+      <p>Heart rate trends, resting HR, zone analysis, and daily rhythms</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">508K</div><div class="lbl">Readings</div></div>
+        <div class="card-stat"><div class="val">4.5yr</div><div class="lbl">Tracked</div></div>
+        <div class="card-stat"><div class="val">59.6</div><div class="lbl">Resting BPM</div></div>
       </div>
     </div>
   </div>

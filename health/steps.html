@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofWalks — Steps Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #22c55e;
+    --accent2: #4ade80;
+    --accent-dim: rgba(34,197,94,0.3);
+    --green: #22c55e;
+    --amber: #fbbf24;
+    --red: #ef4444;
+    --purple: #a855f7;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  .header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .nav-links {
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+  }
+  .header-stat {
+    text-align: right;
+  }
+  .header-stat .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .header-stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Stat cards */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    padding: 20px 40px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat-card .detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Chart sections */
+  .section {
+    padding: 20px 40px;
+  }
+  .section-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .section-grid.two { grid-template-columns: 1fr 1fr; }
+  .section-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-card canvas { width: 100% !important; }
+
+
+  /* Toggle buttons */
+  .toggle-group {
+    display: flex;
+    gap: 4px;
+  }
+  .toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .toggle-btn:hover { border-color: var(--accent); color: var(--text); }
+  .toggle-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+
+  /* Heatgrid */
+  .heatgrid {
+    display: grid;
+    grid-template-columns: 60px repeat(24, 1fr);
+    gap: 2px;
+    font-size: 10px;
+  }
+  .heatgrid .row-label {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding-right: 8px;
+    justify-content: flex-end;
+  }
+  .heatgrid .col-label {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 10px;
+    padding-bottom: 4px;
+  }
+  .heatgrid .cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    position: relative;
+    cursor: default;
+    min-height: 20px;
+  }
+  .heatgrid .cell:hover {
+    outline: 1px solid var(--text-dim);
+    z-index: 1;
+  }
+  .heatgrid .cell .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,15,0.95);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 100;
+    color: var(--text);
+  }
+  .heatgrid .cell:hover .tooltip { display: block; }
+
+  /* Leaderboard */
+  .leaderboard {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .leaderboard::-webkit-scrollbar { width: 6px; }
+  .leaderboard::-webkit-scrollbar-track { background: transparent; }
+  .leaderboard::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .lb-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .lb-item:last-child { border-bottom: none; }
+  .lb-rank {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-item:nth-child(1) .lb-rank { color: #fbbf24; }
+  .lb-item:nth-child(2) .lb-rank { color: #c0c0c0; }
+  .lb-item:nth-child(3) .lb-rank { color: #cd7f32; }
+  .lb-bar {
+    flex: 1;
+    height: 28px;
+    background: rgba(34,197,94,0.08);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lb-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0.7;
+  }
+  .lb-bar-text {
+    position: absolute;
+    top: 0;
+    left: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .lb-steps {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 70px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-dow {
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .section-grid.two, .section-grid.three { grid-template-columns: 1fr; }
+    .section { padding: 16px 20px; }
+    .stats-row { padding: 16px 20px; }
+    .header { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1><span>HofWalks</span></h1>
+    <div class="subtitle">Apple Health step data — every step since Dec 2018</div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="value" id="hTotal">—</div><div class="label">Total Steps</div></div>
+    <div class="header-stat"><div class="value" id="hDays">—</div><div class="label">Days Tracked</div></div>
+    <div class="header-stat"><div class="value" id="hAvg">—</div><div class="label">Avg / Day</div></div>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Master explorer chart -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>
+        Step Trends
+        <div class="toggle-group">
+          <button class="toggle-btn active" onclick="setView('daily')">Daily</button>
+          <button class="toggle-btn" onclick="setView('weekly')">Weekly</button>
+          <button class="toggle-btn" onclick="setView('monthly')">Monthly</button>
+          <button class="toggle-btn" onclick="setView('yearly')">Yearly</button>
+        </div>
+      </h3>
+      <canvas id="trendChart" height="100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Distribution + Heatgrid -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Step Distribution (Days)</h3>
+      <canvas id="distChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Day of Week × Hour Heatgrid</h3>
+      <div class="heatgrid" id="heatgrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Breakdown charts -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Average Steps by Hour of Day</h3>
+      <canvas id="hourChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Average Steps by Day of Week</h3>
+      <canvas id="dowChart" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Average Steps by Day of Month</h3>
+      <canvas id="domChart" height="140"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Average Steps by Month of Year</h3>
+      <canvas id="moyChart" height="140"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card" style="grid-column: 1 / -1;">
+      <h3>
+        Top Days Leaderboard
+        <div class="toggle-group">
+          <button class="toggle-btn active" onclick="setLbCount(25)">25</button>
+          <button class="toggle-btn" onclick="setLbCount(50)">50</button>
+          <button class="toggle-btn" onclick="setLbCount(100)">100</button>
+        </div>
+      </h3>
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 40px;"></div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+// Default: datalabels OFF globally, enable per-dataset
+Chart.defaults.plugins.datalabels = { display: false };
+
+const DATALABEL_OPTS = {
+  display: true,
+  anchor: 'end',
+  align: 'end',
+  color: '#8888a0',
+  font: { size: 9, weight: 600 },
+  formatter: v => v >= 1000 ? (v/1000).toFixed(1) + 'K' : v,
+  offset: 2,
+};
+
+let DATA;
+let trendChart, distChart, dowChart, hourChart, domChart, moyChart;
+let currentView = 'daily';
+
+fetch('data/steps_enriched.json')
+  .then(r => r.json())
+  .then(data => { DATA = data; init(); });
+
+function init() {
+  renderHeader();
+  renderStats();
+  renderTrendChart();
+  renderDistribution();
+  renderHeatgrid();
+  renderHourChart();
+  renderDowChart();
+  renderDomChart();
+  renderMoyChart();
+  renderLeaderboard(25);
+
+}
+
+// ===== HEADER =====
+function renderHeader() {
+  const s = DATA.summary;
+  document.getElementById('hTotal').textContent = (s.totalSteps / 1e6).toFixed(1) + 'M';
+  document.getElementById('hDays').textContent = s.totalDays.toLocaleString();
+  document.getElementById('hAvg').textContent = s.avgStepsPerDay.toLocaleString();
+}
+
+// ===== STAT CARDS =====
+function renderStats() {
+  const s = DATA.summary;
+  const days = DATA.days;
+
+  // Estimated miles (2,000 steps ≈ 1 mile)
+  const totalMiles = Math.round(s.totalSteps / 2000);
+
+  // Days above 10K
+  const above10k = days.filter(d => d.steps >= 10000).length;
+  const pct10k = Math.round(above10k / days.length * 100);
+
+  // Current streak above 5K
+  let streak = 0;
+  for (let i = days.length - 1; i >= 0; i--) {
+    if (days[i].steps >= 5000) streak++;
+    else break;
+  }
+
+  // Best month
+  const byMonth = {};
+  days.forEach(d => {
+    if (!byMonth[d.month]) byMonth[d.month] = [];
+    byMonth[d.month].push(d.steps);
+  });
+  let bestMonth = '', bestMonthAvg = 0;
+  for (const [m, vals] of Object.entries(byMonth)) {
+    const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+    if (avg > bestMonthAvg) { bestMonthAvg = avg; bestMonth = m; }
+  }
+
+  // Most active year
+  const byYear = {};
+  days.forEach(d => {
+    if (!byYear[d.year]) byYear[d.year] = [];
+    byYear[d.year].push(d.steps);
+  });
+  let bestYear = '', bestYearAvg = 0;
+  for (const [y, vals] of Object.entries(byYear)) {
+    if (vals.length < 30) continue; // partial years
+    const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+    if (avg > bestYearAvg) { bestYearAvg = avg; bestYear = y; }
+  }
+
+  const cards = [
+    { label: 'Est. Miles', value: totalMiles.toLocaleString(), detail: `~${Math.round(totalMiles / (s.totalDays / 365.25))} mi/year` },
+    { label: 'Best Day', value: s.maxSteps.toLocaleString(), detail: formatDate(s.bestDay) },
+    { label: 'Median / Day', value: s.medianStepsPerDay.toLocaleString(), detail: 'steps' },
+    { label: 'Days ≥ 10K', value: above10k.toLocaleString(), detail: `${pct10k}% of all days` },
+    { label: 'Best Month', value: bestMonth, detail: Math.round(bestMonthAvg).toLocaleString() + ' avg' },
+    { label: 'Active Streak', value: streak + ' days', detail: '≥ 5,000 steps' },
+  ];
+
+  const row = document.getElementById('statsRow');
+  row.innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="detail">${c.detail}</div>
+    </div>
+  `).join('');
+}
+
+// ===== TREND CHART =====
+function setView(view) {
+  currentView = view;
+  event.target.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTrendChart();
+}
+
+function renderTrendChart() {
+  const ctx = document.getElementById('trendChart');
+  if (trendChart) trendChart.destroy();
+
+  let labels, values, avgLine;
+
+  if (currentView === 'daily') {
+    const recent = DATA.days.slice(-365);
+    labels = recent.map(d => d.date);
+    values = recent.map(d => d.steps);
+    avgLine = values.map((_, i) => {
+      const start = Math.max(0, i - 6);
+      const slice = values.slice(start, i + 1);
+      return Math.round(slice.reduce((a,b) => a+b, 0) / slice.length);
+    });
+  } else if (currentView === 'weekly') {
+    const weeks = {};
+    DATA.days.forEach(d => {
+      const dt = new Date(d.date + 'T00:00:00');
+      const weekStart = new Date(dt);
+      weekStart.setDate(dt.getDate() - ((dt.getDay() + 6) % 7));
+      const key = weekStart.toISOString().slice(0, 10);
+      if (!weeks[key]) weeks[key] = [];
+      weeks[key].push(d.steps);
+    });
+    const sorted = Object.entries(weeks).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => Math.round(v.reduce((a,b) => a+b, 0) / v.length));
+    avgLine = values.map((_, i) => {
+      const start = Math.max(0, i - 3);
+      const slice = values.slice(start, i + 1);
+      return Math.round(slice.reduce((a,b) => a+b, 0) / slice.length);
+    });
+  } else if (currentView === 'monthly') {
+    const months = {};
+    DATA.days.forEach(d => {
+      if (!months[d.month]) months[d.month] = [];
+      months[d.month].push(d.steps);
+    });
+    const sorted = Object.entries(months).sort((a,b) => a[0].localeCompare(b[0]));
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => Math.round(v.reduce((a,b) => a+b, 0) / v.length));
+    avgLine = values.map((_, i) => {
+      const start = Math.max(0, i - 2);
+      const slice = values.slice(start, i + 1);
+      return Math.round(slice.reduce((a,b) => a+b, 0) / slice.length);
+    });
+  } else {
+    const years = {};
+    DATA.days.forEach(d => {
+      if (!years[d.year]) years[d.year] = [];
+      years[d.year].push(d.steps);
+    });
+    const sorted = Object.entries(years).sort((a,b) => a[0] - b[0]);
+    labels = sorted.map(([k]) => k);
+    values = sorted.map(([, v]) => Math.round(v.reduce((a,b) => a+b, 0) / v.length));
+    avgLine = null;
+  }
+
+  const datasets = [{
+    label: currentView === 'daily' ? 'Steps' : 'Avg Steps/Day',
+    data: values,
+    backgroundColor: currentView === 'yearly' ? 'rgba(34,197,94,0.7)' : 'rgba(34,197,94,0.4)',
+    borderColor: currentView === 'daily' ? 'rgba(34,197,94,0.4)' : 'rgba(34,197,94,0.8)',
+    borderWidth: currentView === 'daily' ? 0 : 2,
+    type: 'bar',
+    barPercentage: currentView === 'daily' ? 1.0 : 0.85,
+    categoryPercentage: currentView === 'daily' ? 1.0 : 0.85,
+    order: 2,
+  }];
+
+  if (avgLine) {
+    datasets.push({
+      label: 'Rolling Average',
+      data: avgLine,
+      borderColor: '#ffffff',
+      borderWidth: 2,
+      type: 'line',
+      pointRadius: 0,
+      tension: 0.3,
+      order: 1,
+    });
+  }
+
+  trendChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: !!avgLine, labels: { color: '#8888a0', font: { size: 11 } } },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          titleColor: '#e0e0e8',
+          bodyColor: '#e0e0e8',
+          callbacks: {
+            label: (c) => c.dataset.label + ': ' + c.parsed.y.toLocaleString() + ' steps'
+          }
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#8888a0',
+            font: { size: 10 },
+            maxTicksLimit: currentView === 'daily' ? 12 : currentView === 'weekly' ? 20 : undefined,
+            maxRotation: 45,
+          },
+          grid: { display: false },
+        },
+        y: {
+          ticks: {
+            color: '#8888a0',
+            font: { size: 11 },
+            callback: v => v >= 1000 ? (v/1000) + 'K' : v,
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+        }
+      }
+    }
+  });
+}
+
+// ===== DISTRIBUTION =====
+function renderDistribution() {
+  const buckets = [
+    { label: '0–5K', min: 0, max: 5000 },
+    { label: '5–10K', min: 5000, max: 10000 },
+    { label: '10–15K', min: 10000, max: 15000 },
+    { label: '15–20K', min: 15000, max: 20000 },
+    { label: '20–25K', min: 20000, max: 25000 },
+    { label: '25–30K', min: 25000, max: 30000 },
+    { label: '30–35K', min: 30000, max: 35000 },
+    { label: '35–40K', min: 35000, max: 40000 },
+    { label: '40K+', min: 40000, max: Infinity },
+  ];
+
+  const counts = buckets.map(b =>
+    DATA.days.filter(d => d.steps >= b.min && d.steps < b.max).length
+  );
+
+  const ctx = document.getElementById('distChart');
+  distChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: buckets.map(b => b.label),
+      datasets: [{
+        data: counts,
+        backgroundColor: counts.map((_, i) => {
+          const t = i / (buckets.length - 1);
+          if (t < 0.25) return 'rgba(239,68,68,0.6)';
+          if (t < 0.5) return 'rgba(251,191,36,0.6)';
+          return 'rgba(34,197,94,0.6)';
+        }),
+        borderRadius: 4,
+        datalabels: { ...DATALABEL_OPTS, formatter: v => v },
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ctx.parsed.y + ' days (' + Math.round(ctx.parsed.y / DATA.days.length * 100) + '%)'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 10 } }, grid: { display: false } },
+        y: {
+          ticks: { color: '#8888a0', font: { size: 11 } },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== HEATGRID =====
+function renderHeatgrid() {
+  const grid = document.getElementById('heatgrid');
+  const dowNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Build dow x hour matrix
+  const matrix = {};
+  const counts = {};
+  for (let dow = 1; dow <= 7; dow++) {
+    matrix[dow] = {};
+    counts[dow] = {};
+    for (let h = 0; h < 24; h++) {
+      matrix[dow][h] = 0;
+      counts[dow][h] = 0;
+    }
+  }
+
+  DATA.days.forEach(d => {
+    for (let h = 0; h < 24; h++) {
+      const steps = d.hourly[String(h)] || 0;
+      matrix[d.dayOfWeekNum][h] += steps;
+      counts[d.dayOfWeekNum][h]++;
+    }
+  });
+
+  // Compute averages
+  let maxAvg = 0;
+  const avgs = {};
+  for (let dow = 1; dow <= 7; dow++) {
+    avgs[dow] = {};
+    for (let h = 0; h < 24; h++) {
+      avgs[dow][h] = counts[dow][h] > 0 ? matrix[dow][h] / counts[dow][h] : 0;
+      if (avgs[dow][h] > maxAvg) maxAvg = avgs[dow][h];
+    }
+  }
+
+  // Header row
+  let html = '<div class="row-label"></div>';
+  for (let h = 0; h < 24; h++) {
+    html += `<div class="col-label">${h}</div>`;
+  }
+
+  // Data rows
+  for (let dow = 1; dow <= 7; dow++) {
+    html += `<div class="row-label">${dowNames[dow-1]}</div>`;
+    for (let h = 0; h < 24; h++) {
+      const val = avgs[dow][h];
+      const intensity = maxAvg > 0 ? val / maxAvg : 0;
+      const alpha = 0.05 + intensity * 0.85;
+      const color = `rgba(34,197,94,${alpha.toFixed(2)})`;
+      html += `<div class="cell" style="background:${color}">
+        <div class="tooltip">${dowNames[dow-1]} ${h}:00 — ${Math.round(val).toLocaleString()} avg steps</div>
+      </div>`;
+    }
+  }
+
+  grid.innerHTML = html;
+}
+
+// ===== HOUR OF DAY =====
+function renderHourChart() {
+  const byHour = {};
+  for (let h = 0; h < 24; h++) byHour[h] = [];
+  DATA.days.forEach(d => {
+    for (let h = 0; h < 24; h++) {
+      byHour[h].push(d.hourly[String(h)] || 0);
+    }
+  });
+
+  const avgs = [];
+  for (let h = 0; h < 24; h++) {
+    avgs.push(Math.round(byHour[h].reduce((a,b) => a+b, 0) / byHour[h].length));
+  }
+  const maxAvg = Math.max(...avgs);
+  const labels = Array.from({length: 24}, (_, i) => i + ':00');
+
+  hourChart = new Chart(document.getElementById('hourChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: avgs,
+        backgroundColor: avgs.map(v => v === maxAvg ? 'rgba(34,197,94,0.8)' : 'rgba(34,197,94,0.4)'),
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' avg steps' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+        y: {
+          beginAtZero: false,
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => v >= 1000 ? (v/1000) + 'K' : v },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== DAY OF WEEK =====
+function renderDowChart() {
+  const dowOrder = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dowShort = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const byDow = {};
+  dowOrder.forEach(d => byDow[d] = []);
+  DATA.days.forEach(d => byDow[d.dayOfWeek].push(d.steps));
+
+  const avgs = dowOrder.map(d => Math.round(byDow[d].reduce((a,b) => a+b, 0) / byDow[d].length));
+  const maxAvg = Math.max(...avgs);
+
+  const ctx = document.getElementById('dowChart');
+  dowChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dowShort,
+      datasets: [{
+        data: avgs,
+        backgroundColor: avgs.map(v => v === maxAvg ? 'rgba(34,197,94,0.8)' : 'rgba(34,197,94,0.4)'),
+        borderRadius: 6,
+        datalabels: DATALABEL_OPTS,
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ctx.parsed.y.toLocaleString() + ' avg steps'
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 11 } }, grid: { display: false } },
+        y: {
+          beginAtZero: false,
+          ticks: {
+            color: '#8888a0',
+            font: { size: 11 },
+            callback: v => (v/1000) + 'K',
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== DAY OF MONTH =====
+function renderDomChart() {
+  const byDom = {};
+  for (let d = 1; d <= 31; d++) byDom[d] = [];
+  DATA.days.forEach(d => {
+    const dom = parseInt(d.date.slice(8, 10));
+    byDom[dom].push(d.steps);
+  });
+
+  const labels = Array.from({length: 31}, (_, i) => i + 1);
+  const avgs = labels.map(d => byDom[d].length ? Math.round(byDom[d].reduce((a,b) => a+b, 0) / byDom[d].length) : 0);
+  const maxAvg = Math.max(...avgs);
+
+  domChart = new Chart(document.getElementById('domChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: avgs,
+        backgroundColor: avgs.map(v => v === maxAvg ? 'rgba(34,197,94,0.8)' : 'rgba(34,197,94,0.4)'),
+        borderRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' avg steps' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 9 }, maxRotation: 0 }, grid: { display: false } },
+        y: {
+          beginAtZero: false,
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => (v/1000) + 'K' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== MONTH OF YEAR =====
+function renderMoyChart() {
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const byMonth = {};
+  for (let m = 1; m <= 12; m++) byMonth[m] = [];
+  DATA.days.forEach(d => {
+    const m = parseInt(d.date.slice(5, 7));
+    byMonth[m].push(d.steps);
+  });
+
+  const avgs = [];
+  for (let m = 1; m <= 12; m++) {
+    avgs.push(byMonth[m].length ? Math.round(byMonth[m].reduce((a,b) => a+b, 0) / byMonth[m].length) : 0);
+  }
+  const maxAvg = Math.max(...avgs);
+
+  moyChart = new Chart(document.getElementById('moyChart'), {
+    type: 'bar',
+    data: {
+      labels: monthNames,
+      datasets: [{
+        data: avgs,
+        backgroundColor: avgs.map(v => v === maxAvg ? 'rgba(34,197,94,0.8)' : 'rgba(34,197,94,0.4)'),
+        borderRadius: 6,
+        datalabels: DATALABEL_OPTS,
+      }]
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.95)',
+          borderColor: '#1e1e2e',
+          borderWidth: 1,
+          callbacks: { label: ctx => ctx.parsed.y.toLocaleString() + ' avg steps' }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#8888a0', font: { size: 11 } }, grid: { display: false } },
+        y: {
+          beginAtZero: false,
+          ticks: { color: '#8888a0', font: { size: 11 }, callback: v => (v/1000) + 'K' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+}
+
+// ===== LEADERBOARD =====
+function setLbCount(n) {
+  event.target.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderLeaderboard(n);
+}
+
+function renderLeaderboard(count) {
+  const sorted = [...DATA.days].sort((a,b) => b.steps - a.steps).slice(0, count);
+  const maxSteps = sorted[0].steps;
+  const dowShort = { Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat', Sunday: 'Sun' };
+
+  const lb = document.getElementById('leaderboard');
+  lb.innerHTML = sorted.map((d, i) => {
+    const pct = (d.steps / maxSteps * 100).toFixed(1);
+    return `
+      <div class="lb-item">
+        <div class="lb-rank">${i + 1}</div>
+        <div class="lb-bar">
+          <div class="lb-bar-fill" style="width:${pct}%"></div>
+          <div class="lb-bar-text">${formatDate(d.date)}</div>
+        </div>
+        <div class="lb-dow">${dowShort[d.dayOfWeek]}</div>
+        <div class="lb-steps">${d.steps.toLocaleString()}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== UTILS =====
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
+</body>
+</html>
