@@ -10,6 +10,7 @@ First run opens a browser for OAuth authorization.
 Subsequent runs use the saved refresh token.
 """
 
+import argparse
 import json
 import os
 import sys
@@ -203,58 +204,158 @@ def fetch_activity_streams(activity_id, token):
 
 # ── Main Pipeline ───────────────────────────────────────────────────────────
 
+def get_latest_activity_epoch(raw_file):
+    """Get the epoch timestamp of the most recent activity in existing data."""
+    if not os.path.exists(raw_file):
+        return None
+    try:
+        with open(raw_file) as f:
+            data = json.load(f)
+        if not data:
+            return None
+        # Find the most recent start_date and convert to epoch
+        from datetime import datetime, timezone
+        latest = max(
+            datetime.fromisoformat(a["start_date"].replace("Z", "+00:00"))
+            for a in data if a.get("start_date")
+        )
+        return int(latest.timestamp())
+    except Exception:
+        return None
+
+
+def fetch_new_activities(token, after_epoch):
+    """Fetch only activities created after the given epoch timestamp."""
+    all_activities = []
+    page = 1
+
+    while True:
+        print(f"  Fetching new activities page {page}...")
+        activities = api_get("/athlete/activities", token, {
+            "per_page": 200,
+            "page": page,
+            "after": after_epoch,
+        })
+
+        if not activities:
+            break
+
+        all_activities.extend(activities)
+        print(f"  Got {len(activities)} activities (total new: {len(all_activities)})")
+
+        if len(activities) < 200:
+            break
+
+        page += 1
+        time.sleep(DELAY_BETWEEN_CALLS)
+
+    return all_activities
+
+
+def fetch_details_for_activities(activities, token):
+    """Fetch detailed data + streams for a list of activities."""
+    detailed = []
+    for i, activity in enumerate(activities):
+        aid = activity["id"]
+        atype = activity.get("type", "Unknown")
+        aname = activity.get("name", "Untitled")
+
+        print(f"  [{i+1}/{len(activities)}] {atype}: {aname}")
+
+        detail = fetch_activity_detail(aid, token)
+        time.sleep(DELAY_BETWEEN_CALLS)
+
+        streams = fetch_activity_streams(aid, token)
+        time.sleep(DELAY_BETWEEN_CALLS)
+
+        detail["_streams"] = streams
+        detailed.append(detail)
+
+    return detailed
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Fetch Strava activities")
+    parser.add_argument("--incremental", action="store_true",
+                        help="Only fetch activities newer than existing data")
+    parser.add_argument("--full", action="store_true",
+                        help="Re-fetch all activities from scratch")
+    args = parser.parse_args()
+
+    # Default to incremental if data exists, full otherwise
+    incremental = args.incremental or (not args.full and os.path.exists(RAW_FILE))
+
     print("=" * 60)
-    print("Strava Activity Fetcher")
+    print(f"Strava Activity Fetcher {'(incremental)' if incremental else '(full)'}")
     print("=" * 60)
 
     # Step 1: Auth
     token = get_access_token()
 
-    # Step 2: Fetch all activities
-    print("\nFetching all activities...")
-    all_activities = fetch_all_activities(token)
-    print(f"\nFound {len(all_activities)} total activities.")
+    if incremental:
+        # Load existing data
+        after_epoch = get_latest_activity_epoch(RAW_FILE)
+        if after_epoch is None:
+            print("\nNo existing data found, falling back to full fetch...")
+            incremental = False
 
-    # Count by type
-    type_counts = {}
-    for a in all_activities:
-        t = a.get("type", "Unknown")
-        type_counts[t] = type_counts.get(t, 0) + 1
-    for t, c in sorted(type_counts.items(), key=lambda x: -x[1]):
-        print(f"  {t}: {c}")
+    if incremental:
+        from datetime import datetime, timezone
+        after_dt = datetime.fromtimestamp(after_epoch, tz=timezone.utc)
+        print(f"\nFetching activities after {after_dt.strftime('%Y-%m-%d %H:%M')} UTC...")
+        new_activities = fetch_new_activities(token, after_epoch)
 
-    # Step 3: Fetch detailed data for each activity
-    print(f"\nFetching detailed data for all {len(all_activities)} activities...")
-    detailed_activities = []
+        if not new_activities:
+            print("\nNo new activities found. Already up to date!")
+            return
 
-    for i, activity in enumerate(all_activities):
-        aid = activity["id"]
-        atype = activity.get("type", "Unknown")
-        aname = activity.get("name", "Untitled")
+        print(f"\nFound {len(new_activities)} new activities.")
 
-        print(f"  [{i+1}/{len(all_activities)}] {atype}: {aname}")
+        # Fetch details for new activities only
+        print(f"\nFetching detailed data for {len(new_activities)} new activities...")
+        new_detailed = fetch_details_for_activities(new_activities, token)
 
-        # Fetch detail (full polyline, splits, best efforts)
-        detail = fetch_activity_detail(aid, token)
-        time.sleep(DELAY_BETWEEN_CALLS)
+        # Merge with existing raw data
+        with open(RAW_FILE) as f:
+            existing_raw = json.load(f)
 
-        # Fetch streams (raw GPS, heart rate, etc.)
-        streams = fetch_activity_streams(aid, token)
-        time.sleep(DELAY_BETWEEN_CALLS)
+        existing_ids = {a["id"] for a in existing_raw}
+        added = [a for a in new_detailed if a["id"] not in existing_ids]
 
-        detail["_streams"] = streams
-        detailed_activities.append(detail)
+        if not added:
+            print("\nAll fetched activities already exist in data. Up to date!")
+            return
 
-    # Step 4: Save raw data
+        # Prepend new activities (newest first)
+        all_raw = added + existing_raw
+        print(f"\nAdded {len(added)} new activities (total: {len(all_raw)})")
+
+    else:
+        # Full fetch
+        print("\nFetching all activities...")
+        all_activities = fetch_all_activities(token)
+        print(f"\nFound {len(all_activities)} total activities.")
+
+        # Count by type
+        type_counts = {}
+        for a in all_activities:
+            t = a.get("type", "Unknown")
+            type_counts[t] = type_counts.get(t, 0) + 1
+        for t, c in sorted(type_counts.items(), key=lambda x: -x[1]):
+            print(f"  {t}: {c}")
+
+        print(f"\nFetching detailed data for all {len(all_activities)} activities...")
+        all_raw = fetch_details_for_activities(all_activities, token)
+
+    # Save raw data
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(RAW_FILE, "w") as f:
-        json.dump(detailed_activities, f, indent=2)
-    print(f"\nSaved {len(detailed_activities)} activities to {RAW_FILE}")
+        json.dump(all_raw, f, indent=2)
+    print(f"\nSaved {len(all_raw)} activities to {RAW_FILE}")
 
-    # Step 5: Enrich
-    print("\nEnriching activities...")
-    enriched = enrich_activities(detailed_activities)
+    # Re-enrich ALL data (fast, no API calls)
+    print("\nEnriching all activities...")
+    enriched = enrich_activities(all_raw)
     with open(ENRICHED_FILE, "w") as f:
         json.dump(enriched, f, indent=2)
     print(f"Saved {len(enriched)} enriched activities to {ENRICHED_FILE}")

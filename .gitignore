@@ -2,3 +2,6 @@
 .claude/
 strava/data/.strava_tokens.json
 strava/data/activities_raw.json
+strava/data/.update.log
+strava/data/.launchd_stdout.log
+strava/data/.launchd_stderr.log
