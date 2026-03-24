@@ -22,7 +22,7 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ### What We're Building
 
-A multi-sport activity dashboard for visualizing personal activity data. Live with CitiBike (318 rides), Strava (79 runs, 362 miles), Uber (220 rides, $7.7K spent, 23 cities), and Apple Watch heart rate (508K readings, 4.5 years).
+A multi-sport activity dashboard for visualizing personal activity data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), and Apple Watch heart rate (508K readings, 4.5 years). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
 
 ### Tech Stack
 
@@ -54,11 +54,12 @@ citibike-bot/
 ├── strava/
 │   ├── dashboard.html          # Overview dashboard (stats, charts, trends, rankings)
 │   ├── index.html              # Run explorer (animated routes, heatmap, timelapse)
-│   ├── fetch_activities.py     # OAuth + Strava API data fetcher
+│   ├── fetch_activities.py     # OAuth + Strava API data fetcher (supports --incremental)
 │   ├── build_dashboard.py      # Builds static HTML with baked-in data
+│   ├── update_strava.sh        # Full pipeline: fetch → build → commit + push
 │   └── data/
 │       ├── .strava_tokens.json          # OAuth tokens (gitignored)
-│       ├── activities_raw.json          # Raw API response (169 activities)
+│       ├── activities_raw.json          # Raw API response (175 activities)
 │       └── activities_enriched.json     # Processed data for dashboard
 ├── uber/
 │   ├── explore.html            # Ride explorer (browse Uber rides with map)
@@ -83,6 +84,8 @@ citibike-bot/
 - **Data is baked into HTML**: The enriched JSON data is injected directly into `index.html` and `explore.html` at build time via Python. No server needed -- just open the HTML files.
 - **Routes are pre-fetched**: All 74 unique station-pair routes are fetched from OSRM once and stored in `routes.json`. The HTML files reference this cached data.
 - **No build system**: Everything is static files. Python scripts are used for one-time data processing, not as a runtime dependency.
+- **Incremental sync for Strava**: `fetch_activities.py` defaults to incremental mode — uses Strava's `after` param to only fetch new activities since last sync, then merges into existing data. ~2-4 API calls per new activity vs 338+ for a full re-fetch.
+- **Automated daily updates**: macOS `launchd` agent runs `update_strava.sh` daily at 9 PM (fetch → build HTML → git commit + push). Runs on wake if laptop was asleep. Manual trigger: `./strava/update_strava.sh`
 
 ---
 
@@ -208,11 +211,18 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
    - Keyboard navigation (j/k, arrows, space to play/pause, Esc to deselect)
 
 2. **Data Pipeline**
-   - `strava/fetch_activities.py`: OAuth2 flow + full API pull (activities, details, streams)
-   - Tokens cached in `strava/data/.strava_tokens.json` (auto-refresh)
+   - `strava/fetch_activities.py`: OAuth2 flow + Strava API pull (supports `--incremental` and `--full`)
+   - Tokens cached in `strava/data/.strava_tokens.json` (auto-refresh, no browser needed after first auth)
    - `strava/build_dashboard.py`: builds static HTML with data baked in
-   - Raw data: `strava/data/activities_raw.json` (169 activities, all types)
+   - `strava/update_strava.sh`: full pipeline script (fetch → build → commit + push)
+   - Raw data: `strava/data/activities_raw.json` (175 activities, all types)
    - Enriched data: `strava/data/activities_enriched.json` (processed for dashboard)
+
+3. **Automation**
+   - macOS launchd agent: `~/Library/LaunchAgents/com.hofner.strava-update.plist`
+   - Runs daily at 9 PM, catches up on wake if missed
+   - Logs: `strava/data/.update.log`, `strava/data/.launchd_stderr.log`
+   - Manual: `./strava/update_strava.sh` (or `--full` to re-fetch everything)
 
 ### Strava API Setup
 
@@ -224,12 +234,12 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
 
 ### Key Stats
 
-- 169 total activities (79 runs, 74 rides, 10 weight training, 5 hikes, 1 walk)
-- 362 miles total running distance
+- 175 total activities (85 runs, 74 rides, 10 weight training, 5 hikes, 1 walk)
+- 391 miles total running distance
 - 4.6 mi average run
 - 18.5 mi longest run (NYRR 18M)
-- Date range: Apr 2021 — Feb 2026
-- All 79 runs have GPS routes (latlng streams) and polylines
+- Date range: Apr 2021 — Mar 2026
+- All 85 runs have GPS routes (latlng streams) and polylines
 
 ### Data Format
 
@@ -432,6 +442,16 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 
 ---
 
+## Landing Page
+
+The landing page (`index.html`) has two sections:
+
+1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofWalks, HofBeats. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
+
+2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
+
+---
+
 ## Design Principles
 
 1. **Ship fast** -- Iterate quickly, get feedback early
@@ -451,6 +471,9 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 | Station coordinates missing | GBFS feed URL changed | Verify `https://gbfs.citibikenyc.com/gbfs/en/station_information.json` |
 | OSRM routing fails | Rate limiting or API down | Add delays, check `router.project-osrm.org` status |
 | Data not showing in HTML | Data injection step was skipped | Re-run Python script to inject JSON into HTML |
+| Strava token refresh fails | App deauthorized or tokens corrupted | Delete `.strava_tokens.json`, re-run `fetch_activities.py` (will open browser for re-auth) |
+| Strava daily sync not running | launchd agent unloaded or laptop off | `launchctl list \| grep hofner` to check; `launchctl load ~/Library/LaunchAgents/com.hofner.strava-update.plist` to reload |
+| Landing page stats stale | Stats in `index.html` are hardcoded | Manually update the card stat values after a sync (not yet automated) |
 
 ---
 

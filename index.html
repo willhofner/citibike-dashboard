@@ -185,6 +185,51 @@
   .card.beats .card-links a:hover { color: var(--red); }
   .card.rides .card-links a:hover { color: var(--purple); }
 
+  .jobs {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .jobs h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .job-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .job-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  .job-name {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .job-detail {
+    color: var(--text-dim);
+    margin-left: auto;
+    font-size: 12px;
+  }
+
   @media (max-width: 640px) {
     .container { padding: 24px 20px; }
     h1 { font-size: 26px; }
@@ -227,9 +272,9 @@
       <div class="brand">Strava</div>
       <p>Animated route replay, heatmaps, pace splits, and timelapse</p>
       <div class="card-stat-row">
-        <div class="card-stat"><div class="val">79</div><div class="lbl">Runs</div></div>
-        <div class="card-stat"><div class="val">362 mi</div><div class="lbl">Distance</div></div>
-        <div class="card-stat"><div class="val">62.6h</div><div class="lbl">Running</div></div>
+        <div class="card-stat"><div class="val">85</div><div class="lbl">Runs</div></div>
+        <div class="card-stat"><div class="val">391 mi</div><div class="lbl">Distance</div></div>
+        <div class="card-stat"><div class="val">67.4h</div><div class="lbl">Running</div></div>
       </div>
       <div class="card-links">
         <a href="strava/index.html" onclick="event.stopPropagation()">Run Explorer</a>
@@ -290,6 +335,16 @@
       <div class="card-links">
         <a href="health/heartrate.html" onclick="event.stopPropagation()">Heart Rate Dashboard</a>
       </div>
+    </div>
+  </div>
+
+  <div class="jobs">
+    <h3>Scheduled Jobs</h3>
+    <div class="job-row">
+      <div class="job-dot"></div>
+      <span class="job-name">Strava Sync</span>
+      <span style="color: var(--orange);">HofRuns</span>
+      <span class="job-detail">Daily at 9 PM</span>
     </div>
   </div>
 </div>
