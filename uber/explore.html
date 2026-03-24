@@ -220,6 +220,15 @@
     pointer-events: none;
   }
 
+  /* Runner glow pulse — opacity only, no transform (Leaflet uses transforms for positioning) */
+  .rider-glow {
+    animation: rider-pulse 1s ease-in-out infinite;
+  }
+  @keyframes rider-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+
   .sort-row {
     display: flex;
     gap: 6px;
@@ -307,11 +316,14 @@
 
 <script>
 let RIDES = [];
+let ROUTES = {};
 let selectedRideId = null;
 let ghostLayer = null;
 let routeLayer = null;
 let startMarker = null;
 let endMarker = null;
+let animFrame = null;
+let activeMarkers = [];
 
 // Filters state
 let productFilter = 'all';
@@ -333,10 +345,12 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 }).addTo(map);
 
 // Load data
-fetch('data/rides_enriched.json')
-  .then(r => r.json())
-  .then(data => {
+Promise.all([
+  fetch('data/rides_enriched.json').then(r => r.json()),
+  fetch('data/routes.json').then(r => r.json()).catch(() => ({}))
+]).then(([data, routes]) => {
     RIDES = data.rides.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    ROUTES = routes;
     document.getElementById('allRoutesHint').textContent =
       `${RIDES.length} pickup locations shown — click a ride to view route`;
     renderGhostLayer();
@@ -473,6 +487,21 @@ function renderList() {
   `).join('');
 }
 
+// Stop any running animation
+function stopAnimation() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+}
+
+// Clear route layers
+function clearActiveRoute() {
+  stopAnimation();
+  if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+  if (startMarker) { map.removeLayer(startMarker); startMarker = null; }
+  if (endMarker) { map.removeLayer(endMarker); endMarker = null; }
+  activeMarkers.forEach(m => map.removeLayer(m));
+  activeMarkers = [];
+}
+
 // Select a ride
 function selectRide(ride) {
   if (!ride) return;
@@ -488,46 +517,92 @@ function selectRide(ride) {
   if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
   // Clear previous route
-  if (routeLayer) map.removeLayer(routeLayer);
-  if (startMarker) map.removeLayer(startMarker);
-  if (endMarker) map.removeLayer(endMarker);
+  clearActiveRoute();
 
-  // Draw route if coordinates exist
-  if (ride.startLat && ride.startLon && ride.endLat && ride.endLon) {
-    const start = [ride.startLat, ride.startLon];
-    const end = [ride.endLat, ride.endLon];
+  // Get route coordinates
+  const route = ROUTES[String(ride.id)];
+  let coords = null;
 
-    // Dashed purple line
-    routeLayer = L.polyline([start, end], {
-      color: '#a855f7',
-      weight: 3,
-      opacity: 0.8,
-      dashArray: '8, 6'
-    }).addTo(map);
+  if (route && route.coordinates && route.coordinates.length >= 2) {
+    // OSRM route — coordinates are [lon, lat], flip to [lat, lon]
+    coords = route.coordinates.map(c => [c[1], c[0]]);
+  } else if (ride.startLat && ride.startLon && ride.endLat && ride.endLon) {
+    // Fallback: straight line
+    coords = [[ride.startLat, ride.startLon], [ride.endLat, ride.endLon]];
+  }
+
+  if (coords && coords.length >= 2) {
+    // Fit map first
+    map.fitBounds(L.latLngBounds(coords).pad(0.15), { maxZoom: 15 });
 
     // Start marker (green)
-    startMarker = L.circleMarker(start, {
-      radius: 7,
-      fillColor: '#22c55e',
-      fillOpacity: 1,
-      color: '#22c55e',
-      weight: 2,
-      opacity: 0.5
+    startMarker = L.circleMarker(coords[0], {
+      radius: 7, fillColor: '#22c55e', fillOpacity: 1, color: '#22c55e', weight: 2, opacity: 0.5
     }).addTo(map);
 
-    // End marker (red)
-    endMarker = L.circleMarker(end, {
-      radius: 7,
-      fillColor: '#ef4444',
-      fillOpacity: 1,
-      color: '#ef4444',
-      weight: 2,
-      opacity: 0.5
+    // Glow layer behind the rider
+    const glow = L.circleMarker(coords[0], {
+      radius: 14, color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.3, weight: 0, className: 'rider-glow'
+    }).addTo(map);
+    activeMarkers.push(glow);
+
+    // Rider dot
+    const rider = L.circleMarker(coords[0], {
+      radius: 6, color: '#fff', fillColor: '#a855f7', fillOpacity: 1, weight: 2
+    }).addTo(map);
+    activeMarkers.push(rider);
+
+    // Animated trail
+    const trail = L.polyline([], {
+      color: '#a855f7', weight: 4, opacity: 0.9
     }).addTo(map);
 
-    // Fit bounds
-    const bounds = L.latLngBounds([start, end]);
-    map.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 });
+    // Glow trail
+    const glowTrail = L.polyline([], {
+      color: '#a855f7', weight: 10, opacity: 0.15
+    }).addTo(map);
+    routeLayer = trail;
+    activeMarkers.push(glowTrail);
+
+    // Animate at consistent ground speed
+    let idx = 0;
+    const totalPoints = coords.length;
+    let totalDist = 0;
+    for (let i = 1; i < totalPoints; i++) {
+      const dlat = coords[i][0] - coords[i - 1][0];
+      const dlng = coords[i][1] - coords[i - 1][1];
+      totalDist += Math.sqrt(dlat * dlat + dlng * dlng);
+    }
+    const targetSpeed = 0.0004; // degrees per frame — consistent across all rides
+    const targetFrames = Math.max(90, totalDist / targetSpeed); // min ~1.5s
+    const baseRate = Math.max(1, Math.ceil(totalPoints / targetFrames));
+
+    function step() {
+      const pointsPerFrame = Math.max(1, baseRate);
+      const end = Math.min(idx + pointsPerFrame, totalPoints);
+
+      for (let i = idx; i < end; i++) {
+        trail.addLatLng(coords[i]);
+        glowTrail.addLatLng(coords[i]);
+      }
+      idx = end;
+      const pos = coords[idx - 1];
+      rider.setLatLng(pos);
+      glow.setLatLng(pos);
+
+      if (idx < totalPoints) {
+        animFrame = requestAnimationFrame(step);
+      } else {
+        // Done — add end marker, remove glow + rider
+        map.removeLayer(glow);
+        map.removeLayer(rider);
+        endMarker = L.circleMarker(coords[coords.length - 1], {
+          radius: 7, fillColor: '#ef4444', fillOpacity: 1, color: '#ef4444', weight: 2, opacity: 0.5
+        }).addTo(map);
+      }
+    }
+
+    animFrame = requestAnimationFrame(step);
   }
 
   // Update detail overlay
@@ -563,9 +638,7 @@ function selectRide(ride) {
 // Deselect
 function deselectRide() {
   selectedRideId = null;
-  if (routeLayer) map.removeLayer(routeLayer);
-  if (startMarker) map.removeLayer(startMarker);
-  if (endMarker) map.removeLayer(endMarker);
+  clearActiveRoute();
   document.getElementById('detailOverlay').classList.remove('visible');
   document.querySelectorAll('.ride-item').forEach(el => el.classList.remove('active'));
   // Reset map view

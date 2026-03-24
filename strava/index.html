@@ -184,13 +184,13 @@
   .leaflet-container { background: #0a0a0f; }
   .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
 
-  /* Runner glow pulse */
+  /* Runner glow pulse — opacity only, no transform (Leaflet uses transforms for positioning) */
   .runner-glow {
     animation: pulse 1s ease-in-out infinite;
   }
   @keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.3); }
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
   }
 
   /* Run detail overlay */
@@ -687,7 +687,17 @@ function selectRun(runId) {
 
   let idx = 0;
   const totalPoints = coords.length;
-  const targetFrames = 180; // ~3 seconds at 60fps
+
+  // Fixed ground speed: calculate total route distance so all runs animate at
+  // the same pace (~0.0004 degrees per frame ≈ jogging speed on the map).
+  let totalDist = 0;
+  for (let i = 1; i < totalPoints; i++) {
+    const dlat = coords[i][0] - coords[i - 1][0];
+    const dlng = coords[i][1] - coords[i - 1][1];
+    totalDist += Math.sqrt(dlat * dlat + dlng * dlng);
+  }
+  const targetSpeed = 0.0004; // degrees per frame — consistent across all runs
+  const targetFrames = Math.max(120, totalDist / targetSpeed); // min ~2s
   const baseRate = Math.max(1, Math.ceil(totalPoints / targetFrames));
 
   function step() {

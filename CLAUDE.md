@@ -62,11 +62,13 @@ citibike-bot/
 │       ├── activities_raw.json          # Raw API response (175 activities)
 │       └── activities_enriched.json     # Processed data for dashboard
 ├── uber/
-│   ├── explore.html            # Ride explorer (browse Uber rides with map)
+│   ├── explore.html            # Ride explorer (animated driving routes, ghost layer)
 │   ├── dashboard.html          # Spending dashboard (stats, charts, heatmaps, city breakdown)
 │   ├── parse_rides.py          # CSV parser → enriched JSON
+│   ├── fetch_routes.py         # OSRM driving route fetcher (220 routes, incremental)
 │   └── data/
-│       └── rides_enriched.json          # Processed Uber rides (220 rides, 23 cities)
+│       ├── rides_enriched.json          # Processed Uber rides (220 rides, 23 cities)
+│       └── routes.json                  # OSRM driving routes keyed by ride ID (220 routes)
 ├── health/
 │   ├── steps.html              # HofWalks — steps dashboard
 │   ├── heartrate.html          # HofBeats — heart rate dashboard (RHR, HRV, VO2 Max, zones)
@@ -273,7 +275,8 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
    - Two-panel layout: scrollable ride list + Leaflet map
    - Search locations, filter by product type (UberX/UberXL/Other), weekday/weekend
    - Sort: Recent, Farthest, Priciest
-   - Click any ride to see straight-line route on map (purple dashed line)
+   - Click any ride to see animated driving route on map (OSRM street-level routing)
+   - Route animation: purple dot traces actual driving path with glow trail
    - Green marker = pickup, red marker = dropoff
    - Ghost layer: all 220 pickup points as faded purple circles
    - Detail overlay: date, time, addresses, product, distance, duration, fare, city, wait time, surge
@@ -292,7 +295,9 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
 
 3. **Data Pipeline**
    - `uber/parse_rides.py`: parses CSV export → enriched JSON
+   - `uber/fetch_routes.py`: fetches OSRM driving routes for all rides (incremental, keyed by ride ID)
    - Source: Uber privacy data export (CSV)
+   - Routes: OSRM public API (`router.project-osrm.org/route/v1/driving/`), 0.5s delay between requests
 
 ### Key Stats
 
