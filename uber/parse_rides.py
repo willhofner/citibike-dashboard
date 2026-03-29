@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-INPUT = '../Uber_Ride_History.csv'
+INPUT = 'data/Uber_Ride_History.csv'
 OUTPUT = 'data/rides_enriched.json'
 
 def parse_timestamp(ts):

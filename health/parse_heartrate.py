@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 from collections import defaultdict
 
-INPUT = '../Apple_Health.xml'
+INPUT = 'data/Apple_Health.xml'
 OUTPUT = 'data/heartrate_enriched.json'
 
 TYPES = {

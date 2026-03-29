@@ -7,7 +7,7 @@ from datetime import datetime
 import json
 import os
 
-HEALTH_FILE = os.path.join(os.path.dirname(__file__), "..", "Apple_Health.xml")
+HEALTH_FILE = os.path.join(os.path.dirname(__file__), "data", "Apple_Health.xml")
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "data", "steps_enriched.json")
 
 print("Parsing Apple_Health.xml for step data...")

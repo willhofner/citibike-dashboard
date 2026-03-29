@@ -18,6 +18,7 @@
     --orange: #f97316;
     --purple: #a855f7;
     --red: #ef4444;
+    --amber: #eab308;
   }
 
   body {
@@ -78,6 +79,7 @@
   .card.walks:hover { border-color: var(--green); box-shadow: 0 8px 24px rgba(34,197,94,0.15); }
   .card.beats:hover { border-color: var(--red); box-shadow: 0 8px 24px rgba(239,68,68,0.15); }
   .card.rides:hover { border-color: var(--purple); box-shadow: 0 8px 24px rgba(168,85,247,0.15); }
+  .card.reads:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(234,179,8,0.15); }
 
   .card-top {
     display: flex;
@@ -128,6 +130,7 @@
   .card.walks .brand { color: rgba(34,197,94,0.6); }
   .card.beats .brand { color: rgba(239,68,68,0.6); }
   .card.rides .brand { color: rgba(168,85,247,0.6); }
+  .card.reads .brand { color: rgba(234,179,8,0.6); }
 
   .card p {
     font-size: 13px;
@@ -158,6 +161,7 @@
   .card.walks .card-stat .val { color: var(--green); }
   .card.beats .card-stat .val { color: var(--red); }
   .card.rides .card-stat .val { color: var(--purple); }
+  .card.reads .card-stat .val { color: var(--amber); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -184,6 +188,7 @@
   .card.walks .card-links a:hover { color: var(--green); }
   .card.beats .card-links a:hover { color: var(--red); }
   .card.rides .card-links a:hover { color: var(--purple); }
+  .card.reads .card-links a:hover { color: var(--amber); }
 
   .jobs {
     margin-top: 40px;
@@ -241,7 +246,7 @@
 <body>
 <div class="container">
   <h1>Activity Dashboard</h1>
-  <p class="subtitle">Personal activity data — bikes, runs, rides, walks, and heart rate</p>
+  <p class="subtitle">Personal activity data — bikes, runs, rides, walks, heart rate, and books</p>
 
   <div class="cards">
     <div onclick="location.href='citibike/explore.html'" class="card bikes">
@@ -334,6 +339,24 @@
       </div>
       <div class="card-links">
         <a href="health/heartrate.html" onclick="event.stopPropagation()">Heart Rate Dashboard</a>
+      </div>
+    </div>
+
+    <div onclick="location.href='books/index.html'" class="card reads">
+      <div class="card-top">
+        <div class="icon">📚</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofReads</h2>
+      <div class="brand">Goodreads</div>
+      <p>A photorealistic stack of every book I've read, spines and all</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">51</div><div class="lbl">Books</div></div>
+        <div class="card-stat"><div class="val">15.9K</div><div class="lbl">Pages</div></div>
+        <div class="card-stat"><div class="val">3.5</div><div class="lbl">Avg Rating</div></div>
+      </div>
+      <div class="card-links">
+        <a href="books/index.html" onclick="event.stopPropagation()">Book Stack</a>
       </div>
     </div>
   </div>

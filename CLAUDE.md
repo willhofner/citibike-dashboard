@@ -22,7 +22,7 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ### What We're Building
 
-A multi-sport activity dashboard for visualizing personal activity data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), and Apple Watch heart rate (508K readings, 4.5 years). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), and Books (Goodreads library). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
 
 ### Tech Stack
 
@@ -42,6 +42,8 @@ citibike-bot/
 ├── index.html                  # Landing page (links to all dashboards)
 ├── CLAUDE.md                   # Project context (you are here)
 ├── .gitignore
+├── package.json                # Minimal config (Railway deploy)
+├── railway.json                # Railway deployment config
 ├── citibike/
 │   ├── index.html              # Main dashboard (stats, maps, charts, rankings)
 │   ├── explore.html            # Ride explorer (browse individual rides with route maps)
@@ -59,7 +61,7 @@ citibike-bot/
 │   ├── update_strava.sh        # Full pipeline: fetch → build → commit + push
 │   └── data/
 │       ├── .strava_tokens.json          # OAuth tokens (gitignored)
-│       ├── activities_raw.json          # Raw API response (175 activities)
+│       ├── activities_raw.json          # Raw API response (gitignored)
 │       └── activities_enriched.json     # Processed data for dashboard
 ├── uber/
 │   ├── explore.html            # Ride explorer (animated driving routes, ghost layer)
@@ -67,17 +69,29 @@ citibike-bot/
 │   ├── parse_rides.py          # CSV parser → enriched JSON
 │   ├── fetch_routes.py         # OSRM driving route fetcher (220 routes, incremental)
 │   └── data/
+│       ├── Uber_Ride_History.csv        # Raw CSV from Uber privacy export (gitignored)
 │       ├── rides_enriched.json          # Processed Uber rides (220 rides, 23 cities)
 │       └── routes.json                  # OSRM driving routes keyed by ride ID (220 routes)
 ├── health/
 │   ├── steps.html              # HofWalks — steps dashboard
 │   ├── heartrate.html          # HofBeats — heart rate dashboard (RHR, HRV, VO2 Max, zones)
-│   ├── parse_heartrate.py      # Apple Health XML parser → enriched JSON
+│   ├── parse_heartrate.py      # Apple Health XML → heart rate enriched JSON
+│   ├── parse_health.py         # Apple Health XML → general health data overview
+│   ├── build_steps.py          # Apple Health XML → steps enriched JSON
 │   └── data/
+│       ├── Apple_Health.xml             # Raw Apple Health export (gitignored, ~1.3GB)
+│       ├── Apple_Health_CDA.xml         # Apple Health CDA export (gitignored, ~587MB)
 │       ├── steps_enriched.json          # Daily step data (2,636 days)
 │       └── heartrate_enriched.json      # Heart rate data (508K readings, 1,499 days)
+├── books/
+│   ├── index.html              # HofReads — reading dashboard
+│   ├── stack-of-books.jpg      # Dashboard image asset
+│   └── data/
+│       ├── Goodreads_Library.csv        # Raw Goodreads export (gitignored)
+│       └── books.json                   # Processed book data
 └── references/
-    ├── tweet_animation
+    ├── index_redesign.html     # Landing page redesign draft
+    ├── tweet_animation/
     └── new_dashboards_spec.md  # Specs for Uber/Lyft, Apple Watch, Subway dashboards
 ```
 
@@ -319,7 +333,7 @@ Downloaded from Uber's privacy portal. Export includes full ride history CSV wit
 
 ### Data Formats
 
-**Raw data** (`Uber_Ride_History.csv`):
+**Raw data** (`uber/data/Uber_Ride_History.csv`):
 ```csv
 city_name,currency_code,timezone,flow,product_type_name,global_product_name,
 request_timestamp_local,request_timestamp_utc,request_lat,request_lng,
@@ -403,7 +417,7 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 
 ### Data Formats
 
-**Raw data** (`Apple_Health.xml`):
+**Raw data** (`health/data/Apple_Health.xml`):
 ```xml
 <Record type="HKQuantityTypeIdentifierHeartRate"
   sourceName="Will's Apple Watch" unit="count/min"
@@ -444,6 +458,19 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
   "bpmHistogram": [{ "bpm": 40, "count": 500 }]
 }
 ```
+
+---
+
+## Books (HofReads): Current State
+
+### What's Built
+
+1. **Dashboard** (`books/index.html`)
+   - Reading dashboard (details TBD — early stage)
+
+2. **Data Pipeline**
+   - Source: Goodreads Library export (CSV), gitignored at `books/data/Goodreads_Library.csv`
+   - Processed data: `books/data/books.json`
 
 ---
 
@@ -494,11 +521,29 @@ The landing page (`index.html`) has two sections:
 
 ## Documentation Workflow
 
-CLAUDE.md is the single source of truth. Update it as you go:
+**CLAUDE.md is a living document.** It must stay in sync with reality at all times. Treat it like a co-founder's shared notebook — if something happened, write it down *now*, not later.
 
-- **New file created?** -- Add to Project Structure
-- **New endpoint?** -- Add to relevant section
-- **Architecture change?** -- Update relevant sections
-- **New common issue?** -- Add to Common Issues table
+### Always Update CLAUDE.md When:
 
-Don't batch these. A 30-second edit now saves 10 minutes of confusion for the next instance.
+- **New file or directory created** — Add to Project Structure tree
+- **File moved, renamed, or deleted** — Update Project Structure + any path references
+- **New bug discovered** — Add to Common Issues table with cause + fix
+- **Bug fixed** — Update or remove the Common Issues entry
+- **Architecture decision made** — Add to Key Architecture Decisions with rationale
+- **New data source added** — Add full section (What's Built, Key Stats, Data Formats)
+- **New dashboard or feature shipped** — Update the relevant "What's Built" section
+- **Script path or behavior changed** — Update Data Pipeline references
+- **New API or external dependency** — Document it in the relevant section
+- **Mistake made and lesson learned** — Add to Common Issues or a new "Lessons Learned" entry
+- **Design pattern established** — Note it so future work follows the same pattern
+- **Stats changed** (new rides, new runs, etc.) — Update Key Stats
+- **New scheduled job added** — Update Automation section + Landing Page section
+- **Project direction shifted** — Update Project Overview
+- **New personal preference discovered** — Add to Personal Preferences
+
+### How to Update:
+
+- **Do it inline, immediately** — Don't batch documentation updates. A 30-second edit now saves 10 minutes of confusion for the next Claude instance.
+- **Be specific** — Include file paths, numbers, dates, and rationale. Vague notes are useless.
+- **Include the "why"** — Future context depends on understanding *why* a decision was made, not just *what* was done.
+- **Delete stale info** — Wrong documentation is worse than no documentation. If something is no longer true, remove it or mark it as deprecated.
