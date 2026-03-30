@@ -12,14 +12,21 @@ OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "data", "steps_enriched.js
 
 print("Parsing Apple_Health.xml for step data...")
 
-# Collect raw step records
-steps_by_day = defaultdict(float)
-steps_by_day_hour = defaultdict(lambda: defaultdict(float))
+# Collect raw step records, separated by source type.
+# Apple Health logs steps from BOTH iPhone and Apple Watch with overlapping
+# time ranges. Naively summing all records double-counts steps on days when
+# both devices are active. Fix: prefer Watch data; fall back to Phone only
+# on days with no Watch records.
+watch_by_day = defaultdict(float)
+watch_by_day_hour = defaultdict(lambda: defaultdict(float))
+phone_by_day = defaultdict(float)
+phone_by_day_hour = defaultdict(lambda: defaultdict(float))
 records_count = 0
 total_records = 0
 
 for event, elem in ET.iterparse(HEALTH_FILE, events=("end",)):
     if elem.tag != "Record":
+        elem.clear()
         continue
     total_records += 1
     if total_records % 500000 == 0:
@@ -31,17 +38,37 @@ for event, elem in ET.iterparse(HEALTH_FILE, events=("end",)):
 
     start = elem.get("startDate")
     value = float(elem.get("value", 0))
+    source = elem.get("sourceName", "")
 
     dt = datetime.strptime(start[:19], "%Y-%m-%d %H:%M:%S")
     day = dt.strftime("%Y-%m-%d")
     hour = dt.hour
 
-    steps_by_day[day] += value
-    steps_by_day_hour[day][hour] += value
+    if "Watch" in source:
+        watch_by_day[day] += value
+        watch_by_day_hour[day][hour] += value
+    else:
+        phone_by_day[day] += value
+        phone_by_day_hour[day][hour] += value
+
     records_count += 1
     elem.clear()
 
-print(f"Done! Found {records_count:,} step records across {len(steps_by_day)} days.\n")
+# Deduplicate: use Watch data when available, Phone data otherwise
+steps_by_day = {}
+steps_by_day_hour = {}
+watch_days = set(watch_by_day.keys())
+phone_only_days = set(phone_by_day.keys()) - watch_days
+
+for day in watch_by_day:
+    steps_by_day[day] = watch_by_day[day]
+    steps_by_day_hour[day] = dict(watch_by_day_hour[day])
+for day in phone_only_days:
+    steps_by_day[day] = phone_by_day[day]
+    steps_by_day_hour[day] = dict(phone_by_day_hour[day])
+
+print(f"Done! Found {records_count:,} step records across {len(steps_by_day)} days.")
+print(f"  Watch days: {len(watch_days)}, Phone-only days: {len(phone_only_days)}\n")
 
 # Build daily records
 days_sorted = sorted(steps_by_day.keys())
