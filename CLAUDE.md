@@ -22,7 +22,7 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ### What We're Building
 
-A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), and Books (Goodreads library). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), and Books (Goodreads library). HofSubways is in data collection phase — GPS data actively being collected via Overland iOS app. This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
 
 ### Tech Stack
 
@@ -32,6 +32,7 @@ A personal activity dashboard for visualizing life data. Live with CitiBike (318
 - **Heatmaps**: Leaflet.heat
 - **Routing**: OSRM (Open Source Routing Machine) for estimated bike routes
 - **Data**: Static JSON files, pre-processed with Python scripts
+- **GPS Collection**: Overland iOS app → Railway-hosted receiver → daily JSON files
 
 ---
 
@@ -89,6 +90,12 @@ citibike-bot/
 │   └── data/
 │       ├── Goodreads_Library.csv        # Raw Goodreads export (gitignored)
 │       └── books.json                   # Processed book data
+├── subway/
+│   ├── receiver.py             # Overland GPS receiver (Railway-deployed, accepts POST from phone)
+│   ├── pull_gps.py             # Downloads GPS data from Railway to local machine
+│   ├── Dockerfile              # Railway deployment config
+│   └── data/
+│       └── gps/                        # Daily GPS files: YYYY-MM-DD.json (gitignored)
 └── references/
     ├── index_redesign.html     # Landing page redesign draft
     ├── tweet_animation/
@@ -474,6 +481,98 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 
 ---
 
+## Subway (HofSubways): Current State
+
+### Status: Data Collection Phase (started 2026-03-29)
+
+GPS data is being passively collected via the Overland iOS app, sent to a Railway-hosted receiver. Once ~1 week of data is collected (~2026-04-05), the next step is building the station-snapping algorithm and explorer page.
+
+### The Data Problem
+
+NYC subway has **tap-in only, no tap-out**. OMNY (tap-to-pay) exports from `omny.info` include timestamps and fares but **no station names** — the MTA intentionally removed station names from exports after a 404 Media investigation revealed it as a stalking vector.
+
+**Solution: GPS-based station detection.** The user's phone regains cellular/WiFi connectivity briefly at each subway station stop. This produces GPS pings at each intermediate station (not just entry/exit), allowing us to:
+1. Snap each GPS coordinate to the nearest MTA station (using GTFS station data)
+2. Determine the exact subway line from the sequence of stations
+3. Detect direction (uptown/downtown, eastbound/westbound) from station order
+4. Detect transfers where the station sequence shifts to a different line
+5. Distinguish subway from car/bike/walking by speed between station pings (~15-30 mph)
+
+### Architecture
+
+```
+Overland iOS app (passive GPS logging)
+        ↓ HTTPS POST (batched, works offline)
+Railway receiver (subway/receiver.py)
+        ↓ stores as daily JSON files on Railway volume
+pull_gps.py (downloads to local subway/data/gps/)
+        ↓
+Station-snapping algorithm (TODO)
+        ↓ cross-reference with OMNY CSV for validation
+subway_enriched.json (TODO)
+        ↓
+HofSubways explorer page (TODO)
+```
+
+### Data Collection Pipeline
+
+- **Overland iOS app**: Free, open-source GPS logger. Runs passively in background, batches points, sends via HTTPS POST. Queues data when offline, sends when connectivity returns.
+- **Railway receiver** (`subway/receiver.py`): Python HTTP server accepting Overland's GeoJSON payloads. Stores points in daily JSON files (`/data/gps/YYYY-MM-DD.json`) on a Railway persistent volume. Auth via `?token=` query param.
+- **Railway deployment**: Service `subway-data` in the citibot Railway project. Root directory: `subway`, Dockerfile builder. Domain: `subway-data-production.up.railway.app`. Volume mounted at `/data`.
+- **Pull script** (`subway/pull_gps.py`): Downloads GPS data from Railway to local `subway/data/gps/`. Usage: `RECEIVER_URL=https://subway-data-production.up.railway.app RECEIVER_TOKEN=yourtoken python3 subway/pull_gps.py`
+
+### Data Sources
+
+1. **Overland GPS data** (primary): Continuous GPS coordinates with timestamps, speed, accuracy, motion state. Stored as daily JSON files on Railway.
+2. **OMNY CSV export** (`2026-03-27-trailing-12-months-mta-data.csv`, gitignored): 448 trips, Mar 2025 — Mar 2026. Has exact tap timestamps and fares but NO station names. Downloaded from `omny.info`. Used for validation — cross-reference OMNY tap times with GPS data to confirm station detection accuracy.
+3. **MTA GTFS station data** (TODO): Published station coordinates for nearest-station snapping. Available from MTA open data.
+
+### Data Formats
+
+**GPS point** (from Overland, stored in `subway/data/gps/YYYY-MM-DD.json`):
+```json
+{
+  "timestamp": "2026-03-29T14:23:05-04:00",
+  "lat": 40.7308,
+  "lon": -73.9909,
+  "altitude": 10,
+  "speed": 0.5,
+  "accuracy": 5,
+  "battery": 0.85,
+  "wifi": null,
+  "motion": ["walking"]
+}
+```
+
+**OMNY CSV** (from `omny.info`):
+```csv
+Reference,Transit Account #,Trip Time,Mode,Product Type,Fare Amount ($)
+4165910775,441062336017,2026-03-26 19:48:55,Subway,PAYGO,$3.00
+```
+
+### TODO (Next Steps)
+
+1. Collect ~1 week of GPS data (target: ~2026-04-05)
+2. Download fresh OMNY CSV covering the same week
+3. Pull GPS data: `python3 subway/pull_gps.py`
+4. Build station-snapping algorithm: match GPS coordinates to MTA GTFS station locations
+5. Validate: confirm GPS-detected subway entries match OMNY tap timestamps (should be within ~1-2 min)
+6. Build `subway_enriched.json` with entry station, exit station, line, direction, transfers
+7. Build HofSubways explorer page (same pattern as HofBikes/HofRuns/HofRides explorers)
+8. Subway route rendering: use MTA's published subway line GeoJSON geometries (no OSRM needed)
+9. Accent color: TBD (suggested: yellow #eab308, matching MTA branding)
+
+### Key Research Findings
+
+- **Apple privacy.apple.com export**: Does NOT include location history. Significant Locations are on-device only, end-to-end encrypted.
+- **Tile tracker**: Bluetooth-only, no GPS. Free tier = zero history, Premium = 30 days. Not useful.
+- **Google Timeline**: Unreliable for NYC subway on iPhone. Post-2024 on-device migration made exports inconsistent. iPhone is second-class citizen.
+- **Carrier cell tower data**: US carriers won't provide cell tower logs via CCPA requests. Even if available, precision (~200m) can't distinguish nearby stations.
+- **Arc App**: Best commercial option ($45/yr) but still can't detect specific subway lines or transfers. 10-20% daily battery drain.
+- **Overland + Railway**: Chosen approach. Open source, privacy-first (data goes only to our server), ~2-5% battery/day, GeoJSON output fits our Python pipeline.
+
+---
+
 ## Landing Page
 
 The landing page (`index.html`) has two sections:
@@ -506,6 +605,9 @@ The landing page (`index.html`) has two sections:
 | Strava token refresh fails | App deauthorized or tokens corrupted | Delete `.strava_tokens.json`, re-run `fetch_activities.py` (will open browser for re-auth) |
 | Strava daily sync not running | launchd agent unloaded or laptop off | `launchctl list \| grep hofner` to check; `launchctl load ~/Library/LaunchAgents/com.hofner.strava-update.plist` to reload |
 | Landing page stats stale | Stats in `index.html` are hardcoded | Manually update the card stat values after a sync (not yet automated) |
+| Overland not sending data | Token mismatch or endpoint URL wrong | Check Overland app endpoint URL includes `?token=...`; verify Railway service is running at status endpoint |
+| Railway GPS data lost on redeploy | Volume not mounted | Ensure Railway volume is mounted at `/data` in service settings |
+| GPS data not pulling locally | Env vars not set | Run with `RECEIVER_URL=... RECEIVER_TOKEN=... python3 subway/pull_gps.py` |
 
 ---
 

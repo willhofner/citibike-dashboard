@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofReads</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --amber: #eab308;
+    --book-w: 400px;
+    --book-d: 180px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  .nav {
+    width: 100%;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .nav a { color: var(--text-dim); text-decoration: none; transition: color 0.15s; }
+  .nav a:hover { color: var(--amber); }
+  .nav span { color: var(--text-dim); }
+  .nav .current { color: var(--text); font-weight: 600; }
+
+  .header {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 50px;
+  }
+  .header h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .subtitle { color: var(--text-dim); font-size: 14px; margin-top: 6px; }
+  .header .count { color: var(--amber); font-weight: 600; }
+
+  /* 3D Scene */
+  .scene {
+    perspective: 2500px;
+    perspective-origin: 50% 40%;
+    padding-bottom: 80px;
+  }
+
+  .stack {
+    transform-style: preserve-3d;
+    transform: rotateX(18deg);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  /* Each book is a 3D cuboid */
+  .book {
+    transform-style: preserve-3d;
+    position: relative;
+    width: var(--book-w);
+    height: var(--t);
+    cursor: pointer;
+    transition: transform 0.35s ease;
+  }
+
+  .book:hover {
+    transform: var(--rot-transform) translateZ(15px) !important;
+    z-index: 10;
+  }
+
+  /* Shadow between stacked books */
+  .book::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 5px;
+    right: -15px;
+    height: 6px;
+    background: rgba(0,0,0,0.45);
+    filter: blur(3px);
+    transform: translateZ(calc(var(--book-d) / 2));
+    pointer-events: none;
+  }
+
+  .face {
+    position: absolute;
+    backface-visibility: hidden;
+  }
+
+  /* ===== SPINE (front face) ===== */
+  .spine {
+    width: var(--book-w);
+    height: var(--t);
+    top: 0; left: 0;
+    transform: translateZ(calc(var(--book-d) / 2));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    overflow: hidden;
+    border-radius: 3px 0 0 3px;
+    filter: url(#grain);
+  }
+
+  /* Convex highlight — makes spine look rounded/3D */
+  .spine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.18) 0%,
+      rgba(255,255,255,0.06) 15%,
+      rgba(255,255,255,0.02) 35%,
+      transparent 50%,
+      rgba(0,0,0,0.04) 65%,
+      rgba(0,0,0,0.10) 85%,
+      rgba(0,0,0,0.18) 100%
+    );
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Horizontal ridges + edge grooves (like real hardcover spines) */
+  .spine::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      /* Left edge groove */
+      linear-gradient(90deg,
+        rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.12) 2px, transparent 5px,
+        transparent 7px, rgba(0,0,0,0.04) 8px, transparent 10px),
+      /* Right edge groove */
+      linear-gradient(90deg,
+        transparent calc(100% - 10px), rgba(0,0,0,0.04) calc(100% - 8px),
+        transparent calc(100% - 7px), transparent calc(100% - 5px),
+        rgba(0,0,0,0.12) calc(100% - 2px), rgba(0,0,0,0.3) 100%),
+      /* Horizontal ridges */
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 12px,
+        rgba(0,0,0,0.06) 12px,
+        rgba(255,255,255,0.04) 13px,
+        transparent 14px
+      );
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .spine-title {
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    z-index: 1;
+  }
+
+  .spine-author {
+    font-size: 9.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    white-space: nowrap;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+
+  /* ===== COVER (top face) ===== */
+  .cover-top {
+    width: var(--book-w);
+    height: var(--book-d);
+    top: 0; left: 0;
+    transform-origin: top center;
+    transform: translateZ(calc(var(--book-d) / 2)) rotateX(-90deg);
+    border-radius: 0 2px 2px 0;
+    overflow: hidden;
+  }
+
+  /* Shadow gradient near the spine edge of cover */
+  .cover-top::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.03) 15%, transparent 40%),
+      linear-gradient(to right, rgba(0,0,0,0.12) 0%, transparent 8%);
+    pointer-events: none;
+  }
+
+  /* ===== PAGE EDGES (right side) ===== */
+  .pages-right {
+    width: var(--book-d);
+    height: var(--t);
+    top: 0;
+    right: 0;
+    transform-origin: right center;
+    transform: translateX(calc(var(--book-w) / 2)) rotateY(90deg);
+    background: #ede8dc;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Page line texture */
+  .pages-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 1.2px,
+      rgba(140,130,110,0.1) 1.2px,
+      rgba(140,130,110,0.1) 1.8px
+    );
+    border-radius: inherit;
+  }
+
+  /* Shading on page edges */
+  .pages-right::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.12) 0%,
+      transparent 15%,
+      transparent 85%,
+      rgba(0,0,0,0.12) 100%
+    );
+    border-radius: inherit;
+  }
+
+  /* ===== BACK FACE ===== */
+  .back-face {
+    width: var(--book-w);
+    height: var(--t);
+    top: 0; left: 0;
+    transform: translateZ(calc(var(--book-d) / -2));
+    border-radius: 3px 0 0 3px;
+  }
+
+  /* ===== BOTTOM FACE ===== */
+  .bottom-face {
+    width: var(--book-w);
+    height: var(--book-d);
+    left: 0;
+    bottom: 0;
+    transform-origin: bottom center;
+    transform: translateZ(calc(var(--book-d) / 2)) rotateX(90deg);
+  }
+
+  /* ===== LEFT SIDE ===== */
+  .left-face {
+    width: var(--book-d);
+    height: var(--t);
+    top: 0; left: 0;
+    transform-origin: left center;
+    transform: translateX(calc(var(--book-w) / -2)) rotateY(-90deg);
+  }
+
+  /* Light-colored spine overrides */
+  .light-spine .spine-title,
+  .light-spine .spine-author {
+    text-shadow: none !important;
+  }
+
+  /* Stack base shadow */
+  .stack-base {
+    width: 500px;
+    height: 30px;
+    margin-top: -10px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 65%);
+    filter: blur(12px);
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../index.html">Home</a>
+  <span>/</span>
+  <span class="current">HofReads</span>
+</nav>
+
+<div class="header">
+  <h1>HofReads</h1>
+  <p class="subtitle"><span class="count">51</span> books read</p>
+</div>
+
+<!-- SVG noise filter for weathered book texture -->
+<svg style="position:absolute;width:0;height:0">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+    <feBlend in="SourceGraphic" mode="multiply" result="blend"/>
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.12"/>
+    </feComponentTransfer>
+    <feMerge>
+      <feMergeNode in="SourceGraphic"/>
+      <feMergeNode/>
+    </feMerge>
+  </filter>
+</svg>
+
+<div class="scene">
+  <div class="stack" id="stack"></div>
+</div>
+<div class="stack-base"></div>
+
+<script>
+// [title, author, pages, spineColor, textColor, rotation, serif?, lightSpine?]
+const books = [
+  // ---- UNDATED (bottom of stack) ----
+  ["Bitcoin: Hard Money You Can't F*ck With", "Jason A. Williams", 221, "#1a1a1e", "#c0c0c0", -1.2, false],
+  ["Our Final Invention", "James Barrat", 322, "#2d3040", "#c8c8d4", 2.1, false],
+  ["The Internet of Money", "Andreas M. Antonopoulos", 200, "#1e1e22", "#d4a94c", -0.5, false],
+  ["Start with Why", "Simon Sinek", 256, "#c4a010", "#1a1a0a", 1.8, false, true],
+  ["The Theory of Everything", "Stephen Hawking", 176, "#1a2744", "#e0e0e8", -2.2, true],
+  ["Zero to One", "Peter Thiel", 195, "#1a3040", "#e0e8f0", 0.8, false],
+  ["The Bitcoin Standard", "Saifedean Ammous", 304, "#2a2015", "#d4a94c", -1.5, false],
+  ["2030", "Mauro F. Guillén", 288, "#3d3a2c", "#e8dcc8", 2.5, true],
+  ["Sapiens", "Yuval Noah Harari", 512, "#d4c5a9", "#1a1a1a", -0.3, true, true],
+  ["The Boys in the Boat", "Daniel James Brown", 404, "#1a3a2a", "#d4d8c0", 1.5, true],
+  ["Where the Crawdads Sing", "Delia Owens", 384, "#2a5a4a", "#e0e8e0", -2.8, true],
+  ["Extreme Ownership", "Jocko Willink", 320, "#1a1a1e", "#c8c8c8", 1.2, false],
+  ["The Everything Store", "Brad Stone", 384, "#3d2a1a", "#e8dcc8", -1.8, false],
+  ["Steve Jobs", "Walter Isaacson", 630, "#e0ddd5", "#1a1a1a", 0.5, true, true],
+  ["How to Win at the Sport of Business", "Mark Cuban", 67, "#2a2a4a", "#a8b8d4", -0.8, false],
+  ["Elon Musk", "Ashlee Vance", 392, "#1a1e2a", "#e0e0e8", 2.3, false],
+  ["How to Win Friends & Influence People", "Dale Carnegie", 288, "#8b0000", "#e8d0c0", -1.5, true],
+  ["Never Split the Difference", "Chris Voss", 274, "#1a1e1a", "#e0e0e0", 0.6, false],
+  ["The Power of Habit", "Charles Duhigg", 375, "#5c4033", "#e8dcc8", -2.0, false],
+  ["Outliers", "Malcolm Gladwell", 309, "#e8e0d0", "#1a1a1a", 1.0, false, true],
+  ["Rich Dad, Poor Dad", "Robert T. Kiyosaki", 195, "#6b1a6b", "#e8d0e8", -0.4, false],
+  ["The Power of Now", "Eckhart Tolle", 229, "#2a3a4a", "#c8d8e8", 1.8, true],
+  ["The Lion Tracker's Guide To Life", "Boyd Varty", 160, "#3a5a3a", "#d4e0c8", -1.2, true],
+  ["Shoe Dog", "Phil Knight", 400, "#c94e2a", "#ffffff", 2.0, false],
+  // ---- DATED (ascending by finish date) ----
+  ["The Art of War", "Sun Tzu", 170, "#8b0000", "#d4a94c", -2.5, true],
+  ["Atomic Habits", "James Clear", 319, "#c4a010", "#1a1a0a", 1.3, false, true],
+  ["The Price of Tomorrow", "Jeff Booth", 232, "#1a2744", "#e0e8f0", -0.7, false],
+  ["The Last Olympian", "Rick Riordan", 381, "#1a3a5a", "#c8d8e8", 2.2, false],
+  ["The Titan's Curse", "Rick Riordan", 352, "#2a4a3a", "#c8e0d4", -1.8, false],
+  ["The Sea of Monsters", "Rick Riordan", 279, "#4a6a4a", "#e0e8d8", 0.5, false],
+  ["The Battle of the Labyrinth", "Rick Riordan", 361, "#3a3a5a", "#c8c8e0", -1.0, false],
+  ["The Lightning Thief", "Rick Riordan", 377, "#4a2a1a", "#e8d4c0", 1.8, true],
+  ["Elon Musk", "Walter Isaacson", 688, "#e0ddd5", "#1a1a1a", -0.3, true, true],
+  ["An Astronaut's Guide to Life on Earth", "Chris Hadfield", 295, "#0a1a30", "#8ab4f0", 2.0, false],
+  ["The Inner Game of Tennis", "W. Timothy Gallwey", 134, "#3a5a3a", "#e0e8d4", -2.2, true],
+  ["Permanent Record", "Edward Snowden", 339, "#1a1a1e", "#e0e0e8", 0.8, false],
+  ["Caffeine", "Michael Pollan", 100, "#5c3a20", "#e8d4b8", -0.5, true],
+  ["Layered Money", "Nik Bhatia", 180, "#2a2015", "#d4a94c", 1.5, false],
+  ["The Deficit Myth", "Stephanie Kelton", 327, "#4a1a1a", "#e0c8c8", -1.8, false],
+  ["The Alchemist", "Paulo Coelho", 182, "#c49a30", "#1a1a0a", 2.5, true, true],
+  ["Woke, Inc.", "Vivek Ramaswamy", 368, "#1a1e1a", "#d0d0d0", -0.8, false],
+  ["The Hate You Give", "Angie Thomas", 444, "#d45a2a", "#ffffff", 1.2, false],
+  ["Peak Performance", "Brad Stulberg", 240, "#2a4a6a", "#c8d8e8", -2.0, false],
+  ["The Last Lecture", "Randy Pausch", 217, "#5c4033", "#e8dcc8", 0.6, true],
+  ["The Three-Body Problem", "Liu Cixin", 472, "#0a1020", "#8ab0d4", -1.5, true],
+  ["Touching the Void", "Joe Simpson", 218, "#2a4a4a", "#d4e8e0", 2.8, true],
+  ["A Court of Thorns and Roses", "Sarah J. Maas", 419, "#6b1a4a", "#e8c8d8", -1.0, true],
+  ["The Midnight Library", "Matt Haig", 288, "#2d1f3d", "#c8b8e0", 1.5, true],
+  ["Endurance", "Alfred Lansing", 282, "#1a2744", "#d4a94c", -2.5, true],
+  ["No Country for Old Men", "Cormac McCarthy", 309, "#3d3a2c", "#e8dcc8", 2.0, true],
+  ["How to Read Skyscrapers", "Edward Denison", 256, "#c94e2a", "#ffffff", -0.8, false],
+];
+
+const stack = document.getElementById('stack');
+
+books.forEach((b) => {
+  const [title, author, pages, bg, fg, rot, serif, light] = b;
+  // Fat books: min 50px, max 95px
+  const t = Math.max(50, Math.min(95, pages * 0.08 + 38));
+
+  const book = document.createElement('div');
+  book.className = 'book';
+  book.style.setProperty('--t', t + 'px');
+  book.style.setProperty('--rot-transform', `rotateZ(${rot}deg)`);
+  book.style.transform = `rotateZ(${rot}deg)`;
+
+  // Darken and lighten for gradients
+  const coverBg = bg; // cover matches spine
+
+  book.innerHTML = `
+    <div class="face spine ${light ? 'light-spine' : ''}" style="
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, ${bg}, white 14%),
+        ${bg} 35%,
+        color-mix(in srgb, ${bg}, black 12%));
+      color: ${fg};
+      ${serif ? "font-family: Georgia, 'Times New Roman', serif;" : ''}
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    ">
+      <span class="spine-title">${title}</span>
+      <span class="spine-author">${author}</span>
+    </div>
+    <div class="face cover-top" style="
+      background: linear-gradient(135deg,
+        color-mix(in srgb, ${bg}, white 8%),
+        ${bg},
+        color-mix(in srgb, ${bg}, black 10%));
+    "></div>
+    <div class="face pages-right"></div>
+    <div class="face back-face" style="background: color-mix(in srgb, ${bg}, black 30%);"></div>
+    <div class="face bottom-face" style="background: color-mix(in srgb, ${bg}, black 40%);"></div>
+    <div class="face left-face" style="background: color-mix(in srgb, ${bg}, black 25%);"></div>
+  `;
+
+  stack.appendChild(book);
+});
+</script>
+
+</body>
+</html>
