@@ -162,6 +162,43 @@
   .tag-transfer { background: rgba(239,68,68,0.15); color: var(--red); }
   .tag-line { background: rgba(136,136,160,0.2); color: var(--text-dim); }
 
+  /* MTA subway line bullets */
+  .mta-bullet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  .mta-bullet.sm { width: 15px; height: 15px; font-size: 9px; }
+  .mta-bullets { display: inline-flex; gap: 3px; align-items: center; }
+  /* Lex Ave (green) */
+  .mta-4, .mta-5, .mta-6 { background: #00933c; color: #fff; }
+  /* Broadway (yellow) */
+  .mta-N, .mta-Q, .mta-R, .mta-W { background: #fccc0a; color: #000; }
+  /* 6th Ave (orange) */
+  .mta-B, .mta-D, .mta-F, .mta-M { background: #ff6319; color: #fff; }
+  /* 8th Ave (blue) */
+  .mta-A, .mta-C, .mta-E { background: #0039a6; color: #fff; }
+  /* Broadway-7th (red) */
+  .mta-1, .mta-2, .mta-3 { background: #ee352e; color: #fff; }
+  /* Canarsie (gray) */
+  .mta-L { background: #a7a9ac; color: #fff; }
+  /* Flushing (purple) */
+  .mta-7 { background: #b933ad; color: #fff; }
+  /* Nassau (brown) */
+  .mta-J, .mta-Z { background: #996633; color: #fff; }
+  /* Shuttle (gray) */
+  .mta-S { background: #808183; color: #fff; }
+  /* Crosstown (light green) */
+  .mta-G { background: #6cbe45; color: #fff; }
+
   /* Right panel -- map */
   .map-panel {
     position: relative;
@@ -373,6 +410,17 @@ function renderGhostLayer() {
   ghostLayer.addTo(map);
 }
 
+// Render MTA bullet circles for a line string like "6" or "4/5" or "R/W"
+function mtaBullets(lineStr, size) {
+  const cls = size === 'sm' ? 'sm' : '';
+  // Split "4/5" → ["4", "5"], "R/W" → ["R", "W"], "6" → ["6"]
+  const lines = lineStr.split('/').filter(l => l && l !== 'unknown');
+  if (lines.length === 0) return `<span class="tag tag-line">${lineStr}</span>`;
+  return '<span class="mta-bullets">' +
+    lines.map(l => `<span class="mta-bullet ${cls} mta-${l}">${l}</span>`).join('') +
+    '</span>';
+}
+
 // Get line color
 function lineColor(line) {
   if (line === '6') return '#00933c';           // MTA green
@@ -471,9 +519,9 @@ function renderList() {
       : `${t.entryStation} <span class="ride-arrow">&rarr;</span> ${t.exitStation}`;
 
     const tags = [];
+    tags.push(mtaBullets(t.line, 'sm'));
     if (t.isExpress) tags.push('<span class="tag tag-express">Express</span>');
     if (t.numLegs > 1) tags.push('<span class="tag tag-transfer">Transfer</span>');
-    tags.push(`<span class="tag tag-line">${t.line}</span>`);
 
     return `
       <div class="ride-item ${t.id === selectedTripId ? 'active' : ''}" data-trip-id="${t.id}" onclick="selectTrip(TRIPS.find(x=>x.id===${t.id}))">
@@ -693,7 +741,7 @@ function selectTrip(trip) {
     ['Time', formatTime(trip.startTime) + ' — ' + formatTime(trip.endTime)],
     ['From', trip.entryStation],
     ['To', trip.exitStation],
-    ['Line', trip.line],
+    ['Line', mtaBullets(trip.line)],
     ['Direction', trip.direction],
     ['Duration', formatDuration(trip.durationMin)],
     ['Legs', trip.numLegs === 1 ? 'Direct' : `${trip.numLegs} legs`],
