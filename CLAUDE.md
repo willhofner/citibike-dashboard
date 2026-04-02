@@ -22,7 +22,7 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ### What We're Building
 
-A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), and Books (Goodreads library). HofSubways is in data collection phase — GPS data actively being collected via Overland iOS app. This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), Books (Goodreads library), and Subway (5 trips detected from GPS). HofSubways ride detection is working — detecting subway rides from GPS accuracy degradation via Overland iOS app. This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
 
 ### Tech Stack
 
@@ -93,9 +93,13 @@ citibike-bot/
 ├── subway/
 │   ├── receiver.py             # Overland GPS receiver (Railway-deployed, accepts POST from phone)
 │   ├── pull_gps.py             # Downloads GPS data from Railway to local machine
+│   ├── parse_rides.py          # GPS-to-subway-ride detection algorithm
+│   ├── explore.html            # HofSubways ride explorer
 │   ├── Dockerfile              # Railway deployment config
 │   └── data/
-│       └── gps/                        # Daily GPS files: YYYY-MM-DD.json (gitignored)
+│       ├── gps/                        # Daily GPS files: YYYY-MM-DD.json (gitignored)
+│       ├── rides_enriched.json         # Detected subway rides with station data
+│       └── *.csv                       # OMNY exports from omny.info (gitignored)
 └── references/
     ├── index_redesign.html     # Landing page redesign draft
     ├── tweet_animation/
@@ -483,20 +487,53 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 
 ## Subway (HofSubways): Current State
 
-### Status: Data Collection Phase (started 2026-03-29)
+### Status: Live — Ride Detection Working (since 2026-04-02)
 
-GPS data is being passively collected via the Overland iOS app, sent to a Railway-hosted receiver. Once ~1 week of data is collected (~2026-04-05), the next step is building the station-snapping algorithm and explorer page.
+### What's Built
+
+1. **Data Pipeline** (`subway/parse_rides.py`)
+   - Detects subway rides from GPS accuracy degradation (>50m = underground)
+   - Transfer detection: splits segments >8min at accuracy valleys (<50m) near known stations
+   - Line detection: 6 local vs 4/5 express based on station patterns (entry/exit express flags)
+   - False positive filtering: home accuracy blips, same-station segments, driving tunnels
+   - Station complex mapping (e.g., Chambers St J/Z = Brooklyn Bridge-City Hall)
+   - Station data hardcoded: focused Lex Ave corridor + connecting lines (~40 stations)
+   - 5 confirmed rides detected across 2 days (March 30 — April 2)
+
+2. **Ride Explorer** (`subway/explore.html`) — next to build
+
+3. **GPS Collection Pipeline** (live since 2026-03-29)
+   - Overland iOS app → Railway receiver → daily JSON files
+   - `pull_gps.py` downloads to local machine
+
+### Key Stats
+
+- 5 trips, 6 legs
+- Lines: 6, 4/5, R/W
+- Key stations: Astor Place, Union Sq, Brooklyn Bridge-City Hall, Grand Central, Canal St
+- Date range: Mar 30 — Apr 2, 2026
+
+### Key Architecture Decisions (Subway)
+
+- **Detection uses accuracy degradation (>50m = underground)**, not GPS position — position is unreliable when underground
+- **Transfer detection**: splits segments >8min at accuracy valleys (<50m) near known stations
+- **Station data hardcoded**: focused Lex Ave corridor + connecting lines (~40 stations), not full GTFS import
+- **Station complex mapping**: maps equivalent station names (e.g., Chambers St J/Z → Brooklyn Bridge-City Hall) so transfers are detected correctly
+- **Home position filtering**: eliminates indoor accuracy blips near home that look like underground segments
+- **Express vs local detection**: uses entry/exit station express flags to determine if ride was on 6 local or 4/5 express
 
 ### The Data Problem
 
 NYC subway has **tap-in only, no tap-out**. OMNY (tap-to-pay) exports from `omny.info` include timestamps and fares but **no station names** — the MTA intentionally removed station names from exports after a 404 Media investigation revealed it as a stalking vector.
 
-**Solution: GPS-based station detection.** The user's phone regains cellular/WiFi connectivity briefly at each subway station stop. This produces GPS pings at each intermediate station (not just entry/exit), allowing us to:
-1. Snap each GPS coordinate to the nearest MTA station (using GTFS station data)
-2. Determine the exact subway line from the sequence of stations
-3. Detect direction (uptown/downtown, eastbound/westbound) from station order
-4. Detect transfers where the station sequence shifts to a different line
-5. Distinguish subway from car/bike/walking by speed between station pings (~15-30 mph)
+**Solution: GPS-based station detection.** When the phone goes underground, GPS accuracy degrades dramatically (from ~10-20m to 100-964m) as it falls back to cell tower triangulation. The phone regains partial signal at each station the train passes through. This allows us to:
+1. Detect underground segments via GPS accuracy spikes (>100m = underground)
+2. Identify entry/exit stations from the last/first good-accuracy points near known MTA stations
+3. Detect intermediate stations from brief accuracy recoveries during the ride
+4. Determine the exact subway line from the sequence of stations (using GTFS data)
+5. Detect direction (uptown/downtown, eastbound/westbound) from station order
+6. Detect transfers where the station sequence shifts to a different line
+7. Distinguish subway from other underground scenarios (tunnels, basements) by requiring proximity to ≥2 MTA stations in sequence
 
 ### Architecture
 
@@ -507,11 +544,11 @@ Railway receiver (subway/receiver.py)
         ↓ stores as daily JSON files on Railway volume
 pull_gps.py (downloads to local subway/data/gps/)
         ↓
-Station-snapping algorithm (TODO)
+parse_rides.py (GPS accuracy → ride detection) ✅
         ↓ cross-reference with OMNY CSV for validation
-subway_enriched.json (TODO)
+rides_enriched.json ✅
         ↓
-HofSubways explorer page (TODO)
+HofSubways explorer page (TODO — next)
 ```
 
 ### Data Collection Pipeline
@@ -524,8 +561,8 @@ HofSubways explorer page (TODO)
 ### Data Sources
 
 1. **Overland GPS data** (primary): Continuous GPS coordinates with timestamps, speed, accuracy, motion state. Stored as daily JSON files on Railway.
-2. **OMNY CSV export** (`2026-03-27-trailing-12-months-mta-data.csv`, gitignored): 448 trips, Mar 2025 — Mar 2026. Has exact tap timestamps and fares but NO station names. Downloaded from `omny.info`. Used for validation — cross-reference OMNY tap times with GPS data to confirm station detection accuracy.
-3. **MTA GTFS station data** (TODO): Published station coordinates for nearest-station snapping. Available from MTA open data.
+2. **OMNY CSV export** (`subway/data/2026-03-27-trailing-12-months-mta-data.csv`, gitignored): 448 trips, Mar 2025 — Mar 2026. Has exact tap timestamps and fares but NO station names. Downloaded from `omny.info`. Used for validation — cross-reference OMNY tap times with GPS data to confirm station detection accuracy.
+3. **MTA station data**: ~40 stations hardcoded in `parse_rides.py` (focused on Lex Ave corridor + connecting lines). Covers the user's common routes. Can expand as needed — full GTFS import not required.
 
 ### Data Formats
 
@@ -550,17 +587,122 @@ Reference,Transit Account #,Trip Time,Mode,Product Type,Fare Amount ($)
 4165910775,441062336017,2026-03-26 19:48:55,Subway,PAYGO,$3.00
 ```
 
-### TODO (Next Steps)
+**Enriched trip data** (`rides_enriched.json`):
+```json
+{
+  "trips": [{
+    "id": "trip_2026-03-30_1",
+    "date": "2026-03-30",
+    "legs": [{
+      "entry_station": "Astor Place",
+      "exit_station": "Union Sq - 14th St",
+      "entry_time": "2026-03-30T09:06:43-04:00",
+      "exit_time": "2026-03-30T09:09:01-04:00",
+      "duration_min": 2.3,
+      "line": "6",
+      "direction": "Uptown",
+      "num_stops": 1,
+      "entry_lat": 40.7291, "entry_lon": -73.9910,
+      "exit_lat": 40.7348, "exit_lon": -73.9899
+    }],
+    "total_duration_min": 2.3,
+    "num_legs": 1,
+    "has_transfer": false
+  }],
+  "summary": {
+    "total_trips": 5,
+    "total_legs": 6,
+    "lines": ["6", "4/5", "R/W"],
+    "date_range": ["2026-03-30", "2026-04-02"]
+  }
+}
+```
 
-1. Collect ~1 week of GPS data (target: ~2026-04-05)
-2. Download fresh OMNY CSV covering the same week
-3. Pull GPS data: `python3 subway/pull_gps.py`
-4. Build station-snapping algorithm: match GPS coordinates to MTA GTFS station locations
-5. Validate: confirm GPS-detected subway entries match OMNY tap timestamps (should be within ~1-2 min)
-6. Build `subway_enriched.json` with entry station, exit station, line, direction, transfers
-7. Build HofSubways explorer page (same pattern as HofBikes/HofRuns/HofRides explorers)
-8. Subway route rendering: use MTA's published subway line GeoJSON geometries (no OSRM needed)
-9. Accent color: TBD (suggested: yellow #eab308, matching MTA branding)
+### GPS Detection Methodology
+
+**Primary signal: GPS accuracy degradation.** When the phone goes underground, GPS accuracy degrades from ~10-20m to 100-964m as the phone falls back to cell tower triangulation. This is the most reliable indicator of being underground. Validated against a known 1-stop ride on the 6 train (Astor Place → Union Square, 2026-03-30 ~9:07-9:08 AM).
+
+**Anatomy of a subway ride (observed from real data):**
+
+| Phase | Duration | Accuracy | Motion | Position |
+|-------|----------|----------|--------|----------|
+| Walk to station | 2-5 min | 10-25m (normal) | `walking` | Gradual movement toward station entrance |
+| Wait on platform | 1-10 min | 14-20m (slightly degraded) | `stationary` | Clusters near station coordinates |
+| Train in tunnel | 1-3 min/stop | 44m → 224m → 964m | `[]` (empty) | Coordinate jumps (fake positions from cell towers) |
+| Brief station stop | 10-30 sec | 30-80m (partial recovery) | `[]` or `stationary` | Briefly near station coordinates |
+| Exit station | — | Recovers to <30m | `walking` | Moves away from station at walking speed |
+| Walk from station | 2-10 min | 10-20m (normal) | `walking` | Gradual movement to destination |
+
+**Detection rules:**
+1. **Underground = accuracy > 100m.** Surface GPS in Manhattan is reliably 5-25m. Anything above ~100m means the phone lost sky-view GPS.
+2. **Entry station** = last cluster of good-accuracy points (~<30m) near a known MTA station before accuracy degrades.
+3. **Exit station** = first cluster of good-accuracy points near a known MTA station after accuracy recovers, followed by sustained good accuracy + walking motion away from the station.
+4. **Pass-through station** (not exiting) = brief accuracy recovery (10-30 sec) near a station, followed by accuracy degrading again. The phone does NOT start walking away.
+5. **Discard low-accuracy positions.** Points with accuracy >100m are cell tower guesses, not real locations. Don't use them for station matching.
+
+### Edge Cases & Gotchas
+
+**1. Multi-stop rides**
+The phone regains some signal at every station the train passes through, whether it stops or not. Expected pattern: repeated cycles of accuracy spike (tunnel) → brief recovery (station) → spike again. The key distinction between "passing through" and "exiting" is what happens after the accuracy recovery:
+- **Pass-through**: Brief good-accuracy window (10-30 sec), position stays near station, then accuracy degrades again as train enters next tunnel segment.
+- **Actual exit**: Sustained good-accuracy window (>1-2 min), position starts moving away from station at walking speed, motion field switches to `walking`.
+
+Detection approach: after each accuracy recovery near a station, wait to see if accuracy degrades again within ~60 seconds. If it does → pass-through. If it stays good → exit.
+
+**2. Long underground walks in stations**
+Some stations (14th St-Union Square, Times Square-42nd St, Atlantic Ave-Barclays, Fulton St) have extensive underground concourses. The user may be underground with degraded accuracy for minutes before reaching the platform or after leaving the train. This means:
+- The accuracy degradation may start well before the train departs (walking through station).
+- The accuracy may not recover immediately after exiting the train (still underground walking to exit).
+- The "entry station" and "exit station" should be determined by proximity to known station coordinates, not by the exact moment accuracy degrades/recovers.
+
+Detection approach: within a degraded-accuracy window, look for the points nearest to known stations at the boundaries. The station-snapping algorithm should be tolerant of the phone being underground but walking (not riding) near the start and end.
+
+**3A. Transfers (general)**
+A transfer connects two train rides into a single trip. Transfers can happen:
+- **Underground**: Walk through connecting tunnels/passageways between platforms. Accuracy stays degraded throughout. Looks like: train ride ends at station → extended period of degraded accuracy with walking-speed position changes → new train ride starts.
+- **Above ground**: Exit station, walk on surface to a different station, re-enter. Accuracy fully recovers during the surface walk. Looks like: two separate rides with a walking segment in between.
+
+Data model: A **trip** is the full door-to-door journey. A **leg** is one continuous train ride. A trip can have multiple legs connected by transfers. This matches how people think about subway travel ("I took the subway to work" = 1 trip, even if 2 trains).
+
+Detection approach: if two detected legs are separated by <15 minutes and the exit station of leg 1 is a known transfer point to the entry station of leg 2, group them into one trip.
+
+**3B. Same-platform transfers (express ↔ local)**
+The user exits an express train and waits on the same platform for a local (or vice versa). GPS signature: accuracy recovers at a station → extended stationary period (longer than a normal 10-30 sec station stop, likely 2-5 min) → accuracy degrades again as new train departs. The user never changes platforms or walks anywhere.
+
+Detection approach: if a station stop lasts significantly longer than normal (>90 sec?) and the subsequent station sequence shifts from express stops to local stops (or vice versa), flag it as a same-platform transfer. Requires knowing which stations are express vs. local for each line (from GTFS data).
+
+**3C. Direction changes (overshoots)**
+The user rides past their intended stop, realizes the mistake, gets off, crosses to the opposite platform, and rides back. GPS signature: station sequence goes in one direction (e.g., uptown: 14th → 23rd → 28th), then a transfer-like pause, then the same stations in reverse order (28th → 23rd → 14th). The line is the same, but direction flips.
+
+Detection approach: if a transfer happens at a station that's on the same line as the previous leg, and the direction reverses, flag it as an overshoot/direction change. Model as two legs within one trip. Requires knowing station ordering per line per direction from GTFS.
+
+**4. Distinguishing subway from other underground scenarios**
+False positives to watch for:
+- **Basement/underground venues**: Accuracy degrades but no station-to-station movement pattern. Filter by requiring proximity to ≥2 different MTA stations in sequence.
+- **Driving through tunnels** (Holland, Lincoln, Brooklyn-Battery): Single accuracy degradation event, no intermediate station pings, positions at tunnel endpoints don't match subway stations.
+- **Walking near station entrances**: Brief accuracy blips from passing near subway grates/entrances. Filter by requiring sustained degradation (>30 sec) and movement between stations.
+
+**5. Data quality unknowns (to validate with more data)**
+- How reliably does the phone get signal at underground stations? Some deep stations (e.g., 190th St on the A, Roosevelt Island on the F) may not produce usable pings.
+- Does Overland continue logging when the phone has no GPS fix at all, or does it only log when it gets some position (even if inaccurate)?
+- How does battery saver mode / low battery affect logging frequency? (Note: the 3/29 data showed battery at 5% — logging may be sparser at low battery.)
+- Express trains that skip stations: the phone may not get signal recovery at skipped stations. The station sequence will have gaps matching the express pattern — this is actually useful for identifying which line the user is on.
+
+### Build Workflow
+
+1. ~~**Pull GPS data from Railway**~~ ✅ DONE
+2. ~~**User downloads fresh OMNY CSV**~~ ✅ DONE
+3. ~~**Eyeball the raw GPS data**~~ ✅ DONE — validated against known 6 train ride (Astor Place → Union Sq)
+4. ~~**Download MTA GTFS station data**~~ ✅ DONE (hardcoded ~40 stations instead of full GTFS import)
+5. ~~**Build station-snapping algorithm** (`subway/parse_rides.py`)~~ ✅ DONE — accuracy-based detection with transfer splitting, line detection, false positive filtering
+6. ~~**Validate against OMNY CSV**~~ ✅ DONE — detected ride times match OMNY tap timestamps
+7. ~~**Generate `subway/data/rides_enriched.json`**~~ ✅ DONE — 5 trips, 6 legs
+
+8. **Build HofSubways explorer page** (`subway/explore.html`) — **NEXT** — ride list + Leaflet map with routes rendered on MTA subway line geometries (no OSRM needed — just light up the line segments between entry and exit stations)
+
+9. **Update landing page** (`index.html`) — add HofSubways card with stats and links
+
+10. **Accent color**: yellow #eab308 (matching MTA branding, defined as --amber in index.html)
 
 ### Key Research Findings
 
@@ -577,7 +719,7 @@ Reference,Transit Account #,Trip Time,Mode,Product Type,Fare Amount ($)
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofWalks, HofBeats. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
+1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofWalks, HofBeats, and HofSubways (to be added). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
 
@@ -590,7 +732,7 @@ The landing page (`index.html`) has two sections:
 3. **Own your data** -- Everything runs locally, no third-party services required
 4. **Data tells the story** -- Let the numbers speak
 5. **Personal first** -- This is for one user's data, not a platform
-6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444
+6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444, HofSubways=yellow #eab308
 
 ---
 
@@ -618,6 +760,7 @@ The landing page (`index.html`) has two sections:
 - **NEVER use port 5000 on macOS** -- Conflicts with AirPlay Receiver. Use 8000+.
 - **Git workflow**: "merge", "ship", "push", "commit" all mean the same thing — commit all changes + push to GitHub. Don't ask which one they meant.
 - **Web searches require NO approval** -- Search freely, report findings.
+- **Always validate HTML pages with headless browser before presenting to user** -- Use Playwright (`python3 -m playwright`) to load the page, check for JS errors, verify elements render. Start a local server (`python3 -m http.server 8080`), load the page with `wait_until='networkidle'`, check console errors, verify key elements exist. Playwright is installed (`pip3 install --break-system-packages playwright && python3 -m playwright install chromium`).
 
 ---
 

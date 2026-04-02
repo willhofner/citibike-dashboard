@@ -80,6 +80,7 @@
   .card.beats:hover { border-color: var(--red); box-shadow: 0 8px 24px rgba(239,68,68,0.15); }
   .card.rides:hover { border-color: var(--purple); box-shadow: 0 8px 24px rgba(168,85,247,0.15); }
   .card.reads:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(234,179,8,0.15); }
+  .card.subways:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(234,179,8,0.15); }
 
   .card-top {
     display: flex;
@@ -131,6 +132,7 @@
   .card.beats .brand { color: rgba(239,68,68,0.6); }
   .card.rides .brand { color: rgba(168,85,247,0.6); }
   .card.reads .brand { color: rgba(234,179,8,0.6); }
+  .card.subways .brand { color: rgba(234,179,8,0.6); }
 
   .card p {
     font-size: 13px;
@@ -162,6 +164,7 @@
   .card.beats .card-stat .val { color: var(--red); }
   .card.rides .card-stat .val { color: var(--purple); }
   .card.reads .card-stat .val { color: var(--amber); }
+  .card.subways .card-stat .val { color: var(--amber); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -189,6 +192,7 @@
   .card.beats .card-links a:hover { color: var(--red); }
   .card.rides .card-links a:hover { color: var(--purple); }
   .card.reads .card-links a:hover { color: var(--amber); }
+  .card.subways .card-links a:hover { color: var(--amber); }
 
   .jobs {
     margin-top: 40px;
@@ -246,7 +250,7 @@
 <body>
 <div class="container">
   <h1>Activity Dashboard</h1>
-  <p class="subtitle">Personal activity data — bikes, runs, rides, walks, heart rate, and books</p>
+  <p class="subtitle">Personal activity data — bikes, runs, rides, subways, walks, heart rate, and books</p>
 
   <div class="cards">
     <div onclick="location.href='citibike/explore.html'" class="card bikes">
@@ -303,6 +307,24 @@
       <div class="card-links">
         <a href="uber/explore.html" onclick="event.stopPropagation()">Ride Explorer</a>
         <a href="uber/dashboard.html" onclick="event.stopPropagation()">Dashboard</a>
+      </div>
+    </div>
+
+    <div onclick="location.href='subway/explore.html'" class="card subways">
+      <div class="card-top">
+        <div class="icon">🚇</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofSubways</h2>
+      <div class="brand">MTA / GPS Detection</div>
+      <p>Subway rides detected from GPS accuracy degradation, with station maps</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">5</div><div class="lbl">Trips</div></div>
+        <div class="card-stat"><div class="val">6</div><div class="lbl">Legs</div></div>
+        <div class="card-stat"><div class="val">3</div><div class="lbl">Lines</div></div>
+      </div>
+      <div class="card-links">
+        <a href="subway/explore.html" onclick="event.stopPropagation()">Ride Explorer</a>
       </div>
     </div>
 

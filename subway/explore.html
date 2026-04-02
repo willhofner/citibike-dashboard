@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subway Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #eab308;
+    --accent2: #fbbf24;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f59e0b;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Left panel */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sidebar-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .sidebar-header h1 span { color: var(--accent); }
+  .sidebar-header .nav-links {
+    display: flex;
+    gap: 12px;
+  }
+  .sidebar-header .back-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .sidebar-header .back-link:hover { text-decoration: underline; }
+
+  /* Filters */
+  .filters {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .search-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+  .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .ride-count {
+    font-size: 11px;
+    color: var(--text-dim);
+    padding: 0 2px;
+  }
+
+  /* Ride list */
+  .ride-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .ride-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .ride-item:hover { background: rgba(234,179,8,0.05); }
+  .ride-item.active { background: rgba(234,179,8,0.1); border-left: 3px solid var(--accent); }
+
+  .ride-item .ride-date {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .ride-item .ride-stations {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .ride-item .ride-arrow {
+    color: var(--accent);
+    margin: 0 4px;
+  }
+  .ride-item .ride-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+    align-items: center;
+  }
+  .ride-item .ride-meta .tag {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .tag-express { background: rgba(234,179,8,0.2); color: var(--accent); }
+  .tag-local { background: rgba(34,197,94,0.2); color: var(--green); }
+  .tag-transfer { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tag-line { background: rgba(136,136,160,0.2); color: var(--text-dim); }
+
+  /* Right panel -- map */
+  .map-panel {
+    position: relative;
+    height: 100vh;
+  }
+  #rideMap { height: 100%; width: 100%; }
+  .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
+
+  .ride-detail-overlay {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 280px;
+    max-width: 340px;
+    display: none;
+  }
+  .ride-detail-overlay.visible { display: block; }
+
+  .ride-detail-overlay h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .detail-label { color: var(--text-dim); }
+  .detail-row .detail-value { font-weight: 500; text-align: right; max-width: 180px; }
+
+  .all-routes-hint {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .rider-glow {
+    animation: rider-pulse 1s ease-in-out infinite;
+  }
+  @keyframes rider-pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+
+  .sort-row {
+    display: flex;
+    gap: 6px;
+  }
+  .sort-btn {
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .sort-btn:hover { border-color: var(--accent); color: var(--text); }
+  .sort-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  .no-rides {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    body { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; height: 100dvh; }
+    .sidebar { height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .map-panel { height: auto; }
+    .ride-detail-overlay { top: auto; bottom: 12px; right: 12px; left: 12px; min-width: unset; max-width: unset; }
+    .all-routes-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>Subway <span>Explorer</span></h1>
+    <div class="nav-links">
+      <a href="../index.html" class="back-link">Home</a>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search stations...">
+
+    <div class="filter-row" id="lineFilter">
+      <button class="filter-btn active" data-line="all">All</button>
+      <button class="filter-btn" data-line="6">6</button>
+      <button class="filter-btn" data-line="4/5">4/5</button>
+      <button class="filter-btn" data-line="R/W">R/W</button>
+    </div>
+
+    <div class="filter-row" id="dirFilter">
+      <button class="filter-btn active" data-dir="all">All</button>
+      <button class="filter-btn" data-dir="Northbound">Uptown</button>
+      <button class="filter-btn" data-dir="Southbound">Downtown</button>
+    </div>
+
+    <div class="sort-row" id="sortRow">
+      <button class="sort-btn active" data-sort="recent">Recent</button>
+      <button class="sort-btn" data-sort="longest">Longest</button>
+    </div>
+
+    <div class="ride-count" id="rideCount">Loading...</div>
+  </div>
+
+  <div class="ride-list" id="rideList"></div>
+</div>
+
+<div class="map-panel">
+  <div id="rideMap"></div>
+
+  <div class="ride-detail-overlay" id="detailOverlay">
+    <h3 id="detailTitle">Trip Details</h3>
+    <div id="detailRows"></div>
+  </div>
+
+  <div class="all-routes-hint" id="allRoutesHint">
+    Loading...
+  </div>
+</div>
+
+<script>
+let TRIPS = [];
+let STATIONS = {};
+let selectedTripId = null;
+let ghostLayer = null;
+let routeLayers = [];
+let stationMarkers = [];
+let animFrame = null;
+
+// Filters state
+let lineFilter = 'all';
+let dirFilter = 'all';
+let sortMode = 'recent';
+let searchQuery = '';
+
+// Init map
+const map = L.map('rideMap', {
+  center: [40.7350, -73.990],
+  zoom: 13,
+  zoomControl: true
+});
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// Load data
+fetch('data/rides_enriched.json')
+  .then(r => r.json())
+  .then(data => {
+    TRIPS = data.trips;
+    STATIONS = data.stations || {};
+    document.getElementById('allRoutesHint').textContent =
+      `${Object.keys(STATIONS).length} stations across ${TRIPS.length} trips — click a trip to view route`;
+    renderGhostLayer();
+    renderList();
+    if (TRIPS.length > 0) selectTrip(TRIPS[0]);
+  })
+  .catch(err => {
+    console.error('Failed to load data:', err);
+    document.getElementById('rideList').innerHTML = '<div class="no-rides">Failed to load ride data</div>';
+  });
+
+// Ghost layer: all station dots
+function renderGhostLayer() {
+  if (ghostLayer) map.removeLayer(ghostLayer);
+  ghostLayer = L.layerGroup();
+  Object.entries(STATIONS).forEach(([name, s]) => {
+    L.circleMarker([s.lat, s.lon], {
+      radius: 4,
+      fillColor: '#eab308',
+      fillOpacity: 0.2,
+      stroke: true,
+      color: '#eab308',
+      weight: 1,
+      opacity: 0.15
+    }).bindTooltip(name, { permanent: false, direction: 'top', className: 'station-tooltip' })
+     .addTo(ghostLayer);
+  });
+  ghostLayer.addTo(map);
+}
+
+// Get line color
+function lineColor(line) {
+  if (line === '6') return '#00933c';           // MTA green
+  if (line === '4/5' || line === '4/5/6') return '#00933c';
+  if (line === 'R/W' || line === 'N/Q/R/W') return '#fccc0a';  // MTA yellow
+  return '#eab308';
+}
+
+// Filter + sort trips
+function getFilteredTrips() {
+  let filtered = TRIPS.filter(t => {
+    // Line filter
+    if (lineFilter !== 'all') {
+      const tripLines = t.legs.map(l => l.line);
+      if (lineFilter === '6' && !tripLines.some(l => l === '6')) return false;
+      if (lineFilter === '4/5' && !tripLines.some(l => l.includes('4') || l.includes('5'))) return false;
+      if (lineFilter === 'R/W' && !tripLines.some(l => l.includes('R') || l.includes('W'))) return false;
+    }
+    // Direction filter
+    if (dirFilter !== 'all') {
+      if (t.numLegs === 1 && t.direction !== dirFilter) return false;
+      if (t.numLegs > 1 && !t.legs.some(l => l.direction === dirFilter)) return false;
+    }
+    // Search
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const searchable = `${t.entryStation} ${t.exitStation} ${t.line} ${t.legs.map(l => l.entryStation + ' ' + l.exitStation).join(' ')}`.toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (sortMode === 'recent') filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+  else if (sortMode === 'longest') filtered.sort((a, b) => b.durationMin - a.durationMin);
+
+  return filtered;
+}
+
+// Format helpers
+function formatDate(dt) {
+  const d = new Date(dt);
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+function formatTime(dt) {
+  const d = new Date(dt);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function formatDuration(min) {
+  if (min < 1) return '<1 min';
+  if (min < 60) return `${Math.round(min)} min`;
+  const h = Math.floor(min / 60);
+  const m = Math.round(min % 60);
+  return `${h}h ${m}m`;
+}
+
+// Build route coordinates from station sequence for a leg
+function legRouteCoords(leg) {
+  const coords = [];
+  // Entry station
+  coords.push([leg.entryLat, leg.entryLon]);
+  // Intermediate stations (skip duplicates of entry/exit)
+  if (leg.intermediateStations) {
+    leg.intermediateStations.forEach(s => {
+      const last = coords[coords.length - 1];
+      const dist = Math.abs(s.lat - last[0]) + Math.abs(s.lon - last[1]);
+      if (dist > 0.0005) { // skip if too close to previous point
+        coords.push([s.lat, s.lon]);
+      }
+    });
+  }
+  // Exit station
+  const last = coords[coords.length - 1];
+  const exitDist = Math.abs(leg.exitLat - last[0]) + Math.abs(leg.exitLon - last[1]);
+  if (exitDist > 0.0005) {
+    coords.push([leg.exitLat, leg.exitLon]);
+  }
+  return coords;
+}
+
+// Render ride list
+function renderList() {
+  const filtered = getFilteredTrips();
+  const container = document.getElementById('rideList');
+  document.getElementById('rideCount').textContent = `${filtered.length} trip${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="no-rides">No trips match your filters</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(t => {
+    const stationStr = t.numLegs > 1
+      ? t.legs.map(l => l.entryStation).join(` <span class="ride-arrow">&rarr;</span> `) + ` <span class="ride-arrow">&rarr;</span> ${t.legs[t.legs.length-1].exitStation}`
+      : `${t.entryStation} <span class="ride-arrow">&rarr;</span> ${t.exitStation}`;
+
+    const tags = [];
+    if (t.isExpress) tags.push('<span class="tag tag-express">Express</span>');
+    if (t.numLegs > 1) tags.push('<span class="tag tag-transfer">Transfer</span>');
+    tags.push(`<span class="tag tag-line">${t.line}</span>`);
+
+    return `
+      <div class="ride-item ${t.id === selectedTripId ? 'active' : ''}" data-trip-id="${t.id}" onclick="selectTrip(TRIPS.find(x=>x.id===${t.id}))">
+        <div class="ride-date">
+          <span>${formatDate(t.startTime)}</span>
+          <span>${formatTime(t.startTime)}</span>
+        </div>
+        <div class="ride-stations">${stationStr}</div>
+        <div class="ride-meta">
+          ${tags.join('')}
+          <span>${formatDuration(t.durationMin)}</span>
+          <span>${t.direction}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Stop any running animation
+function stopAnimation() {
+  if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+}
+
+// Clear route layers
+function clearActiveRoute() {
+  stopAnimation();
+  routeLayers.forEach(l => map.removeLayer(l));
+  routeLayers = [];
+  stationMarkers.forEach(m => map.removeLayer(m));
+  stationMarkers = [];
+}
+
+// Select a trip
+function selectTrip(trip) {
+  if (!trip) return;
+  selectedTripId = trip.id;
+
+  // Update active state in list
+  document.querySelectorAll('.ride-item').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.tripId) === trip.id);
+  });
+
+  // Scroll active into view
+  const activeEl = document.querySelector('.ride-item.active');
+  if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Clear previous route
+  clearActiveRoute();
+
+  // Build all coordinates for all legs
+  const allCoords = [];
+  const legCoordSets = [];
+
+  trip.legs.forEach(leg => {
+    const coords = legRouteCoords(leg);
+    legCoordSets.push({ coords, leg });
+    allCoords.push(...coords);
+  });
+
+  if (allCoords.length < 2) return;
+
+  // Fit map to route bounds
+  map.fitBounds(L.latLngBounds(allCoords).pad(0.2), { maxZoom: 15 });
+
+  // Draw each leg
+  legCoordSets.forEach(({ coords, leg }, legIdx) => {
+    const color = lineColor(leg.line);
+
+    // Glow trail (drawn immediately)
+    const glowTrail = L.polyline(coords, {
+      color: color,
+      weight: 12,
+      opacity: 0.1
+    }).addTo(map);
+    routeLayers.push(glowTrail);
+
+    // Animated trail
+    const trail = L.polyline([], {
+      color: color,
+      weight: 4,
+      opacity: 0.9
+    }).addTo(map);
+    routeLayers.push(trail);
+
+    // Station dots along the leg
+    if (leg.intermediateStations) {
+      leg.intermediateStations.forEach(s => {
+        const marker = L.circleMarker([s.lat, s.lon], {
+          radius: 4,
+          fillColor: '#fff',
+          fillOpacity: 0.6,
+          color: color,
+          weight: 2,
+          opacity: 0.8
+        }).bindTooltip(s.station, { permanent: false, direction: 'top' }).addTo(map);
+        stationMarkers.push(marker);
+      });
+    }
+
+    // Animate this leg's trail
+    const totalPoints = coords.length;
+    let idx = 0;
+    const delay = legIdx * 800; // stagger legs for transfers
+
+    function animateLeg() {
+      setTimeout(() => {
+        let i = 0;
+        function step() {
+          const end = Math.min(i + 2, totalPoints);
+          for (let j = i; j < end; j++) {
+            trail.addLatLng(coords[j]);
+          }
+          i = end;
+          if (i < totalPoints) {
+            animFrame = requestAnimationFrame(step);
+          }
+        }
+        step();
+      }, delay);
+    }
+    animateLeg();
+  });
+
+  // Entry marker (green) on first leg
+  const firstLeg = trip.legs[0];
+  const entryMarker = L.circleMarker([firstLeg.entryLat, firstLeg.entryLon], {
+    radius: 8, fillColor: '#22c55e', fillOpacity: 1, color: '#22c55e', weight: 2, opacity: 0.5
+  }).bindTooltip(firstLeg.entryStation, { permanent: false, direction: 'top' }).addTo(map);
+  stationMarkers.push(entryMarker);
+
+  // Exit marker (red) on last leg
+  const lastLeg = trip.legs[trip.legs.length - 1];
+  const exitMarker = L.circleMarker([lastLeg.exitLat, lastLeg.exitLon], {
+    radius: 8, fillColor: '#ef4444', fillOpacity: 1, color: '#ef4444', weight: 2, opacity: 0.5
+  }).bindTooltip(lastLeg.exitStation, { permanent: false, direction: 'top' }).addTo(map);
+  stationMarkers.push(exitMarker);
+
+  // Transfer markers (yellow diamond)
+  if (trip.transferStations && trip.transferStations.length > 0) {
+    trip.transferStations.forEach(name => {
+      const s = STATIONS[name];
+      if (s) {
+        const marker = L.circleMarker([s.lat, s.lon], {
+          radius: 7, fillColor: '#eab308', fillOpacity: 1, color: '#eab308', weight: 2, opacity: 0.6
+        }).bindTooltip('Transfer: ' + name, { permanent: false, direction: 'top' }).addTo(map);
+        stationMarkers.push(marker);
+      }
+    });
+  }
+
+  // Update detail overlay
+  const overlay = document.getElementById('detailOverlay');
+  const title = document.getElementById('detailTitle');
+  const rows = document.getElementById('detailRows');
+
+  title.textContent = formatDate(trip.startTime);
+
+  const detailData = [
+    ['Time', formatTime(trip.startTime) + ' — ' + formatTime(trip.endTime)],
+    ['From', trip.entryStation],
+    ['To', trip.exitStation],
+    ['Line', trip.line],
+    ['Direction', trip.direction],
+    ['Duration', formatDuration(trip.durationMin)],
+    ['Legs', trip.numLegs === 1 ? 'Direct' : `${trip.numLegs} legs`],
+  ];
+
+  if (trip.transferStations.length > 0) {
+    detailData.push(['Transfer', trip.transferStations.join(', ')]);
+  }
+
+  // Show intermediate stations for each leg
+  trip.legs.forEach((leg, i) => {
+    if (leg.intermediateStations && leg.intermediateStations.length > 0) {
+      const stationNames = leg.intermediateStations.map(s => s.station);
+      const label = trip.numLegs > 1 ? `Leg ${i+1} Stations` : 'Stations';
+      detailData.push([label, stationNames.join(' → ')]);
+    }
+  });
+
+  rows.innerHTML = detailData.map(([label, value]) => `
+    <div class="detail-row">
+      <span class="detail-label">${label}</span>
+      <span class="detail-value">${value}</span>
+    </div>
+  `).join('');
+
+  overlay.classList.add('visible');
+}
+
+// Deselect
+function deselectTrip() {
+  selectedTripId = null;
+  clearActiveRoute();
+  document.getElementById('detailOverlay').classList.remove('visible');
+  document.querySelectorAll('.ride-item').forEach(el => el.classList.remove('active'));
+  map.setView([40.7350, -73.990], 13);
+}
+
+// Filter button handlers
+document.querySelectorAll('#lineFilter .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#lineFilter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    lineFilter = btn.dataset.line;
+    renderList();
+  });
+});
+
+document.querySelectorAll('#dirFilter .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#dirFilter .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    dirFilter = btn.dataset.dir;
+    renderList();
+  });
+});
+
+document.querySelectorAll('#sortRow .sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#sortRow .sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    sortMode = btn.dataset.sort;
+    renderList();
+  });
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderList();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const filtered = getFilteredTrips();
+  if (filtered.length === 0) return;
+
+  const currentIdx = filtered.findIndex(t => t.id === selectedTripId);
+
+  if (e.key === 'ArrowDown' || e.key === 'j') {
+    e.preventDefault();
+    const next = Math.min(currentIdx + 1, filtered.length - 1);
+    selectTrip(filtered[next]);
+  } else if (e.key === 'ArrowUp' || e.key === 'k') {
+    e.preventDefault();
+    const prev = Math.max(currentIdx - 1, 0);
+    selectTrip(filtered[prev]);
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    deselectTrip();
+  }
+});
+</script>
+</body>
+</html>
