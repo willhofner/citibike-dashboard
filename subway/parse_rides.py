@@ -321,11 +321,21 @@ def find_entry_exit(points, segment):
     return entry_station, entry_dist, exit_station, exit_dist
 
 
-def detect_intermediate_stations(points, segment):
+def detect_intermediate_stations(points, segment, entry_station=None, exit_station=None):
     """Find intermediate station pings within an underground segment.
 
     These are brief accuracy recoveries near known stations mid-ride.
+    Only includes stations that share a line with the entry/exit stations
+    to avoid showing nearby stations on different lines (e.g., Canal St N/Q/R/W
+    when riding the 6).
     """
+    # Determine which lines this leg is on
+    leg_lines = set()
+    if entry_station:
+        leg_lines.update(entry_station.get('lines', []))
+    if exit_station:
+        leg_lines.update(exit_station.get('lines', []))
+
     intermediates = []
     start_idx = segment['start_idx']
     end_idx = segment['end_idx']
@@ -348,14 +358,17 @@ def detect_intermediate_stations(points, segment):
             station, dist = nearest_station(avg_lat, avg_lon, max_dist_m=400)
 
             if station and dist is not None:
-                intermediates.append({
-                    'station': normalize_station_name(station['name']),
-                    'lat': station['lat'],
-                    'lon': station['lon'],
-                    'dist_m': round(dist),
-                    'time': to_edt(cluster[0]['_dt']).isoformat(),
-                    'num_points': len(cluster),
-                })
+                # Only include if station shares a line with entry/exit
+                station_lines = set(station.get('lines', []))
+                if not leg_lines or (station_lines & leg_lines):
+                    intermediates.append({
+                        'station': normalize_station_name(station['name']),
+                        'lat': station['lat'],
+                        'lon': station['lon'],
+                        'dist_m': round(dist),
+                        'time': to_edt(cluster[0]['_dt']).isoformat(),
+                        'num_points': len(cluster),
+                    })
 
             i = j
         else:
@@ -509,7 +522,7 @@ def snap_segments_to_legs(points, segments):
             print(f"  SKIP: Both stations near home ({entry_station['name']} → {exit_station['name']})")
             continue
 
-        intermediates = detect_intermediate_stations(points, seg)
+        intermediates = detect_intermediate_stations(points, seg, entry_station, exit_station)
 
         # Normalize station names (collapse complex entrances)
         entry_name = normalize_station_name(entry_station['name'])

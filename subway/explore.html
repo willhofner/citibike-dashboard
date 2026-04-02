@@ -538,27 +538,21 @@ function selectTrip(trip) {
   // Fit map to route bounds
   map.fitBounds(L.latLngBounds(allCoords).pad(0.2), { maxZoom: 15 });
 
-  // Draw each leg
-  legCoordSets.forEach(({ coords, leg }, legIdx) => {
+  // Flatten all leg coords into one sequence for continuous animation
+  // with color info per segment
+  const flatCoords = [];
+  const legColors = [];
+  legCoordSets.forEach(({ coords, leg }) => {
     const color = lineColor(leg.line);
+    coords.forEach(c => {
+      flatCoords.push(c);
+      legColors.push(color);
+    });
+  });
 
-    // Glow trail (drawn immediately)
-    const glowTrail = L.polyline(coords, {
-      color: color,
-      weight: 12,
-      opacity: 0.1
-    }).addTo(map);
-    routeLayers.push(glowTrail);
-
-    // Animated trail
-    const trail = L.polyline([], {
-      color: color,
-      weight: 4,
-      opacity: 0.9
-    }).addTo(map);
-    routeLayers.push(trail);
-
-    // Station dots along the leg
+  // Draw station dots for each leg
+  legCoordSets.forEach(({ coords, leg }) => {
+    const color = lineColor(leg.line);
     if (leg.intermediateStations) {
       leg.intermediateStations.forEach(s => {
         const marker = L.circleMarker([s.lat, s.lon], {
@@ -573,29 +567,93 @@ function selectTrip(trip) {
       });
     }
 
-    // Animate this leg's trail
-    const totalPoints = coords.length;
-    let idx = 0;
-    const delay = legIdx * 800; // stagger legs for transfers
-
-    function animateLeg() {
-      setTimeout(() => {
-        let i = 0;
-        function step() {
-          const end = Math.min(i + 2, totalPoints);
-          for (let j = i; j < end; j++) {
-            trail.addLatLng(coords[j]);
-          }
-          i = end;
-          if (i < totalPoints) {
-            animFrame = requestAnimationFrame(step);
-          }
-        }
-        step();
-      }, delay);
-    }
-    animateLeg();
+    // Glow trail (drawn immediately as faint guide)
+    const glowTrail = L.polyline(coords, {
+      color: color,
+      weight: 12,
+      opacity: 0.08
+    }).addTo(map);
+    routeLayers.push(glowTrail);
   });
+
+  // Animated trail + rider dot
+  const trail = L.polyline([], {
+    color: legColors[0],
+    weight: 4,
+    opacity: 0.9
+  }).addTo(map);
+  routeLayers.push(trail);
+
+  const glowTrail = L.polyline([], {
+    color: legColors[0],
+    weight: 10,
+    opacity: 0.15
+  }).addTo(map);
+  routeLayers.push(glowTrail);
+
+  // Rider glow
+  const riderGlow = L.circleMarker(flatCoords[0], {
+    radius: 14, color: legColors[0], fillColor: legColors[0],
+    fillOpacity: 0.3, weight: 0, className: 'rider-glow'
+  }).addTo(map);
+  stationMarkers.push(riderGlow);
+
+  // Rider dot
+  const rider = L.circleMarker(flatCoords[0], {
+    radius: 6, color: '#fff', fillColor: legColors[0],
+    fillOpacity: 1, weight: 2
+  }).addTo(map);
+  stationMarkers.push(rider);
+
+  // Interpolate extra points between stations for smooth animation
+  function interpolateCoords(coords, pointsPerSegment) {
+    if (coords.length < 2) return coords;
+    const result = [coords[0]];
+    for (let i = 1; i < coords.length; i++) {
+      const [lat1, lon1] = coords[i - 1];
+      const [lat2, lon2] = coords[i];
+      for (let j = 1; j <= pointsPerSegment; j++) {
+        const t = j / pointsPerSegment;
+        result.push([lat1 + (lat2 - lat1) * t, lon1 + (lon2 - lon1) * t]);
+      }
+    }
+    return result;
+  }
+
+  const smoothCoords = interpolateCoords(flatCoords, 30);
+  const totalFrames = smoothCoords.length;
+  let frameIdx = 0;
+
+  function animStep() {
+    const batchSize = Math.max(1, Math.ceil(totalFrames / 120)); // ~2 seconds total
+    const end = Math.min(frameIdx + batchSize, totalFrames);
+
+    for (let i = frameIdx; i < end; i++) {
+      trail.addLatLng(smoothCoords[i]);
+      glowTrail.addLatLng(smoothCoords[i]);
+    }
+    frameIdx = end;
+
+    const pos = smoothCoords[frameIdx - 1];
+    rider.setLatLng(pos);
+    riderGlow.setLatLng(pos);
+
+    // Update color if we've crossed into a new leg
+    const origIdx = Math.min(Math.floor((frameIdx / totalFrames) * flatCoords.length), flatCoords.length - 1);
+    const currentColor = legColors[origIdx];
+    rider.setStyle({ fillColor: currentColor });
+    riderGlow.setStyle({ color: currentColor, fillColor: currentColor });
+
+    if (frameIdx < totalFrames) {
+      animFrame = requestAnimationFrame(animStep);
+    } else {
+      // Done — remove rider, keep trail
+      map.removeLayer(rider);
+      map.removeLayer(riderGlow);
+    }
+  }
+
+  animFrame = requestAnimationFrame(animStep);
 
   // Entry marker (green) on first leg
   const firstLeg = trip.legs[0];

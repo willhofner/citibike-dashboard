@@ -1,9 +1,9 @@
 {
-  "generated": "2026-04-02T16:37:31.271535",
+  "generated": "2026-04-02T19:09:17.282032",
   "summary": {
     "totalTrips": 5,
     "totalLegs": 6,
-    "uniqueStations": 13,
+    "uniqueStations": 12,
     "dateRange": [
       "2026-03-30",
       "2026-04-01"
@@ -53,14 +53,6 @@
               "dist_m": 110,
               "time": "2026-04-01T23:43:59-04:00",
               "num_points": 23
-            },
-            {
-              "station": "Broadway-Lafayette",
-              "lat": 40.7253,
-              "lon": -73.9959,
-              "dist_m": 192,
-              "time": "2026-04-01T23:46:22-04:00",
-              "num_points": 1
             },
             {
               "station": "8th St-NYU",
@@ -238,14 +230,6 @@
               "num_points": 6
             },
             {
-              "station": "Canal St (N/Q/R/W)",
-              "lat": 40.7201,
-              "lon": -74.0014,
-              "dist_m": 233,
-              "time": "2026-04-01T18:25:50-04:00",
-              "num_points": 2
-            },
-            {
               "station": "Astor Place",
               "lat": 40.7301,
               "lon": -73.9909,
@@ -395,17 +379,82 @@
     }
   ],
   "stations": {
-    "23rd St (6)": {
-      "lat": 40.739,
-      "lon": -73.9847,
+    "28th St (6)": {
+      "lat": 40.7432,
+      "lon": -73.984,
       "lines": [
         "6"
       ],
       "tripCount": 0
     },
-    "28th St (6)": {
-      "lat": 40.7432,
-      "lon": -73.984,
+    "14th St-Union Sq": {
+      "lat": 40.7355,
+      "lon": -73.9905,
+      "lines": [
+        "4",
+        "5",
+        "6",
+        "L",
+        "N",
+        "Q",
+        "R",
+        "W"
+      ],
+      "tripCount": 3
+    },
+    "Bleecker St": {
+      "lat": 40.7259,
+      "lon": -73.9944,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
+    },
+    "Spring St (6)": {
+      "lat": 40.7224,
+      "lon": -73.9972,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
+    },
+    "Canal St (6)": {
+      "lat": 40.7182,
+      "lon": -73.9998,
+      "lines": [
+        "6",
+        "J",
+        "Z"
+      ],
+      "tripCount": 1
+    },
+    "Brooklyn Bridge-City Hall": {
+      "lat": 40.7131,
+      "lon": -74.0028,
+      "lines": [
+        "4",
+        "5",
+        "6",
+        "J",
+        "Z"
+      ],
+      "tripCount": 0
+    },
+    "Grand Central-42nd St": {
+      "lat": 40.7527,
+      "lon": -73.9772,
+      "lines": [
+        "4",
+        "5",
+        "6",
+        "7",
+        "S"
+      ],
+      "tripCount": 1
+    },
+    "33rd St (6)": {
+      "lat": 40.746,
+      "lon": -73.9827,
       "lines": [
         "6"
       ],
@@ -431,90 +480,6 @@
       ],
       "tripCount": 1
     },
-    "14th St-Union Sq": {
-      "lat": 40.7355,
-      "lon": -73.9905,
-      "lines": [
-        "4",
-        "5",
-        "6",
-        "L",
-        "N",
-        "Q",
-        "R",
-        "W"
-      ],
-      "tripCount": 3
-    },
-    "Spring St (6)": {
-      "lat": 40.7224,
-      "lon": -73.9972,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
-    },
-    "33rd St (6)": {
-      "lat": 40.746,
-      "lon": -73.9827,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
-    },
-    "Bleecker St": {
-      "lat": 40.7259,
-      "lon": -73.9944,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
-    },
-    "Canal St (6)": {
-      "lat": 40.7182,
-      "lon": -73.9998,
-      "lines": [
-        "6",
-        "J",
-        "Z"
-      ],
-      "tripCount": 1
-    },
-    "Grand Central-42nd St": {
-      "lat": 40.7527,
-      "lon": -73.9772,
-      "lines": [
-        "4",
-        "5",
-        "6",
-        "7",
-        "S"
-      ],
-      "tripCount": 1
-    },
-    "Broadway-Lafayette": {
-      "lat": 40.7253,
-      "lon": -73.9959,
-      "lines": [
-        "B",
-        "D",
-        "F",
-        "M"
-      ],
-      "tripCount": 0
-    },
-    "Brooklyn Bridge-City Hall": {
-      "lat": 40.7131,
-      "lon": -74.0028,
-      "lines": [
-        "4",
-        "5",
-        "6",
-        "J",
-        "Z"
-      ],
-      "tripCount": 0
-    },
     "Astor Place": {
       "lat": 40.7301,
       "lon": -73.9909,
@@ -522,6 +487,14 @@
         "6"
       ],
       "tripCount": 3
+    },
+    "23rd St (6)": {
+      "lat": 40.739,
+      "lon": -73.9847,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
     }
   }
 }
