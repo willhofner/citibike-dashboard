@@ -89,6 +89,7 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
+    align-items: center;
   }
   .filter-btn {
     padding: 4px 10px;
@@ -102,6 +103,19 @@
   }
   .filter-btn:hover { border-color: var(--accent); color: var(--text); }
   .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  /* MTA bullet filter buttons */
+  .line-filter-btn {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    padding: 1px;
+    transition: all 0.15s;
+    opacity: 1;
+  }
+  .line-filter-btn:hover { border-color: rgba(255,255,255,0.4); }
+  .line-filter-btn.active { border-color: #fff; }
+  .line-filter-btn.dimmed { opacity: 0.3; }
 
   .ride-count {
     font-size: 11px;
@@ -159,24 +173,11 @@
     color: var(--accent);
     margin: 0 4px;
   }
-  .ride-item .ride-meta {
-    display: flex;
-    gap: 8px;
-    margin-top: 5px;
+  .ride-item .ride-duration {
+    margin-top: 4px;
     font-size: 11px;
     color: var(--text-dim);
-    align-items: center;
   }
-  .ride-item .ride-meta .tag {
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: 600;
-  }
-  .tag-express { background: rgba(234,179,8,0.2); color: var(--accent); }
-  .tag-local { background: rgba(34,197,94,0.2); color: var(--green); }
-  .tag-transfer { background: rgba(239,68,68,0.15); color: var(--red); }
-  .tag-line { background: rgba(136,136,160,0.2); color: var(--text-dim); }
 
   /* MTA subway line bullets */
   .mta-bullet {
@@ -240,19 +241,41 @@
   }
   .ride-detail-overlay.visible { display: block; }
 
-  .ride-detail-overlay h3 {
-    font-size: 14px;
-    font-weight: 600;
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 12px;
   }
+  .detail-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .leg-card {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .leg-card:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+  .leg-card .leg-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .leg-card .leg-route {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
   .detail-row {
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
+    padding: 4px 0;
     font-size: 13px;
-    border-bottom: 1px solid var(--border);
   }
-  .detail-row:last-child { border-bottom: none; }
   .detail-row .detail-label { color: var(--text-dim); }
   .detail-row .detail-value { font-weight: 500; text-align: right; max-width: 180px; }
 
@@ -327,16 +350,12 @@
     <input type="text" class="search-input" id="searchInput" placeholder="Search stations...">
 
     <div class="filter-row" id="lineFilter">
-      <button class="filter-btn active" data-line="all">All</button>
-      <button class="filter-btn" data-line="6">6</button>
-      <button class="filter-btn" data-line="4/5">4/5</button>
-      <button class="filter-btn" data-line="R/W">R/W</button>
-    </div>
-
-    <div class="filter-row" id="dirFilter">
-      <button class="filter-btn active" data-dir="all">All</button>
-      <button class="filter-btn" data-dir="Northbound">Uptown</button>
-      <button class="filter-btn" data-dir="Southbound">Downtown</button>
+      <span class="line-filter-btn active" data-line="all"><span class="mta-bullet lg" style="background:#888;color:#fff;">All</span></span>
+      <span class="line-filter-btn" data-line="6"><span class="mta-bullet lg mta-6">6</span></span>
+      <span class="line-filter-btn" data-line="4"><span class="mta-bullet lg mta-4">4</span></span>
+      <span class="line-filter-btn" data-line="5"><span class="mta-bullet lg mta-5">5</span></span>
+      <span class="line-filter-btn" data-line="R"><span class="mta-bullet lg mta-R">R</span></span>
+      <span class="line-filter-btn" data-line="W"><span class="mta-bullet lg mta-W">W</span></span>
     </div>
 
     <div class="sort-row" id="sortRow">
@@ -354,8 +373,7 @@
   <div id="rideMap"></div>
 
   <div class="ride-detail-overlay" id="detailOverlay">
-    <h3 id="detailTitle">Trip Details</h3>
-    <div id="detailRows"></div>
+    <div id="detailContent"></div>
   </div>
 
   <div class="all-routes-hint" id="allRoutesHint">
@@ -373,8 +391,7 @@ let stationMarkers = [];
 let animFrame = null;
 
 // Filters state
-let lineFilter = 'all';
-let dirFilter = 'all';
+let lineFilter = 'all';  // 'all', '6', '4', '5', 'R', 'W'
 let sortMode = 'recent';
 let searchQuery = '';
 
@@ -456,17 +473,10 @@ function lineColor(line) {
 // Filter + sort trips
 function getFilteredTrips() {
   let filtered = TRIPS.filter(t => {
-    // Line filter
+    // Line filter — individual line (4 and 5 both match 4/5 trips)
     if (lineFilter !== 'all') {
-      const tripLines = t.legs.map(l => l.line);
-      if (lineFilter === '6' && !tripLines.some(l => l === '6')) return false;
-      if (lineFilter === '4/5' && !tripLines.some(l => l.includes('4') || l.includes('5'))) return false;
-      if (lineFilter === 'R/W' && !tripLines.some(l => l.includes('R') || l.includes('W'))) return false;
-    }
-    // Direction filter
-    if (dirFilter !== 'all') {
-      if (t.numLegs === 1 && t.direction !== dirFilter) return false;
-      if (t.numLegs > 1 && !t.legs.some(l => l.direction === dirFilter)) return false;
+      const tripLineStr = t.legs.map(l => l.line).join('/');
+      if (!tripLineStr.includes(lineFilter)) return false;
     }
     // Search
     if (searchQuery) {
@@ -538,13 +548,8 @@ function renderList() {
   }
 
   container.innerHTML = filtered.map(t => {
-    const stationStr = t.numLegs > 1
-      ? t.legs.map(l => displayStation(l.entryStation)).join(` <span class="ride-arrow">&rarr;</span> `) + ` <span class="ride-arrow">&rarr;</span> ${displayStation(t.legs[t.legs.length-1].exitStation)}`
-      : `${displayStation(t.entryStation)} <span class="ride-arrow">&rarr;</span> ${displayStation(t.exitStation)}`;
-
-    const tags = [];
-    if (t.isExpress) tags.push('<span class="tag tag-express">Express</span>');
-    if (t.numLegs > 1) tags.push('<span class="tag tag-transfer">Transfer</span>');
+    const from = displayStation(t.entryStation);
+    const to = displayStation(t.exitStation);
 
     return `
       <div class="ride-item ${t.id === selectedTripId ? 'active' : ''}" data-trip-id="${t.id}" onclick="selectTrip(TRIPS.find(x=>x.id===${t.id}))">
@@ -554,12 +559,8 @@ function renderList() {
             <span>${formatDate(t.startTime)}</span>
             <span>${formatTime(t.startTime)}</span>
           </div>
-          <div class="ride-stations">${stationStr}</div>
-          <div class="ride-meta">
-            ${tags.join('')}
-            <span>${formatDuration(t.durationMin)}</span>
-            <span>${t.direction}</span>
-          </div>
+          <div class="ride-stations">${from} 🚇 ${to}</div>
+          <div class="ride-duration">${formatDuration(t.durationMin)}</div>
         </div>
       </div>
     `;
@@ -756,43 +757,41 @@ function selectTrip(trip) {
     });
   }
 
-  // Update detail overlay
+  // Update detail overlay — one card per leg
   const overlay = document.getElementById('detailOverlay');
-  const title = document.getElementById('detailTitle');
-  const rows = document.getElementById('detailRows');
+  const content = document.getElementById('detailContent');
 
-  title.textContent = formatDate(trip.startTime);
+  let html = '';
 
-  const detailData = [
-    ['Time', formatTime(trip.startTime) + ' — ' + formatTime(trip.endTime)],
-    ['From', displayStation(trip.entryStation)],
-    ['To', displayStation(trip.exitStation)],
-    ['Line', mtaBullets(trip.line)],
-    ['Direction', trip.direction],
-    ['Duration', formatDuration(trip.durationMin)],
-    ['Legs', trip.numLegs === 1 ? 'Direct' : `${trip.numLegs} legs`],
-  ];
-
-  if (trip.transferStations.length > 0) {
-    detailData.push(['Transfer', trip.transferStations.map(displayStation).join(', ')]);
-  }
-
-  // Show intermediate stations for each leg
   trip.legs.forEach((leg, i) => {
-    if (leg.intermediateStations && leg.intermediateStations.length > 0) {
-      const stationNames = leg.intermediateStations.map(s => displayStation(s.station));
-      const label = trip.numLegs > 1 ? `Leg ${i+1} Stations` : 'Stations';
-      detailData.push([label, stationNames.join(' → ')]);
-    }
+    const legStart = formatTime(leg.startTime);
+    const legEnd = formatTime(leg.endTime);
+    const legDate = i === 0 ? formatDate(leg.startTime) : '';
+
+    html += `<div class="leg-card">
+      <div class="leg-header">
+        <span style="font-size:14px;font-weight:600;">${legDate || '&nbsp;'}</span>
+        ${mtaBullets(leg.line, 'lg')}
+      </div>
+      <div class="leg-route">
+        ${displayStation(leg.entryStation)} 🚇 ${displayStation(leg.exitStation)}
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Time</span>
+        <span class="detail-value">${legStart} — ${legEnd}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Duration</span>
+        <span class="detail-value">${formatDuration(leg.durationMin)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Direction</span>
+        <span class="detail-value">${leg.direction}</span>
+      </div>
+    </div>`;
   });
 
-  rows.innerHTML = detailData.map(([label, value]) => `
-    <div class="detail-row">
-      <span class="detail-label">${label}</span>
-      <span class="detail-value">${value}</span>
-    </div>
-  `).join('');
-
+  content.innerHTML = html;
   overlay.classList.add('visible');
 }
 
@@ -805,21 +804,33 @@ function deselectTrip() {
   map.setView([40.7350, -73.990], 13);
 }
 
-// Filter button handlers
-document.querySelectorAll('#lineFilter .filter-btn').forEach(btn => {
+// Line filter with MTA bullets
+document.querySelectorAll('#lineFilter .line-filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#lineFilter .filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    lineFilter = btn.dataset.line;
-    renderList();
-  });
-});
+    const selected = btn.dataset.line;
+    lineFilter = selected;
 
-document.querySelectorAll('#dirFilter .filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#dirFilter .filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    dirFilter = btn.dataset.dir;
+    // Update active/dimmed states
+    document.querySelectorAll('#lineFilter .line-filter-btn').forEach(b => {
+      b.classList.remove('active', 'dimmed');
+      if (selected === 'all') {
+        // All selected — everything full color
+      } else if (b.dataset.line === selected) {
+        b.classList.add('active');
+      } else if (b.dataset.line !== 'all') {
+        b.classList.add('dimmed');
+      }
+    });
+
+    // Also update the "All" button
+    const allBtn = document.querySelector('#lineFilter .line-filter-btn[data-line="all"]');
+    if (selected === 'all') {
+      allBtn.classList.add('active');
+    } else {
+      allBtn.classList.remove('active');
+      allBtn.classList.add('dimmed');
+    }
+
     renderList();
   });
 });
