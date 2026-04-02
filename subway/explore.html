@@ -404,10 +404,15 @@ function renderGhostLayer() {
       color: '#eab308',
       weight: 1,
       opacity: 0.15
-    }).bindTooltip(name, { permanent: false, direction: 'top', className: 'station-tooltip' })
+    }).bindTooltip(displayStation(name), { permanent: false, direction: 'top', className: 'station-tooltip' })
      .addTo(ghostLayer);
   });
   ghostLayer.addTo(map);
+}
+
+// Strip line suffixes from station names for display: "Canal St (6)" → "Canal St"
+function displayStation(name) {
+  return name.replace(/\s*\([^)]*\)$/, '');
 }
 
 // Render MTA bullet circles for a line string like "6" or "4/5" or "R/W"
@@ -515,8 +520,8 @@ function renderList() {
 
   container.innerHTML = filtered.map(t => {
     const stationStr = t.numLegs > 1
-      ? t.legs.map(l => l.entryStation).join(` <span class="ride-arrow">&rarr;</span> `) + ` <span class="ride-arrow">&rarr;</span> ${t.legs[t.legs.length-1].exitStation}`
-      : `${t.entryStation} <span class="ride-arrow">&rarr;</span> ${t.exitStation}`;
+      ? t.legs.map(l => displayStation(l.entryStation)).join(` <span class="ride-arrow">&rarr;</span> `) + ` <span class="ride-arrow">&rarr;</span> ${displayStation(t.legs[t.legs.length-1].exitStation)}`
+      : `${displayStation(t.entryStation)} <span class="ride-arrow">&rarr;</span> ${displayStation(t.exitStation)}`;
 
     const tags = [];
     tags.push(mtaBullets(t.line, 'sm'));
@@ -610,7 +615,7 @@ function selectTrip(trip) {
           color: color,
           weight: 2,
           opacity: 0.8
-        }).bindTooltip(s.station, { permanent: false, direction: 'top' }).addTo(map);
+        }).bindTooltip(displayStation(s.station), { permanent: false, direction: 'top' }).addTo(map);
         stationMarkers.push(marker);
       });
     }
@@ -707,14 +712,14 @@ function selectTrip(trip) {
   const firstLeg = trip.legs[0];
   const entryMarker = L.circleMarker([firstLeg.entryLat, firstLeg.entryLon], {
     radius: 8, fillColor: '#22c55e', fillOpacity: 1, color: '#22c55e', weight: 2, opacity: 0.5
-  }).bindTooltip(firstLeg.entryStation, { permanent: false, direction: 'top' }).addTo(map);
+  }).bindTooltip(displayStation(firstLeg.entryStation), { permanent: false, direction: 'top' }).addTo(map);
   stationMarkers.push(entryMarker);
 
   // Exit marker (red) on last leg
   const lastLeg = trip.legs[trip.legs.length - 1];
   const exitMarker = L.circleMarker([lastLeg.exitLat, lastLeg.exitLon], {
     radius: 8, fillColor: '#ef4444', fillOpacity: 1, color: '#ef4444', weight: 2, opacity: 0.5
-  }).bindTooltip(lastLeg.exitStation, { permanent: false, direction: 'top' }).addTo(map);
+  }).bindTooltip(displayStation(lastLeg.exitStation), { permanent: false, direction: 'top' }).addTo(map);
   stationMarkers.push(exitMarker);
 
   // Transfer markers (yellow diamond)
@@ -724,7 +729,7 @@ function selectTrip(trip) {
       if (s) {
         const marker = L.circleMarker([s.lat, s.lon], {
           radius: 7, fillColor: '#eab308', fillOpacity: 1, color: '#eab308', weight: 2, opacity: 0.6
-        }).bindTooltip('Transfer: ' + name, { permanent: false, direction: 'top' }).addTo(map);
+        }).bindTooltip('Transfer: ' + displayStation(name), { permanent: false, direction: 'top' }).addTo(map);
         stationMarkers.push(marker);
       }
     });
@@ -739,8 +744,8 @@ function selectTrip(trip) {
 
   const detailData = [
     ['Time', formatTime(trip.startTime) + ' — ' + formatTime(trip.endTime)],
-    ['From', trip.entryStation],
-    ['To', trip.exitStation],
+    ['From', displayStation(trip.entryStation)],
+    ['To', displayStation(trip.exitStation)],
     ['Line', mtaBullets(trip.line)],
     ['Direction', trip.direction],
     ['Duration', formatDuration(trip.durationMin)],
@@ -748,13 +753,13 @@ function selectTrip(trip) {
   ];
 
   if (trip.transferStations.length > 0) {
-    detailData.push(['Transfer', trip.transferStations.join(', ')]);
+    detailData.push(['Transfer', trip.transferStations.map(displayStation).join(', ')]);
   }
 
   // Show intermediate stations for each leg
   trip.legs.forEach((leg, i) => {
     if (leg.intermediateStations && leg.intermediateStations.length > 0) {
-      const stationNames = leg.intermediateStations.map(s => s.station);
+      const stationNames = leg.intermediateStations.map(s => displayStation(s.station));
       const label = trip.numLegs > 1 ? `Leg ${i+1} Stations` : 'Stations';
       detailData.push([label, stationNames.join(' → ')]);
     }
