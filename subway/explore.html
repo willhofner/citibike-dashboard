@@ -194,8 +194,11 @@
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
   .mta-bullet.lg { width: 26px; height: 26px; font-size: 15px; }
+  .mta-bullet.xl { width: 34px; height: 34px; font-size: 20px; }
   .mta-bullets { display: inline-flex; gap: 3px; align-items: center; }
   .mta-bullets.vertical { flex-direction: column; }
+  .subway-emoji { font-size: 16px; }
+  .subway-emoji.lg { font-size: 20px; }
   /* Lex Ave (green) */
   .mta-4, .mta-5, .mta-6 { background: #00933c; color: #fff; }
   /* Broadway (yellow) */
@@ -450,14 +453,14 @@ function displayStation(name) {
 }
 
 // Render MTA bullet circles for a line string like "6" or "4/5" or "R/W"
-// size: 'lg' for ride list left column, default for detail overlay
-function mtaBullets(lineStr, size) {
-  const cls = size === 'lg' ? 'lg' : '';
-  const vertical = size === 'lg' ? 'vertical' : '';
-  // Split "4/5" → ["4", "5"], "R/W" → ["R", "W"], "6" → ["6"]
+// size: 'xl' single-line selector, 'lg' multi-line selector / detail, default for inline
+// layout: 'vertical' stacks them, default is horizontal
+function mtaBullets(lineStr, size, layout) {
   const lines = lineStr.split('/').filter(l => l && l !== 'unknown');
-  if (lines.length === 0) return `<span class="tag tag-line">${lineStr}</span>`;
-  return `<span class="mta-bullets ${vertical}">` +
+  if (lines.length === 0) return `<span style="color:var(--text-dim)">${lineStr}</span>`;
+  const cls = size || '';
+  const dir = layout === 'vertical' ? 'vertical' : '';
+  return `<span class="mta-bullets ${dir}">` +
     lines.map(l => `<span class="mta-bullet ${cls} mta-${l}">${l}</span>`).join('') +
     '</span>';
 }
@@ -550,16 +553,19 @@ function renderList() {
   container.innerHTML = filtered.map(t => {
     const from = displayStation(t.entryStation);
     const to = displayStation(t.exitStation);
+    const lineCount = t.line.split('/').filter(l => l && l !== 'unknown').length;
+    const bulletSize = lineCount === 1 ? 'xl' : 'lg';
+    const bulletLayout = lineCount > 1 ? 'vertical' : '';
 
     return `
       <div class="ride-item ${t.id === selectedTripId ? 'active' : ''}" data-trip-id="${t.id}" onclick="selectTrip(TRIPS.find(x=>x.id===${t.id}))">
-        <div class="ride-bullets">${mtaBullets(t.line, 'lg')}</div>
+        <div class="ride-bullets">${mtaBullets(t.line, bulletSize, bulletLayout)}</div>
         <div class="ride-content">
           <div class="ride-date">
             <span>${formatDate(t.startTime)}</span>
             <span>${formatTime(t.startTime)}</span>
           </div>
-          <div class="ride-stations">${from} 🚇 ${to}</div>
+          <div class="ride-stations">${from} <span class="subway-emoji">🚇</span> ${to}</div>
           <div class="ride-duration">${formatDuration(t.durationMin)}</div>
         </div>
       </div>
@@ -610,125 +616,129 @@ function selectTrip(trip) {
 
   if (allCoords.length < 2) return;
 
-  // Fit map to route bounds
+  // Fit map to route bounds, then start animation after zoom completes
   map.fitBounds(L.latLngBounds(allCoords).pad(0.2), { maxZoom: 15 });
 
-  // Flatten all leg coords into one sequence for continuous animation
-  // with color info per segment
-  const flatCoords = [];
-  const legColors = [];
-  legCoordSets.forEach(({ coords, leg }) => {
-    const color = lineColor(leg.line);
-    coords.forEach(c => {
-      flatCoords.push(c);
-      legColors.push(color);
-    });
-  });
-
-  // Draw station dots for each leg
-  legCoordSets.forEach(({ coords, leg }) => {
-    const color = lineColor(leg.line);
-    if (leg.intermediateStations) {
-      leg.intermediateStations.forEach(s => {
-        const marker = L.circleMarker([s.lat, s.lon], {
-          radius: 4,
-          fillColor: '#fff',
-          fillOpacity: 0.6,
-          color: color,
-          weight: 2,
-          opacity: 0.8
-        }).bindTooltip(displayStation(s.station), { permanent: false, direction: 'top' }).addTo(map);
-        stationMarkers.push(marker);
+  function startAnimation() {
+    // Flatten all leg coords into one sequence for continuous animation
+    const flatCoords = [];
+    const legColors = [];
+    legCoordSets.forEach(({ coords, leg }) => {
+      const color = lineColor(leg.line);
+      coords.forEach(c => {
+        flatCoords.push(c);
+        legColors.push(color);
       });
-    }
+    });
 
-    // Glow trail (drawn immediately as faint guide)
-    const glowTrail = L.polyline(coords, {
-      color: color,
-      weight: 12,
-      opacity: 0.08
+    // Draw station dots for each leg
+    legCoordSets.forEach(({ coords, leg }) => {
+      const color = lineColor(leg.line);
+      if (leg.intermediateStations) {
+        leg.intermediateStations.forEach(s => {
+          const marker = L.circleMarker([s.lat, s.lon], {
+            radius: 4,
+            fillColor: '#fff',
+            fillOpacity: 0.6,
+            color: color,
+            weight: 2,
+            opacity: 0.8
+          }).bindTooltip(displayStation(s.station), { permanent: false, direction: 'top' }).addTo(map);
+          stationMarkers.push(marker);
+        });
+      }
+
+      // Glow trail (drawn immediately as faint guide)
+      const glowTrail = L.polyline(coords, {
+        color: color,
+        weight: 12,
+        opacity: 0.08
+      }).addTo(map);
+      routeLayers.push(glowTrail);
+    });
+
+    // Animated trail + rider dot
+    const trail = L.polyline([], {
+      color: legColors[0],
+      weight: 4,
+      opacity: 0.9
+    }).addTo(map);
+    routeLayers.push(trail);
+
+    const glowTrail = L.polyline([], {
+      color: legColors[0],
+      weight: 10,
+      opacity: 0.15
     }).addTo(map);
     routeLayers.push(glowTrail);
-  });
 
-  // Animated trail + rider dot
-  const trail = L.polyline([], {
-    color: legColors[0],
-    weight: 4,
-    opacity: 0.9
-  }).addTo(map);
-  routeLayers.push(trail);
+    // Rider glow
+    const riderGlow = L.circleMarker(flatCoords[0], {
+      radius: 14, color: legColors[0], fillColor: legColors[0],
+      fillOpacity: 0.3, weight: 0, className: 'rider-glow'
+    }).addTo(map);
+    stationMarkers.push(riderGlow);
 
-  const glowTrail = L.polyline([], {
-    color: legColors[0],
-    weight: 10,
-    opacity: 0.15
-  }).addTo(map);
-  routeLayers.push(glowTrail);
+    // Rider dot
+    const rider = L.circleMarker(flatCoords[0], {
+      radius: 6, color: '#fff', fillColor: legColors[0],
+      fillOpacity: 1, weight: 2
+    }).addTo(map);
+    stationMarkers.push(rider);
 
-  // Rider glow
-  const riderGlow = L.circleMarker(flatCoords[0], {
-    radius: 14, color: legColors[0], fillColor: legColors[0],
-    fillOpacity: 0.3, weight: 0, className: 'rider-glow'
-  }).addTo(map);
-  stationMarkers.push(riderGlow);
+    // Interpolate extra points between stations for smooth animation
+    function interpolateCoords(coords, pointsPerSegment) {
+      if (coords.length < 2) return coords;
+      const result = [coords[0]];
+      for (let i = 1; i < coords.length; i++) {
+        const [lat1, lon1] = coords[i - 1];
+        const [lat2, lon2] = coords[i];
+        for (let j = 1; j <= pointsPerSegment; j++) {
+          const t = j / pointsPerSegment;
+          result.push([lat1 + (lat2 - lat1) * t, lon1 + (lon2 - lon1) * t]);
+        }
+      }
+      return result;
+    }
 
-  // Rider dot
-  const rider = L.circleMarker(flatCoords[0], {
-    radius: 6, color: '#fff', fillColor: legColors[0],
-    fillOpacity: 1, weight: 2
-  }).addTo(map);
-  stationMarkers.push(rider);
+    const smoothCoords = interpolateCoords(flatCoords, 30);
+    const totalFrames = smoothCoords.length;
+    let frameIdx = 0;
 
-  // Interpolate extra points between stations for smooth animation
-  function interpolateCoords(coords, pointsPerSegment) {
-    if (coords.length < 2) return coords;
-    const result = [coords[0]];
-    for (let i = 1; i < coords.length; i++) {
-      const [lat1, lon1] = coords[i - 1];
-      const [lat2, lon2] = coords[i];
-      for (let j = 1; j <= pointsPerSegment; j++) {
-        const t = j / pointsPerSegment;
-        result.push([lat1 + (lat2 - lat1) * t, lon1 + (lon2 - lon1) * t]);
+    function animStep() {
+      const batchSize = Math.max(1, Math.ceil(totalFrames / 120)); // ~2 seconds total
+      const end = Math.min(frameIdx + batchSize, totalFrames);
+
+      for (let i = frameIdx; i < end; i++) {
+        trail.addLatLng(smoothCoords[i]);
+        glowTrail.addLatLng(smoothCoords[i]);
+      }
+      frameIdx = end;
+
+      const pos = smoothCoords[frameIdx - 1];
+      rider.setLatLng(pos);
+      riderGlow.setLatLng(pos);
+
+      // Update color if we've crossed into a new leg
+      const origIdx = Math.min(Math.floor((frameIdx / totalFrames) * flatCoords.length), flatCoords.length - 1);
+      const currentColor = legColors[origIdx];
+      rider.setStyle({ fillColor: currentColor });
+      riderGlow.setStyle({ color: currentColor, fillColor: currentColor });
+
+      if (frameIdx < totalFrames) {
+        animFrame = requestAnimationFrame(animStep);
+      } else {
+        // Done — remove rider, keep trail
+        map.removeLayer(rider);
+        map.removeLayer(riderGlow);
       }
     }
-    return result;
+
+    animFrame = requestAnimationFrame(animStep);
   }
 
-  const smoothCoords = interpolateCoords(flatCoords, 30);
-  const totalFrames = smoothCoords.length;
-  let frameIdx = 0;
-
-  function animStep() {
-    const batchSize = Math.max(1, Math.ceil(totalFrames / 120)); // ~2 seconds total
-    const end = Math.min(frameIdx + batchSize, totalFrames);
-
-    for (let i = frameIdx; i < end; i++) {
-      trail.addLatLng(smoothCoords[i]);
-      glowTrail.addLatLng(smoothCoords[i]);
-    }
-    frameIdx = end;
-
-    const pos = smoothCoords[frameIdx - 1];
-    rider.setLatLng(pos);
-    riderGlow.setLatLng(pos);
-
-    // Update color if we've crossed into a new leg
-    const origIdx = Math.min(Math.floor((frameIdx / totalFrames) * flatCoords.length), flatCoords.length - 1);
-    const currentColor = legColors[origIdx];
-    rider.setStyle({ fillColor: currentColor });
-    riderGlow.setStyle({ color: currentColor, fillColor: currentColor });
-
-    if (frameIdx < totalFrames) {
-      animFrame = requestAnimationFrame(animStep);
-    } else {
-      // Done — remove rider, keep trail
-      map.removeLayer(rider);
-      map.removeLayer(riderGlow);
-    }
-  }
-
-  animFrame = requestAnimationFrame(animStep);
+  // Wait for zoom/pan to finish before starting route animation
+  map.once('moveend', startAnimation);
 
   // Entry marker (green) on first leg
   const firstLeg = trip.legs[0];
@@ -766,19 +776,18 @@ function selectTrip(trip) {
   trip.legs.forEach((leg, i) => {
     const legStart = formatTime(leg.startTime);
     const legEnd = formatTime(leg.endTime);
-    const legDate = i === 0 ? formatDate(leg.startTime) : '';
+    const legDate = formatDate(leg.startTime);
 
     html += `<div class="leg-card">
       <div class="leg-header">
-        <span style="font-size:14px;font-weight:600;">${legDate || '&nbsp;'}</span>
+        <div>
+          <div style="font-size:14px;font-weight:600;">${legDate}</div>
+          <div style="font-size:12px;color:var(--text-dim);">${legStart} — ${legEnd}</div>
+        </div>
         ${mtaBullets(leg.line, 'lg')}
       </div>
       <div class="leg-route">
-        ${displayStation(leg.entryStation)} 🚇 ${displayStation(leg.exitStation)}
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Time</span>
-        <span class="detail-value">${legStart} — ${legEnd}</span>
+        ${displayStation(leg.entryStation)} <span class="subway-emoji lg">🚇</span> ${displayStation(leg.exitStation)}
       </div>
       <div class="detail-row">
         <span class="detail-label">Duration</span>
