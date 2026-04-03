@@ -4,16 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HofReads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
     --bg: #0a0a0f;
+    --bg-shelf: #1a1410;
+    --bg-card: #141418;
     --text: #e0e0e8;
     --text-dim: #8888a0;
     --amber: #eab308;
-    --book-w: 400px;
-    --book-d: 180px;
+    --shelf-wood: linear-gradient(180deg, #2a2018 0%, #1e1810 40%, #16120c 100%);
+    --shelf-edge: #3a2e20;
   }
 
   body {
@@ -21,9 +26,6 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     overflow-x: hidden;
   }
 
@@ -42,254 +44,292 @@
 
   .header {
     text-align: center;
-    margin-top: 40px;
-    margin-bottom: 50px;
+    margin-top: 32px;
+    margin-bottom: 16px;
   }
   .header h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.5px; }
   .header .subtitle { color: var(--text-dim); font-size: 14px; margin-top: 6px; }
   .header .count { color: var(--amber); font-weight: 600; }
 
-  /* 3D Scene */
-  .scene {
-    perspective: 2500px;
-    perspective-origin: 50% 40%;
-    padding-bottom: 80px;
-  }
-
-  .stack {
-    transform-style: preserve-3d;
-    transform: rotateX(18deg);
+  /* Stats row */
+  .stats-row {
     display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-val { font-size: 22px; font-weight: 700; color: var(--amber); }
+  .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  /* Bookcase */
+  .bookcase {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
   }
 
-  /* Each book is a 3D cuboid */
-  .book {
-    transform-style: preserve-3d;
+  .shelf {
     position: relative;
-    width: var(--book-w);
-    height: var(--t);
+    margin-bottom: 0;
+  }
+
+  /* Scrollable shelf viewport with fade edges */
+  .shelf-viewport {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shelf-viewport::before,
+  .shelf-viewport::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 30;
+    pointer-events: none;
+  }
+  .shelf-viewport::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg), transparent);
+  }
+  .shelf-viewport::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg), transparent);
+  }
+
+  .shelf-books {
+    display: flex;
+    align-items: flex-end;
+    padding: 0 60px;
+    min-height: 310px;
+    gap: 0;
+    overflow-x: auto;
+    cursor: grab;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+  }
+  .shelf-books::-webkit-scrollbar { display: none; }
+  .shelf-books.dragging { cursor: grabbing; scroll-behavior: auto; }
+
+  .shelf-plank {
+    height: 14px;
+    background: var(--shelf-wood);
+    border-top: 2px solid var(--shelf-edge);
+    border-bottom: 1px solid #0a0806;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    border-radius: 0 0 2px 2px;
+    margin-bottom: 8px;
+  }
+
+  /* Individual book */
+  .book {
+    flex-shrink: 0;
     cursor: pointer;
-    transition: transform 0.35s ease;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transform-origin: bottom center;
+    border-radius: 2px 3px 0 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
   }
 
   .book:hover {
-    transform: var(--rot-transform) translateZ(15px) !important;
-    z-index: 10;
+    z-index: 10 !important;
   }
 
-  /* Shadow between stacked books */
+  .book.selected {
+    z-index: 20 !important;
+  }
+
+  /* Spine texture overlay — edge darkening + worn top/bottom */
+  .book::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      /* Left/right edge grooves */
+      linear-gradient(90deg,
+        rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.1) 3px, transparent 7px,
+        transparent calc(100% - 7px), rgba(0,0,0,0.1) calc(100% - 3px), rgba(0,0,0,0.3) 100%),
+      /* Worn/faded top and bottom edges */
+      linear-gradient(180deg,
+        rgba(200,180,140,0.15) 0%, rgba(200,180,140,0.06) 3%, transparent 6%,
+        transparent 90%, rgba(0,0,0,0.1) 95%, rgba(0,0,0,0.2) 100%),
+      /* Convex highlight for spine roundness */
+      linear-gradient(90deg,
+        transparent 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.09) 50%,
+        rgba(255,255,255,0.06) 70%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Grain texture overlay (replaces SVG filter to avoid haze) */
+  .book .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: multiply;
+    border-radius: inherit;
+  }
+
+  /* Horizontal ridges + scuff marks */
   .book::after {
     content: '';
     position: absolute;
-    bottom: -4px;
-    left: 5px;
-    right: -15px;
-    height: 6px;
-    background: rgba(0,0,0,0.45);
-    filter: blur(3px);
-    transform: translateZ(calc(var(--book-d) / 2));
-    pointer-events: none;
-  }
-
-  .face {
-    position: absolute;
-    backface-visibility: hidden;
-  }
-
-  /* ===== SPINE (front face) ===== */
-  .spine {
-    width: var(--book-w);
-    height: var(--t);
-    top: 0; left: 0;
-    transform: translateZ(calc(var(--book-d) / 2));
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 22px;
-    overflow: hidden;
-    border-radius: 3px 0 0 3px;
-    filter: url(#grain);
-  }
-
-  /* Convex highlight — makes spine look rounded/3D */
-  .spine::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.18) 0%,
-      rgba(255,255,255,0.06) 15%,
-      rgba(255,255,255,0.02) 35%,
-      transparent 50%,
-      rgba(0,0,0,0.04) 65%,
-      rgba(0,0,0,0.10) 85%,
-      rgba(0,0,0,0.18) 100%
-    );
-    pointer-events: none;
-    border-radius: inherit;
-  }
-
-  /* Horizontal ridges + edge grooves (like real hardcover spines) */
-  .spine::before {
-    content: '';
-    position: absolute;
     inset: 0;
     background:
-      /* Left edge groove */
-      linear-gradient(90deg,
-        rgba(0,0,0,0.3) 0px, rgba(0,0,0,0.12) 2px, transparent 5px,
-        transparent 7px, rgba(0,0,0,0.04) 8px, transparent 10px),
-      /* Right edge groove */
-      linear-gradient(90deg,
-        transparent calc(100% - 10px), rgba(0,0,0,0.04) calc(100% - 8px),
-        transparent calc(100% - 7px), transparent calc(100% - 5px),
-        rgba(0,0,0,0.12) calc(100% - 2px), rgba(0,0,0,0.3) 100%),
-      /* Horizontal ridges */
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 12px,
-        rgba(0,0,0,0.06) 12px,
-        rgba(255,255,255,0.04) 13px,
-        transparent 14px
-      );
+      /* Horizontal ridges (like bands on hardcover spines) */
+      repeating-linear-gradient(180deg,
+        transparent 0px, transparent 12px,
+        rgba(0,0,0,0.06) 12px, rgba(255,255,255,0.03) 13px, transparent 14px),
+      /* Diagonal scuff/wear marks */
+      repeating-linear-gradient(135deg,
+        transparent 0px, transparent 18px,
+        rgba(255,255,255,0.015) 18px, transparent 19px),
+      repeating-linear-gradient(45deg,
+        transparent 0px, transparent 22px,
+        rgba(0,0,0,0.02) 22px, transparent 23px);
     pointer-events: none;
-    border-radius: inherit;
+    z-index: 2;
   }
 
-  .spine-title {
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    font-size: 12px;
+  .book-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: translateX(-50%) rotate(180deg);
+    position: absolute;
+    left: 50%;
+    z-index: 3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    position: relative;
-    z-index: 1;
+    max-height: 70%;
   }
 
-  .spine-author {
-    font-size: 9.5px;
-    letter-spacing: 0.8px;
+  .book-title {
+    font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    opacity: 0.7;
-    white-space: nowrap;
-    position: relative;
-    z-index: 1;
+    line-height: 1.2;
+    bottom: 10px;
+  }
+
+  .book-author {
+    font-size: 8px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    top: 10px;
+    max-height: 40%;
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .detail-card {
+    background: var(--bg-card);
+    border: 1px solid #2a2a30;
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .detail-card.visible { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-top { display: flex; gap: 24px; align-items: flex-start; }
+
+  .detail-cover {
+    width: 100px;
+    height: 150px;
+    border-radius: 4px;
     flex-shrink: 0;
-    margin-left: 16px;
-  }
-
-  /* ===== COVER (top face) ===== */
-  .cover-top {
-    width: var(--book-w);
-    height: var(--book-d);
-    top: 0; left: 0;
-    transform-origin: top center;
-    transform: translateZ(calc(var(--book-d) / 2)) rotateX(-90deg);
-    border-radius: 0 2px 2px 0;
     overflow: hidden;
+    background: var(--bg);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  .detail-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Fallback colored spine when no cover available */
+  .detail-cover-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
   }
 
-  /* Shadow gradient near the spine edge of cover */
-  .cover-top::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.03) 15%, transparent 40%),
-      linear-gradient(to right, rgba(0,0,0,0.12) 0%, transparent 8%);
-    pointer-events: none;
+  .detail-info { flex: 1; min-width: 0; }
+  .detail-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .detail-author { font-size: 14px; color: var(--text-dim); margin-bottom: 12px; }
+
+  .detail-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .detail-meta-item { font-size: 13px; }
+  .detail-meta-item .label { color: var(--text-dim); }
+  .detail-meta-item .value { color: var(--text); font-weight: 600; }
+
+  .detail-stars { color: var(--amber); font-size: 16px; letter-spacing: 2px; margin-bottom: 12px; }
+
+  .detail-review {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-style: italic;
+    border-left: 3px solid var(--amber);
+    padding-left: 14px;
+    margin-top: 8px;
   }
 
-  /* ===== PAGE EDGES (right side) ===== */
-  .pages-right {
-    width: var(--book-d);
-    height: var(--t);
-    top: 0;
-    right: 0;
-    transform-origin: right center;
-    transform: translateX(calc(var(--book-w) / 2)) rotateY(90deg);
-    background: #ede8dc;
-    border-radius: 0 2px 2px 0;
+  /* Rating filter */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
   }
-
-  /* Page line texture */
-  .pages-right::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 1.2px,
-      rgba(140,130,110,0.1) 1.2px,
-      rgba(140,130,110,0.1) 1.8px
-    );
-    border-radius: inherit;
+  .controls button {
+    background: var(--bg-card);
+    border: 1px solid #2a2a30;
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
   }
-
-  /* Shading on page edges */
-  .pages-right::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.12) 0%,
-      transparent 15%,
-      transparent 85%,
-      rgba(0,0,0,0.12) 100%
-    );
-    border-radius: inherit;
-  }
-
-  /* ===== BACK FACE ===== */
-  .back-face {
-    width: var(--book-w);
-    height: var(--t);
-    top: 0; left: 0;
-    transform: translateZ(calc(var(--book-d) / -2));
-    border-radius: 3px 0 0 3px;
-  }
-
-  /* ===== BOTTOM FACE ===== */
-  .bottom-face {
-    width: var(--book-w);
-    height: var(--book-d);
-    left: 0;
-    bottom: 0;
-    transform-origin: bottom center;
-    transform: translateZ(calc(var(--book-d) / 2)) rotateX(90deg);
-  }
-
-  /* ===== LEFT SIDE ===== */
-  .left-face {
-    width: var(--book-d);
-    height: var(--t);
-    top: 0; left: 0;
-    transform-origin: left center;
-    transform: translateX(calc(var(--book-w) / -2)) rotateY(-90deg);
-  }
-
-  /* Light-colored spine overrides */
-  .light-spine .spine-title,
-  .light-spine .spine-author {
-    text-shadow: none !important;
-  }
-
-  /* Stack base shadow */
-  .stack-base {
-    width: 500px;
-    height: 30px;
-    margin-top: -10px;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 65%);
-    filter: blur(12px);
-  }
+  .controls button:hover { border-color: var(--amber); color: var(--text); }
+  .controls button.active { background: var(--amber); color: #0a0a0f; border-color: var(--amber); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -305,128 +345,378 @@
   <p class="subtitle"><span class="count">51</span> books read</p>
 </div>
 
-<!-- SVG noise filter for weathered book texture -->
-<svg style="position:absolute;width:0;height:0">
-  <filter id="grain">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
-    <feColorMatrix type="saturate" values="0"/>
-    <feBlend in="SourceGraphic" mode="multiply" result="blend"/>
-    <feComponentTransfer>
-      <feFuncA type="linear" slope="0.12"/>
-    </feComponentTransfer>
-    <feMerge>
-      <feMergeNode in="SourceGraphic"/>
-      <feMergeNode/>
-    </feMerge>
-  </filter>
-</svg>
-
-<div class="scene">
-  <div class="stack" id="stack"></div>
+<div class="stats-row">
+  <div class="stat"><div class="stat-val" id="stat-books">51</div><div class="stat-label">Books</div></div>
+  <div class="stat"><div class="stat-val" id="stat-pages">15,869</div><div class="stat-label">Pages</div></div>
+  <div class="stat"><div class="stat-val" id="stat-avg">3.5</div><div class="stat-label">Avg Rating</div></div>
+  <div class="stat"><div class="stat-val" id="stat-fives">5</div><div class="stat-label">5-Star Books</div></div>
 </div>
-<div class="stack-base"></div>
+
+<div class="controls">
+  <button class="active" data-filter="all">All</button>
+  <button data-filter="5">5 Stars</button>
+  <button data-filter="4">4 Stars</button>
+  <button data-filter="3">3 Stars</button>
+</div>
+
+<div class="detail-panel">
+  <div class="detail-card" id="detail"></div>
+</div>
+
+<div class="bookcase" id="bookcase"></div>
 
 <script>
-// [title, author, pages, spineColor, textColor, rotation, serif?, lightSpine?]
 const books = [
-  // ---- UNDATED (bottom of stack) ----
-  ["Bitcoin: Hard Money You Can't F*ck With", "Jason A. Williams", 221, "#1a1a1e", "#c0c0c0", -1.2, false],
-  ["Our Final Invention", "James Barrat", 322, "#2d3040", "#c8c8d4", 2.1, false],
-  ["The Internet of Money", "Andreas M. Antonopoulos", 200, "#1e1e22", "#d4a94c", -0.5, false],
-  ["Start with Why", "Simon Sinek", 256, "#c4a010", "#1a1a0a", 1.8, false, true],
-  ["The Theory of Everything", "Stephen Hawking", 176, "#1a2744", "#e0e0e8", -2.2, true],
-  ["Zero to One", "Peter Thiel", 195, "#1a3040", "#e0e8f0", 0.8, false],
-  ["The Bitcoin Standard", "Saifedean Ammous", 304, "#2a2015", "#d4a94c", -1.5, false],
-  ["2030", "Mauro F. Guillén", 288, "#3d3a2c", "#e8dcc8", 2.5, true],
-  ["Sapiens", "Yuval Noah Harari", 512, "#d4c5a9", "#1a1a1a", -0.3, true, true],
-  ["The Boys in the Boat", "Daniel James Brown", 404, "#1a3a2a", "#d4d8c0", 1.5, true],
-  ["Where the Crawdads Sing", "Delia Owens", 384, "#2a5a4a", "#e0e8e0", -2.8, true],
-  ["Extreme Ownership", "Jocko Willink", 320, "#1a1a1e", "#c8c8c8", 1.2, false],
-  ["The Everything Store", "Brad Stone", 384, "#3d2a1a", "#e8dcc8", -1.8, false],
-  ["Steve Jobs", "Walter Isaacson", 630, "#e0ddd5", "#1a1a1a", 0.5, true, true],
-  ["How to Win at the Sport of Business", "Mark Cuban", 67, "#2a2a4a", "#a8b8d4", -0.8, false],
-  ["Elon Musk", "Ashlee Vance", 392, "#1a1e2a", "#e0e0e8", 2.3, false],
-  ["How to Win Friends & Influence People", "Dale Carnegie", 288, "#8b0000", "#e8d0c0", -1.5, true],
-  ["Never Split the Difference", "Chris Voss", 274, "#1a1e1a", "#e0e0e0", 0.6, false],
-  ["The Power of Habit", "Charles Duhigg", 375, "#5c4033", "#e8dcc8", -2.0, false],
-  ["Outliers", "Malcolm Gladwell", 309, "#e8e0d0", "#1a1a1a", 1.0, false, true],
-  ["Rich Dad, Poor Dad", "Robert T. Kiyosaki", 195, "#6b1a6b", "#e8d0e8", -0.4, false],
-  ["The Power of Now", "Eckhart Tolle", 229, "#2a3a4a", "#c8d8e8", 1.8, true],
-  ["The Lion Tracker's Guide To Life", "Boyd Varty", 160, "#3a5a3a", "#d4e0c8", -1.2, true],
-  ["Shoe Dog", "Phil Knight", 400, "#c94e2a", "#ffffff", 2.0, false],
-  // ---- DATED (ascending by finish date) ----
-  ["The Art of War", "Sun Tzu", 170, "#8b0000", "#d4a94c", -2.5, true],
-  ["Atomic Habits", "James Clear", 319, "#c4a010", "#1a1a0a", 1.3, false, true],
-  ["The Price of Tomorrow", "Jeff Booth", 232, "#1a2744", "#e0e8f0", -0.7, false],
-  ["The Last Olympian", "Rick Riordan", 381, "#1a3a5a", "#c8d8e8", 2.2, false],
-  ["The Titan's Curse", "Rick Riordan", 352, "#2a4a3a", "#c8e0d4", -1.8, false],
-  ["The Sea of Monsters", "Rick Riordan", 279, "#4a6a4a", "#e0e8d8", 0.5, false],
-  ["The Battle of the Labyrinth", "Rick Riordan", 361, "#3a3a5a", "#c8c8e0", -1.0, false],
-  ["The Lightning Thief", "Rick Riordan", 377, "#4a2a1a", "#e8d4c0", 1.8, true],
-  ["Elon Musk", "Walter Isaacson", 688, "#e0ddd5", "#1a1a1a", -0.3, true, true],
-  ["An Astronaut's Guide to Life on Earth", "Chris Hadfield", 295, "#0a1a30", "#8ab4f0", 2.0, false],
-  ["The Inner Game of Tennis", "W. Timothy Gallwey", 134, "#3a5a3a", "#e0e8d4", -2.2, true],
-  ["Permanent Record", "Edward Snowden", 339, "#1a1a1e", "#e0e0e8", 0.8, false],
-  ["Caffeine", "Michael Pollan", 100, "#5c3a20", "#e8d4b8", -0.5, true],
-  ["Layered Money", "Nik Bhatia", 180, "#2a2015", "#d4a94c", 1.5, false],
-  ["The Deficit Myth", "Stephanie Kelton", 327, "#4a1a1a", "#e0c8c8", -1.8, false],
-  ["The Alchemist", "Paulo Coelho", 182, "#c49a30", "#1a1a0a", 2.5, true, true],
-  ["Woke, Inc.", "Vivek Ramaswamy", 368, "#1a1e1a", "#d0d0d0", -0.8, false],
-  ["The Hate You Give", "Angie Thomas", 444, "#d45a2a", "#ffffff", 1.2, false],
-  ["Peak Performance", "Brad Stulberg", 240, "#2a4a6a", "#c8d8e8", -2.0, false],
-  ["The Last Lecture", "Randy Pausch", 217, "#5c4033", "#e8dcc8", 0.6, true],
-  ["The Three-Body Problem", "Liu Cixin", 472, "#0a1020", "#8ab0d4", -1.5, true],
-  ["Touching the Void", "Joe Simpson", 218, "#2a4a4a", "#d4e8e0", 2.8, true],
-  ["A Court of Thorns and Roses", "Sarah J. Maas", 419, "#6b1a4a", "#e8c8d8", -1.0, true],
-  ["The Midnight Library", "Matt Haig", 288, "#2d1f3d", "#c8b8e0", 1.5, true],
-  ["Endurance", "Alfred Lansing", 282, "#1a2744", "#d4a94c", -2.5, true],
-  ["No Country for Old Men", "Cormac McCarthy", 309, "#3d3a2c", "#e8dcc8", 2.0, true],
-  ["How to Read Skyscrapers", "Edward Denison", 256, "#c94e2a", "#ffffff", -0.8, false],
+  {"id":1,"title":"How to Read Skyscrapers","author":"Edward Denison","pages":256,"isbn":"0789335573","rating":3,"review":null,"dateRead":"2026-02-01","yearPublished":2019},
+  {"id":2,"title":"No Country for Old Men","author":"Cormac McCarthy","pages":309,"isbn":"0375706674","rating":3,"review":"Written like a screenplay","dateRead":"2026-02-01","yearPublished":2005},
+  {"id":3,"title":"Endurance","author":"Alfred Lansing","pages":282,"isbn":"0786706716","rating":5,"review":"Unbelievable. Favorite book of 2025.","dateRead":"2025-12-07","yearPublished":1959},
+  {"id":4,"title":"The Midnight Library","author":"Matt Haig","pages":288,"isbn":"0525559477","rating":4,"review":"Awesome premise. Had to put it down for a full month at one point.","dateRead":"2025-06-01","yearPublished":2020},
+  {"id":5,"title":"A Court of Thorns and Roses","author":"Sarah J. Maas","pages":419,"isbn":"1635575567","rating":3,"review":"Szn 1 of GOT, but somehow hornier. Pretty sick plot / world, not mad Riley got me to read this.","dateRead":"2025-05-01","yearPublished":2015},
+  {"id":6,"title":"Touching the Void","author":"Joe Simpson","pages":218,"isbn":"0060730552","rating":4,"review":"Insane story. Favorite book of the year so far.","dateRead":"2025-04-01","yearPublished":1988},
+  {"id":7,"title":"The Three-Body Problem","author":"Liu Cixin","pages":472,"isbn":null,"rating":4,"review":null,"dateRead":"2024-05-27","yearPublished":2006},
+  {"id":8,"title":"The Last Lecture","author":"Randy Pausch","pages":217,"isbn":null,"rating":4,"review":"Especially the last 1/4 of this book was incredible. Most emotional book I've ever read.","dateRead":"2024-03-15","yearPublished":2008},
+  {"id":9,"title":"Peak Performance","author":"Brad Stulberg","pages":240,"isbn":"162336793X","rating":4,"review":"Perfect book to listen to on runs. TL;DR: Find something bigger.","dateRead":"2024-02-11","yearPublished":2017},
+  {"id":10,"title":"The Hate You Give","author":"Angie Thomas","pages":444,"isbn":null,"rating":3,"review":null,"dateRead":"2023-10-23","yearPublished":2017},
+  {"id":11,"title":"The Price of Tomorrow","author":"Jeff Booth","pages":232,"isbn":"1999257405","rating":5,"review":null,"dateRead":"2023-01-01","yearPublished":2020},
+  {"id":12,"title":"The Last Olympian","author":"Rick Riordan","pages":381,"isbn":"1423101472","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2009},
+  {"id":13,"title":"The Titan's Curse","author":"Rick Riordan","pages":352,"isbn":null,"rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2007},
+  {"id":14,"title":"The Sea of Monsters","author":"Rick Riordan","pages":279,"isbn":"0120000318","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2006},
+  {"id":15,"title":"The Battle of the Labyrinth","author":"Rick Riordan","pages":361,"isbn":null,"rating":4,"review":null,"dateRead":"2023-01-01","yearPublished":2008},
+  {"id":16,"title":"The Lightning Thief","author":"Rick Riordan","pages":377,"isbn":"0786838655","rating":4,"review":"Such a fun series. Read the entire thing in Europe.","dateRead":"2023-01-01","yearPublished":2005},
+  {"id":17,"title":"Elon Musk","author":"Walter Isaacson","pages":688,"isbn":"1982181281","rating":4,"review":"Simply lock in.","dateRead":"2023-01-01","yearPublished":2023},
+  {"id":18,"title":"An Astronaut's Guide to Life on Earth","author":"Chris Hadfield","pages":295,"isbn":"0316253014","rating":4,"review":"Powerful lessons from space. Good bit of Hadfield's story as well.","dateRead":"2023-01-01","yearPublished":2013},
+  {"id":19,"title":"The Inner Game of Tennis","author":"W. Timothy Gallwey","pages":134,"isbn":"0679778314","rating":3,"review":"Your teacher self vs. Your student self. Good bit of actual tennis tips.","dateRead":"2023-01-01","yearPublished":1974},
+  {"id":20,"title":"Permanent Record","author":"Edward Snowden","pages":339,"isbn":"1250237238","rating":4,"review":"One of the most eye-opening books I've ever read.","dateRead":"2023-01-01","yearPublished":2019},
+  {"id":21,"title":"Caffeine","author":"Michael Pollan","pages":2,"isbn":null,"rating":3,"review":"America runs on uppers.","dateRead":"2023-01-01","yearPublished":2020},
+  {"id":22,"title":"Layered Money","author":"Nik Bhatia","pages":180,"isbn":null,"rating":3,"review":"Bitcoin.","dateRead":"2023-01-01","yearPublished":2021},
+  {"id":23,"title":"The Deficit Myth","author":"Stephanie Kelton","pages":327,"isbn":"1541736184","rating":3,"review":"It's all keystrokes.","dateRead":"2023-01-01","yearPublished":2020},
+  {"id":24,"title":"The Alchemist","author":"Paulo Coelho","pages":182,"isbn":"0062315005","rating":4,"review":"Tied for my 2023 BOTY","dateRead":"2023-01-01","yearPublished":1988},
+  {"id":25,"title":"Woke, Inc.","author":"Vivek Ramaswamy","pages":368,"isbn":"1546090789","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2021},
+  {"id":26,"title":"The Art of War","author":"Sun Tzu","pages":170,"isbn":null,"rating":3,"review":"Classic. Didn't realize half this book is actual battle strats lol. Thought the whole thing was allegorical.","dateRead":"2022-01-01","yearPublished":null},
+  {"id":27,"title":"Atomic Habits","author":"James Clear","pages":319,"isbn":null,"rating":3,"review":null,"dateRead":"2022-01-07","yearPublished":2018},
+  {"id":28,"title":"Shoe Dog","author":"Phil Knight","pages":400,"isbn":"1501135910","rating":5,"review":null,"dateRead":null,"yearPublished":2016},
+  {"id":29,"title":"The Lion Tracker's Guide To Life","author":"Boyd Varty","pages":160,"isbn":"0358099773","rating":3,"review":null,"dateRead":null,"yearPublished":2014},
+  {"id":30,"title":"The Power of Now","author":"Eckhart Tolle","pages":229,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":1997},
+  {"id":31,"title":"Rich Dad, Poor Dad","author":"Robert T. Kiyosaki","pages":195,"isbn":"0751532711","rating":3,"review":null,"dateRead":null,"yearPublished":1997},
+  {"id":32,"title":"Outliers","author":"Malcolm Gladwell","pages":309,"isbn":"0316017922","rating":3,"review":null,"dateRead":null,"yearPublished":2008},
+  {"id":33,"title":"The Power of Habit","author":"Charles Duhigg","pages":375,"isbn":"1400069289","rating":3,"review":null,"dateRead":null,"yearPublished":2012},
+  {"id":34,"title":"Never Split the Difference","author":"Chris Voss","pages":274,"isbn":"0062407805","rating":3,"review":null,"dateRead":null,"yearPublished":2016},
+  {"id":35,"title":"How to Win Friends & Influence People","author":"Dale Carnegie","pages":288,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":1936},
+  {"id":36,"title":"Elon Musk","author":"Ashlee Vance","pages":392,"isbn":"0062301233","rating":4,"review":null,"dateRead":null,"yearPublished":2015},
+  {"id":37,"title":"How to Win at the Sport of Business","author":"Mark Cuban","pages":67,"isbn":"0983988536","rating":3,"review":null,"dateRead":null,"yearPublished":2011},
+  {"id":38,"title":"Steve Jobs","author":"Walter Isaacson","pages":630,"isbn":"1451648537","rating":4,"review":null,"dateRead":null,"yearPublished":2011},
+  {"id":39,"title":"The Everything Store","author":"Brad Stone","pages":384,"isbn":"0316219266","rating":4,"review":null,"dateRead":null,"yearPublished":2013},
+  {"id":40,"title":"Extreme Ownership","author":"Jocko Willink","pages":320,"isbn":"1250067057","rating":3,"review":null,"dateRead":null,"yearPublished":2015},
+  {"id":41,"title":"Where the Crawdads Sing","author":"Delia Owens","pages":384,"isbn":"0735219117","rating":5,"review":null,"dateRead":null,"yearPublished":2018},
+  {"id":42,"title":"The Boys in the Boat","author":"Daniel James Brown","pages":404,"isbn":"067002581X","rating":5,"review":null,"dateRead":null,"yearPublished":2013},
+  {"id":43,"title":"Sapiens","author":"Yuval Noah Harari","pages":512,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":2011},
+  {"id":44,"title":"2030","author":"Mauro F. Guill\u00e9n","pages":288,"isbn":"1250268176","rating":3,"review":null,"dateRead":null,"yearPublished":2020},
+  {"id":45,"title":"The Bitcoin Standard","author":"Saifedean Ammous","pages":304,"isbn":"1119473861","rating":4,"review":null,"dateRead":null,"yearPublished":2018},
+  {"id":46,"title":"Zero to One","author":"Peter Thiel","pages":195,"isbn":"0804139296","rating":3,"review":null,"dateRead":null,"yearPublished":2014},
+  {"id":47,"title":"The Theory of Everything","author":"Stephen W. Hawking","pages":176,"isbn":"0641587716","rating":3,"review":null,"dateRead":null,"yearPublished":2002},
+  {"id":48,"title":"Start with Why","author":"Simon Sinek","pages":256,"isbn":"1591842808","rating":3,"review":null,"dateRead":null,"yearPublished":2009},
+  {"id":49,"title":"The Internet of Money","author":"Andreas M. Antonopoulos","pages":200,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":2016},
+  {"id":50,"title":"Our Final Invention","author":"James Barrat","pages":322,"isbn":"0312622376","rating":4,"review":null,"dateRead":null,"yearPublished":2013},
+  {"id":51,"title":"Bitcoin: Hard Money You Can't F*ck With","author":"Jason A. Williams","pages":221,"isbn":"1838318410","rating":3,"review":null,"dateRead":null,"yearPublished":2020}
 ];
 
-const stack = document.getElementById('stack');
+// Curated spine color palette (rich, book-like)
+const SPINE_COLORS = [
+  { bg: '#8b0000', fg: '#e8d0c0' },  // deep red
+  { bg: '#1a2744', fg: '#c8d8f0' },  // navy
+  { bg: '#2a5a4a', fg: '#d4e8d8' },  // forest green
+  { bg: '#5c3a20', fg: '#e8dcc8' },  // brown leather
+  { bg: '#4a1a4a', fg: '#e0c8e0' },  // plum
+  { bg: '#c94e2a', fg: '#ffffff' },  // burnt orange
+  { bg: '#1a3a5a', fg: '#c8dce8' },  // slate blue
+  { bg: '#3a5a3a', fg: '#d4e0c8' },  // olive
+  { bg: '#2a2015', fg: '#d4a94c' },  // dark gold
+  { bg: '#3d3a2c', fg: '#e8dcc8' },  // khaki dark
+  { bg: '#0a1a30', fg: '#8ab4f0' },  // midnight blue
+  { bg: '#6b1a1a', fg: '#e8c8b8' },  // maroon
+  { bg: '#1e3830', fg: '#a8d8c0' },  // teal dark
+  { bg: '#4a3a2a', fg: '#e0d4c0' },  // chocolate
+  { bg: '#2d1f3d', fg: '#c8b8e0' },  // deep purple
+  { bg: '#c4a010', fg: '#1a1a0a' },  // gold (dark text)
+  { bg: '#d4c5a9', fg: '#1a1a1a' },  // cream (dark text)
+  { bg: '#e0ddd5', fg: '#1a1a1a' },  // off-white (dark text)
+];
 
-books.forEach((b) => {
-  const [title, author, pages, bg, fg, rot, serif, light] = b;
-  // Fat books: min 50px, max 95px
-  const t = Math.max(50, Math.min(95, pages * 0.08 + 38));
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
 
-  const book = document.createElement('div');
-  book.className = 'book';
-  book.style.setProperty('--t', t + 'px');
-  book.style.setProperty('--rot-transform', `rotateZ(${rot}deg)`);
-  book.style.transform = `rotateZ(${rot}deg)`;
+function getSpineColor(book) {
+  return SPINE_COLORS[hashStr(book.title) % SPINE_COLORS.length];
+}
 
-  // Darken and lighten for gradients
-  const coverBg = bg; // cover matches spine
+function getSpineWidth(pages) {
+  return Math.max(24, Math.min(62, pages * 0.075 + 18));
+}
 
-  book.innerHTML = `
-    <div class="face spine ${light ? 'light-spine' : ''}" style="
-      background: linear-gradient(to bottom,
-        color-mix(in srgb, ${bg}, white 14%),
-        ${bg} 35%,
-        color-mix(in srgb, ${bg}, black 12%));
-      color: ${fg};
-      ${serif ? "font-family: Georgia, 'Times New Roman', serif;" : ''}
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    ">
-      <span class="spine-title">${title}</span>
-      <span class="spine-author">${author}</span>
-    </div>
-    <div class="face cover-top" style="
-      background: linear-gradient(135deg,
-        color-mix(in srgb, ${bg}, white 8%),
-        ${bg},
-        color-mix(in srgb, ${bg}, black 10%));
-    "></div>
-    <div class="face pages-right"></div>
-    <div class="face back-face" style="background: color-mix(in srgb, ${bg}, black 30%);"></div>
-    <div class="face bottom-face" style="background: color-mix(in srgb, ${bg}, black 40%);"></div>
-    <div class="face left-face" style="background: color-mix(in srgb, ${bg}, black 25%);"></div>
-  `;
+function getBookHeight(book) {
+  // Vary height 250-300px based on title hash
+  const h = hashStr(book.title + 'h');
+  return 250 + (h % 50);
+}
 
-  stack.appendChild(book);
+// Manual lean overrides: positive = lean right, negative = lean left
+const LEAN_OVERRIDES = {
+  "Bitcoin: Hard Money You Can't F*ck With": -5,
+};
+
+function getBookLean(book, index) {
+  if (LEAN_OVERRIDES[book.title] !== undefined) return LEAN_OVERRIDES[book.title];
+  const h = hashStr(book.title + 'lean');
+  if (h % 5 !== 0) return 0;
+  // Lean between -6 and 6 degrees, excluding 0
+  let angle = ((h % 11) - 5);
+  if (angle === 0) angle = 3;
+  return angle;
+}
+
+function getLeanMargin(lean, height) {
+  // Extra horizontal space needed so leaning book doesn't overlap neighbors
+  if (!lean) return 0;
+  return Math.ceil(height * Math.sin(Math.abs(lean) * Math.PI / 180) / 2);
+}
+
+function stars(n) {
+  return '\u2605'.repeat(n) + '\u2606'.repeat(5 - n);
+}
+
+function formatDate(d) {
+  if (!d) return null;
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+// Sort: dated books first (most recent), then undated
+const sorted = [...books].sort((a, b) => {
+  if (a.dateRead && b.dateRead) return b.dateRead.localeCompare(a.dateRead);
+  if (a.dateRead && !b.dateRead) return -1;
+  if (!a.dateRead && b.dateRead) return 1;
+  return 0;
 });
+
+let selectedId = null;
+let currentFilter = 'all';
+
+function getFiltered() {
+  if (currentFilter === 'all') return sorted;
+  return sorted.filter(b => b.rating === parseInt(currentFilter));
+}
+
+function renderBookcase() {
+  const bookcase = document.getElementById('bookcase');
+  // Save scroll position if re-rendering
+  const oldScroll = bookcase.querySelector('.shelf-books')?.scrollLeft || 0;
+  bookcase.innerHTML = '';
+
+  const filtered = getFiltered();
+
+  const shelfEl = document.createElement('div');
+  shelfEl.className = 'shelf';
+
+  const viewport = document.createElement('div');
+  viewport.className = 'shelf-viewport';
+
+  const booksEl = document.createElement('div');
+  booksEl.className = 'shelf-books';
+
+  filtered.forEach((book, bi) => {
+      const color = getSpineColor(book);
+      const w = getSpineWidth(book.pages);
+      const h = getBookHeight(book);
+      const lean = getBookLean(book, bi);
+      const isSelected = book.id === selectedId;
+
+      const el = document.createElement('div');
+      el.className = 'book' + (isSelected ? ' selected' : '');
+      el.style.width = w + 'px';
+      el.style.height = h + 'px';
+
+      // Weathered gradient — slight color variation top-to-bottom like sun fading
+      const fadeAmt = 4 + (hashStr(book.title + 'fade') % 8); // 4-12% fade
+      el.style.background = `linear-gradient(180deg,
+        color-mix(in srgb, ${color.bg}, #c8b898 ${fadeAmt}%),
+        ${color.bg} 25%,
+        color-mix(in srgb, ${color.bg}, black 6%) 90%,
+        color-mix(in srgb, ${color.bg}, black 14%))`;
+
+      // Add margin so leaning books don't overlap neighbors
+      const margin = getLeanMargin(lean, h);
+      if (margin) {
+        el.style.marginLeft = margin + 'px';
+        el.style.marginRight = margin + 'px';
+      }
+
+      // Shift leaning books sideways so they center in the gap
+      // rotate() pivots at bottom-center, so the top swings out — translateX compensates
+      const shiftX = lean ? Math.round(-h * Math.sin(lean * Math.PI / 180) / 2) : 0;
+      const baseTransform = lean ? `translateX(${shiftX}px) rotate(${lean}deg)` : '';
+
+      if (isSelected) {
+        el.style.transform = `${baseTransform} translateY(-16px) scale(1.04)`;
+        el.style.boxShadow = '0 0 0 2px var(--amber), 0 12px 32px rgba(0,0,0,0.7)';
+      } else {
+        el.style.transform = baseTransform;
+      }
+
+      el.addEventListener('mouseenter', () => {
+        if (book.id !== selectedId) {
+          el.style.transform = `${baseTransform} translateY(-12px) scale(1.02)`;
+          el.style.boxShadow = '0 8px 24px rgba(0,0,0,0.6)';
+        }
+      });
+      el.addEventListener('mouseleave', () => {
+        if (book.id !== selectedId) {
+          el.style.transform = baseTransform;
+          el.style.boxShadow = '';
+        }
+      });
+
+      // Grain texture overlay
+      const grain = document.createElement('div');
+      grain.className = 'grain';
+      el.appendChild(grain);
+
+      const isDarkText = color.fg === '#1a1a1a' || color.fg === '#1a1a0a';
+      const textShadow = isDarkText ? 'none' : '0 1px 2px rgba(0,0,0,0.5)';
+
+      // Title — pinned to bottom of spine
+      const title = document.createElement('div');
+      title.className = 'book-label book-title';
+      title.style.color = color.fg;
+      title.style.textShadow = textShadow;
+      if (w < 30) title.style.fontSize = '10px';
+      else if (w < 38) title.style.fontSize = '11.5px';
+      title.textContent = book.title;
+      el.appendChild(title);
+
+      // Author — pinned to top of spine
+      const author = document.createElement('div');
+      author.className = 'book-label book-author';
+      author.style.color = color.fg;
+      author.style.textShadow = textShadow;
+      if (w < 30) author.style.fontSize = '7px';
+      author.textContent = book.author;
+      el.appendChild(author);
+
+      el.addEventListener('click', () => {
+        selectedId = selectedId === book.id ? null : book.id;
+        renderBookcase();
+        showDetail(selectedId === book.id ? null : book);
+        if (selectedId) showDetail(book);
+      });
+
+      booksEl.appendChild(el);
+  });
+
+  viewport.appendChild(booksEl);
+  shelfEl.appendChild(viewport);
+
+  const plank = document.createElement('div');
+  plank.className = 'shelf-plank';
+  shelfEl.appendChild(plank);
+
+  bookcase.appendChild(shelfEl);
+
+  // Restore scroll position
+  booksEl.scrollLeft = oldScroll;
+
+  // Drag-to-scroll
+  let isDragging = false, startX, startScroll, didDrag = false;
+  booksEl.addEventListener('mousedown', e => {
+    isDragging = true;
+    didDrag = false;
+    startX = e.pageX;
+    startScroll = booksEl.scrollLeft;
+    booksEl.classList.add('dragging');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dx = e.pageX - startX;
+    if (Math.abs(dx) > 5) didDrag = true;
+    booksEl.scrollLeft = startScroll - dx;
+  });
+  // Suppress click on books after a drag
+  booksEl.addEventListener('click', e => {
+    if (didDrag) { e.stopPropagation(); didDrag = false; }
+  }, true);
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    booksEl.classList.remove('dragging');
+  });
+}
+
+function showDetail(book) {
+  const el = document.getElementById('detail');
+  if (!book) {
+    el.classList.remove('visible');
+    return;
+  }
+
+  const color = getSpineColor(book);
+  const dateStr = formatDate(book.dateRead);
+
+  const coverHtml = book.isbn
+    ? `<div class="detail-cover"><img src="https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg" alt="${book.title}" onerror="this.parentElement.innerHTML='<div class=\\'detail-cover-fallback\\' style=\\'background:linear-gradient(180deg,color-mix(in srgb,${color.bg},white 10%),${color.bg},color-mix(in srgb,${color.bg},black 8%));\\'></div>'"></div>`
+    : `<div class="detail-cover"><div class="detail-cover-fallback" style="background:linear-gradient(180deg,color-mix(in srgb,${color.bg},white 10%),${color.bg},color-mix(in srgb,${color.bg},black 8%))"></div></div>`;
+
+  el.innerHTML = `
+    <div class="detail-top">
+      ${coverHtml}
+      <div class="detail-info">
+        <div class="detail-title">${book.title}</div>
+        <div class="detail-author">${book.author}</div>
+        <div class="detail-stars">${stars(book.rating)}</div>
+        <div class="detail-meta">
+          <div class="detail-meta-item"><span class="label">Pages </span><span class="value">${book.pages.toLocaleString()}</span></div>
+          ${book.yearPublished ? `<div class="detail-meta-item"><span class="label">Published </span><span class="value">${book.yearPublished}</span></div>` : ''}
+          ${dateStr ? `<div class="detail-meta-item"><span class="label">Read </span><span class="value">${dateStr}</span></div>` : ''}
+        </div>
+        ${book.review ? `<div class="detail-review">"${book.review}"</div>` : ''}
+      </div>
+    </div>
+  `;
+  el.classList.add('visible');
+}
+
+// Filter buttons
+document.querySelectorAll('.controls button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.controls button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    selectedId = null;
+    showDetail(null);
+    renderBookcase();
+  });
+});
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    selectedId = null;
+    showDetail(null);
+    renderBookcase();
+  }
+});
+
+// Responsive re-render
+window.addEventListener('resize', () => {
+  renderBookcase();
+  if (selectedId) {
+    const book = books.find(b => b.id === selectedId);
+    if (book) showDetail(book);
+  }
+});
+
+renderBookcase();
 </script>
 
 </body>
