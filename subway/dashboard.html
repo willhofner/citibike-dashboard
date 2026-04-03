@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofSubways — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --accent: #eab308;
+    --accent2: #fbbf24;
+    --accent-dim: rgba(234,179,8,0.3);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  .header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  .nav-links {
+    font-size: 13px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+  }
+  .header-stats {
+    display: flex;
+    gap: 32px;
+    align-items: flex-end;
+  }
+  .header-stat {
+    text-align: right;
+  }
+  .header-stat .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .header-stat .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Stat cards */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px 40px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat-card .detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Chart sections */
+  .section {
+    padding: 20px 40px;
+  }
+  .section-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .section-grid.two { grid-template-columns: 1fr 1fr; }
+  .section-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-card canvas { width: 100% !important; }
+
+  /* Heatgrid */
+  .heatgrid {
+    display: grid;
+    grid-template-columns: 60px repeat(24, 1fr);
+    gap: 2px;
+    font-size: 10px;
+  }
+  .heatgrid .row-label {
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    font-size: 11px;
+    padding-right: 8px;
+    justify-content: flex-end;
+  }
+  .heatgrid .col-label {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 10px;
+    padding-bottom: 4px;
+  }
+  .heatgrid .cell {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    position: relative;
+    cursor: default;
+    min-height: 20px;
+  }
+  .heatgrid .cell:hover {
+    outline: 1px solid var(--text-dim);
+    z-index: 1;
+  }
+  .heatgrid .cell .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,15,0.95);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 100;
+    color: var(--text);
+  }
+  .heatgrid .cell:hover .tooltip { display: block; }
+
+  /* Leaderboard */
+  .leaderboard {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .leaderboard::-webkit-scrollbar { width: 6px; }
+  .leaderboard::-webkit-scrollbar-track { background: transparent; }
+  .leaderboard::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .lb-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .lb-item:last-child { border-bottom: none; }
+  .lb-rank {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .lb-item:nth-child(1) .lb-rank { color: #fbbf24; }
+  .lb-item:nth-child(2) .lb-rank { color: #c0c0c0; }
+  .lb-item:nth-child(3) .lb-rank { color: #cd7f32; }
+  .lb-bar {
+    flex: 1;
+    height: 28px;
+    background: rgba(234,179,8,0.08);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lb-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0.7;
+  }
+  .lb-bar-text {
+    position: absolute;
+    top: 0;
+    left: 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .lb-count {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 70px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* MTA line bullets */
+  .line-bullet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .section-grid.two, .section-grid.three { grid-template-columns: 1fr; }
+    .section { padding: 16px 20px; }
+    .stats-row { padding: 16px 20px; }
+    .header { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Hof<span>Subways</span></h1>
+    <div class="subtitle">NYC subway rides — detected from GPS data</div>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="explore.html">Ride Explorer</a>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat"><div class="value" id="hTrips">—</div><div class="label">Total Trips</div></div>
+    <div class="header-stat"><div class="value" id="hSpent">—</div><div class="label">Total Spent</div></div>
+    <div class="header-stat"><div class="value" id="hTime">—</div><div class="label">Ride Time</div></div>
+  </div>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<!-- Rides by Line + Most Visited Stations -->
+<div class="section">
+  <div class="section-grid two">
+    <div class="chart-card">
+      <h3>Rides by Line</h3>
+      <canvas id="lineChart" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Most Visited Stations</h3>
+      <div class="leaderboard" id="stationLeaderboard"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Heatgrid -->
+<div class="section">
+  <div class="section-grid">
+    <div class="chart-card full">
+      <h3>Day of Week × Hour</h3>
+      <div class="heatgrid" id="heatgrid"></div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 40px;"></div>
+
+<script>
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels = { display: false };
+
+const TOOLTIP_STYLE = {
+  backgroundColor: 'rgba(10,10,15,0.95)',
+  borderColor: '#1e1e2e',
+  borderWidth: 1,
+  titleColor: '#e0e0e8',
+  bodyColor: '#e0e0e8',
+};
+
+const ACCENT_RGB = '234,179,8';
+
+// MTA line colors
+const LINE_COLORS = {
+  '6':   '#00933C',
+  '4/5': '#00933C',
+  '4':   '#00933C',
+  '5':   '#00933C',
+  'R/W': '#FCCC0A',
+  'R':   '#FCCC0A',
+  'W':   '#FCCC0A',
+  'N':   '#FCCC0A',
+  'Q':   '#FCCC0A',
+  'L':   '#A7A9AC',
+  '1':   '#EE352E',
+  '2':   '#EE352E',
+  '3':   '#EE352E',
+  'A':   '#0039A6',
+  'C':   '#0039A6',
+  'E':   '#0039A6',
+  'B':   '#FF6319',
+  'D':   '#FF6319',
+  'F':   '#FF6319',
+  'M':   '#FF6319',
+  'G':   '#6CBE45',
+  'J':   '#996633',
+  'Z':   '#996633',
+  '7':   '#B933AD',
+  'S':   '#808183',
+};
+
+function getLineColor(line) {
+  return LINE_COLORS[line] || '#eab308';
+}
+
+// For R/W doughnut text color — yellow on yellow is unreadable
+function getLineLabelColor(line) {
+  if (line === 'R/W' || line === 'N' || line === 'Q' || line === 'R' || line === 'W') return '#000';
+  return '#fff';
+}
+
+let DATA;
+
+fetch('data/rides_enriched.json')
+  .then(r => r.json())
+  .then(data => { DATA = data; init(); });
+
+function init() {
+  renderHeader();
+  renderStats();
+  renderLineChart();
+  renderStationLeaderboard();
+  renderHeatgrid();
+}
+
+// ===== HEADER =====
+function renderHeader() {
+  const trips = DATA.trips;
+  const totalTrips = trips.length;
+  // Each trip entrance costs $3 (transfers are free)
+  const totalSpent = totalTrips * 3;
+  const totalMin = trips.reduce((s, t) => s + t.durationMin, 0);
+
+  document.getElementById('hTrips').textContent = totalTrips;
+  document.getElementById('hSpent').textContent = '$' + totalSpent;
+  document.getElementById('hTime').textContent = totalMin.toFixed(0) + 'min';
+}
+
+// ===== STAT CARDS =====
+function renderStats() {
+  const trips = DATA.trips;
+  const totalLegs = trips.reduce((s, t) => s + t.numLegs, 0);
+  const transferTrips = trips.filter(t => t.numLegs > 1).length;
+  const avgDuration = trips.reduce((s, t) => s + t.durationMin, 0) / trips.length;
+
+  // Count unique lines
+  const lines = new Set();
+  trips.forEach(t => {
+    t.legs.forEach(l => lines.add(l.line));
+  });
+
+  // Count unique stations visited (entry + exit + transfer)
+  const stationSet = new Set();
+  trips.forEach(t => {
+    stationSet.add(t.entryStation);
+    stationSet.add(t.exitStation);
+    t.transferStations.forEach(s => stationSet.add(s));
+  });
+
+  const cards = [
+    { label: 'Avg Duration', value: avgDuration.toFixed(1) + ' min', detail: 'per trip' },
+    { label: 'Lines Ridden', value: lines.size, detail: [...lines].join(', ') },
+    { label: 'Stations Visited', value: stationSet.size, detail: 'unique stations' },
+    { label: 'Transfers', value: transferTrips, detail: totalLegs + ' total legs' },
+  ];
+
+  const row = document.getElementById('statsRow');
+  row.innerHTML = cards.map(c => `
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="detail">${c.detail}</div>
+    </div>
+  `).join('');
+}
+
+// ===== RIDES BY LINE =====
+function renderLineChart() {
+  // Count trips per line (use the trip-level line, or first leg for multi-leg)
+  const byLine = {};
+  DATA.trips.forEach(t => {
+    t.legs.forEach(leg => {
+      const line = leg.line;
+      if (!byLine[line]) byLine[line] = 0;
+      byLine[line]++;
+    });
+  });
+
+  const sorted = Object.entries(byLine).sort((a, b) => b[1] - a[1]);
+  const labels = sorted.map(([k]) => k);
+  const values = sorted.map(([, v]) => v);
+  const colors = labels.map(l => getLineColor(l));
+
+  new Chart(document.getElementById('lineChart'), {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderColor: '#12121a',
+        borderWidth: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '55%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...TOOLTIP_STYLE,
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = Math.round(ctx.parsed / total * 100);
+              return ` ${ctx.label}: ${ctx.parsed} leg${ctx.parsed !== 1 ? 's' : ''} (${pct}%)`;
+            }
+          }
+        },
+        datalabels: {
+          display: true,
+          color: ctx => getLineLabelColor(labels[ctx.dataIndex]),
+          font: { size: 14, weight: 700 },
+          formatter: (val, ctx) => labels[ctx.dataIndex],
+        }
+      }
+    }
+  });
+}
+
+// ===== MOST VISITED STATIONS =====
+function renderStationLeaderboard() {
+  // A visit = entry station, exit station, or transfer station
+  const visits = {};
+  DATA.trips.forEach(t => {
+    const stations = [t.entryStation, t.exitStation, ...t.transferStations];
+    stations.forEach(s => {
+      if (!visits[s]) visits[s] = 0;
+      visits[s]++;
+    });
+  });
+
+  const sorted = Object.entries(visits).sort((a, b) => b[1] - a[1]);
+  const maxCount = sorted[0]?.[1] || 1;
+
+  const container = document.getElementById('stationLeaderboard');
+
+  // Get line bullets for station
+  function stationBullets(name) {
+    const stationData = DATA.stations[name];
+    if (!stationData) return '';
+    return stationData.lines.map(l =>
+      `<span class="line-bullet" style="background:${getLineColor(l)};color:${getLineLabelColor(l)};width:18px;height:18px;font-size:10px;margin-right:2px;">${l}</span>`
+    ).join('');
+  }
+
+  container.innerHTML = sorted.map(([name, count], i) => `
+    <div class="lb-item">
+      <div class="lb-rank">${i + 1}</div>
+      <div class="lb-bar" style="flex:1;">
+        <div class="lb-bar-fill" style="width:${Math.round(count / maxCount * 100)}%;"></div>
+        <div class="lb-bar-text">${stationBullets(name)} <span style="margin-left:6px;">${name}</span></div>
+      </div>
+      <div class="lb-count">${count} visit${count !== 1 ? 's' : ''}</div>
+    </div>
+  `).join('');
+}
+
+// ===== HEATGRID =====
+function renderHeatgrid() {
+  const grid = document.getElementById('heatgrid');
+  const dowNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dowMap = { Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6, Sunday: 7 };
+
+  const matrix = {};
+  for (let dow = 1; dow <= 7; dow++) {
+    matrix[dow] = {};
+    for (let h = 0; h < 24; h++) matrix[dow][h] = 0;
+  }
+
+  DATA.trips.forEach(t => {
+    const dow = dowMap[t.dayOfWeek];
+    if (dow && t.hour !== undefined) matrix[dow][t.hour]++;
+  });
+
+  let maxVal = 0;
+  for (let dow = 1; dow <= 7; dow++) {
+    for (let h = 0; h < 24; h++) {
+      if (matrix[dow][h] > maxVal) maxVal = matrix[dow][h];
+    }
+  }
+
+  // Column headers
+  let html = '<div></div>';
+  for (let h = 0; h < 24; h++) {
+    const label = h === 0 ? '12a' : h < 12 ? h + 'a' : h === 12 ? '12p' : (h - 12) + 'p';
+    html += `<div class="col-label">${h % 3 === 0 ? label : ''}</div>`;
+  }
+
+  for (let dow = 1; dow <= 7; dow++) {
+    html += `<div class="row-label">${dowNames[dow - 1]}</div>`;
+    for (let h = 0; h < 24; h++) {
+      const v = matrix[dow][h];
+      const opacity = maxVal > 0 ? v / maxVal : 0;
+      const bg = v > 0
+        ? `rgba(${ACCENT_RGB},${0.2 + opacity * 0.8})`
+        : 'rgba(255,255,255,0.03)';
+      html += `<div class="cell" style="background:${bg}">
+        <div class="tooltip">${dowNames[dow - 1]} ${h}:00 — ${v} trip${v !== 1 ? 's' : ''}</div>
+      </div>`;
+    }
+  }
+
+  grid.innerHTML = html;
+}
+</script>
+
+</body>
+</html>

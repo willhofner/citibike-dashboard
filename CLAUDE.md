@@ -85,7 +85,7 @@ citibike-bot/
 │       ├── steps_enriched.json          # Daily step data (2,636 days)
 │       └── heartrate_enriched.json      # Heart rate data (508K readings, 1,499 days)
 ├── books/
-│   ├── index.html              # HofReads — reading dashboard
+│   ├── index.html              # HofReads — bookshelf dashboard
 │   ├── stack-of-books.jpg      # Dashboard image asset
 │   └── data/
 │       ├── Goodreads_Library.csv        # Raw Goodreads export (gitignored)
@@ -95,6 +95,7 @@ citibike-bot/
 │   ├── pull_gps.py             # Downloads GPS data from Railway to local machine
 │   ├── parse_rides.py          # GPS-to-subway-ride detection algorithm
 │   ├── explore.html            # HofSubways ride explorer
+│   ├── dashboard.html          # HofSubways dashboard (spending, heatgrid, line breakdown, station visits)
 │   ├── Dockerfile              # Railway deployment config
 │   └── data/
 │       ├── gps/                        # Daily GPS files: YYYY-MM-DD.json (gitignored)
@@ -476,12 +477,23 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
 
 ### What's Built
 
-1. **Dashboard** (`books/index.html`)
-   - Reading dashboard (details TBD — early stage)
+1. **Bookshelf Dashboard** (`books/index.html`)
+   - Visual bookshelf: books standing upright on a wooden shelf, spines facing out
+   - Spine widths proportional to page count, heights varied per book
+   - Weathered texture: grain overlay, sun-faded tops, scuff marks, edge darkening
+   - Some books lean at angles with proper margin spacing
+   - Barlow Condensed font for titles, authors at top of spine
+   - Single horizontally scrollable shelf with fade edges and drag-to-scroll
+   - Click any book for detail card with Open Library cover image (38/51 books have ISBN)
+   - Filter by star rating (1-5 stars)
+   - Keyboard dismiss with Escape
+   - Stack-of-books hero image at top
+   - Accent color: amber #eab308
 
 2. **Data Pipeline**
    - Source: Goodreads Library export (CSV), gitignored at `books/data/Goodreads_Library.csv`
    - Processed data: `books/data/books.json`
+   - Cover images: fetched from Open Library API via ISBN (`covers.openlibrary.org`)
 
 ---
 
@@ -500,9 +512,27 @@ Exported from iPhone Health app (Settings → Health → Export All Health Data)
    - Station data hardcoded: focused Lex Ave corridor + connecting lines (~40 stations)
    - 5 confirmed rides detected across 2 days (March 30 — April 2)
 
-2. **Ride Explorer** (`subway/explore.html`) — next to build
+2. **Ride Explorer** (`subway/explore.html`)
+   - Two-panel layout: scrollable ride list + Leaflet map
+   - MTA-style colored circle bullet filters (6, 4, 5, R/W) with active/dimmed states
+   - Ride list: line bullets, date, entry→exit stations, duration
+   - Click any ride to see animated route on map with colored MTA line segments
+   - Animated rider dot traces route between stations
+   - Per-leg detail cards with line bullets, direction, station info
+   - Transfer rides show as stacked leg cards
+   - Green marker = entry, red marker = exit
+   - Keyboard navigation (j/k, arrows, Escape)
+   - Accent color: yellow #eab308
 
-3. **GPS Collection Pipeline** (live since 2026-03-29)
+3. **Dashboard** (`subway/dashboard.html`)
+   - Header stats: total trips, total spent ($3/entrance, transfers free), ride time
+   - 4 stat cards: avg duration, lines ridden, stations visited, transfers
+   - Rides by Line doughnut chart (MTA colors)
+   - Most Visited Stations leaderboard (counts entry + exit + transfer stations only, not pass-throughs)
+   - Day × Hour heatgrid (yellow intensity)
+   - Accent color: yellow #eab308
+
+4. **GPS Collection Pipeline** (live since 2026-03-29)
    - Overland iOS app → Railway receiver → daily JSON files
    - `pull_gps.py` downloads to local machine
 
@@ -698,11 +728,9 @@ False positives to watch for:
 6. ~~**Validate against OMNY CSV**~~ ✅ DONE — detected ride times match OMNY tap timestamps
 7. ~~**Generate `subway/data/rides_enriched.json`**~~ ✅ DONE — 5 trips, 6 legs
 
-8. **Build HofSubways explorer page** (`subway/explore.html`) — **NEXT** — ride list + Leaflet map with routes rendered on MTA subway line geometries (no OSRM needed — just light up the line segments between entry and exit stations)
-
-9. **Update landing page** (`index.html`) — add HofSubways card with stats and links
-
-10. **Accent color**: yellow #eab308 (matching MTA branding, defined as --amber in index.html)
+8. ~~**Build HofSubways explorer page** (`subway/explore.html`)~~ ✅ DONE — MTA bullet filters, animated routes, per-leg detail cards
+9. ~~**Update landing page** (`index.html`)~~ ✅ DONE — HofSubways card with stats and links
+10. ~~**Accent color**~~ ✅ DONE — yellow #eab308 (matching MTA branding)
 
 ### Key Research Findings
 
@@ -719,7 +747,7 @@ False positives to watch for:
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofWalks, HofBeats, and HofSubways (to be added). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
+1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
 
@@ -733,6 +761,7 @@ The landing page (`index.html`) has two sections:
 4. **Data tells the story** -- Let the numbers speak
 5. **Personal first** -- This is for one user's data, not a platform
 6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444, HofSubways=yellow #eab308
+7. **Consistent naming** -- All pages use the `Hof<span>Brand</span>` h1 pattern. Titles: `HofBrand — Dashboard` or `HofBrand — Ride Explorer`. Nav links: plain `Home` + sibling page name (no arrows). Explorers use `.back-link` in sidebar, dashboards use `.nav-links` in header.
 
 ---
 
