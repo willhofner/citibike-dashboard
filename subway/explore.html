@@ -146,10 +146,12 @@
 
   .ride-item .ride-bullets {
     flex-shrink: 0;
+    width: 38px;
     display: flex;
     flex-direction: column;
     gap: 3px;
     align-items: center;
+    justify-content: center;
   }
 
   .ride-item .ride-content {
@@ -616,8 +618,12 @@ function selectTrip(trip) {
 
   if (allCoords.length < 2) return;
 
-  // Fit map to route bounds, then start animation after zoom completes
-  map.fitBounds(L.latLngBounds(allCoords).pad(0.2), { maxZoom: 15 });
+  // Fit map to route bounds, then start animation after zoom completes.
+  // If fitBounds doesn't change the view, moveend won't fire — use a fallback timer.
+  const bounds = L.latLngBounds(allCoords).pad(0.2);
+  const currentBounds = map.getBounds();
+  const needsMove = !currentBounds.equals(bounds);
+  map.fitBounds(bounds, { maxZoom: 15 });
 
   function startAnimation() {
     // Flatten all leg coords into one sequence for continuous animation
@@ -737,8 +743,18 @@ function selectTrip(trip) {
     animFrame = requestAnimationFrame(animStep);
   }
 
-  // Wait for zoom/pan to finish before starting route animation
-  map.once('moveend', startAnimation);
+  // Wait for zoom/pan to finish before starting route animation.
+  // Fallback: if no move needed, start immediately.
+  let animStarted = false;
+  function startOnce() {
+    if (animStarted) return;
+    animStarted = true;
+    map.off('moveend', startOnce);
+    startAnimation();
+  }
+  map.once('moveend', startOnce);
+  // Fallback in case fitBounds didn't change the view (moveend won't fire)
+  setTimeout(startOnce, 300);
 
   // Entry marker (green) on first leg
   const firstLeg = trip.legs[0];
