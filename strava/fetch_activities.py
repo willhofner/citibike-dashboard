@@ -205,23 +205,46 @@ def fetch_activity_streams(activity_id, token):
 # ── Main Pipeline ───────────────────────────────────────────────────────────
 
 def get_latest_activity_epoch(raw_file):
-    """Get the epoch timestamp of the most recent activity in existing data."""
-    if not os.path.exists(raw_file):
-        return None
-    try:
-        with open(raw_file) as f:
-            data = json.load(f)
-        if not data:
-            return None
-        # Find the most recent start_date and convert to epoch
-        from datetime import datetime, timezone
-        latest = max(
-            datetime.fromisoformat(a["start_date"].replace("Z", "+00:00"))
-            for a in data if a.get("start_date")
-        )
-        return int(latest.timestamp())
-    except Exception:
-        return None
+    """Get the epoch timestamp of the most recent activity in existing data.
+
+    Checks raw file first, falls back to enriched file (useful in CI where
+    raw file may not be available but enriched file is committed to git).
+    """
+    from datetime import datetime, timezone
+
+    # Try raw file first (has start_date in ISO format)
+    if os.path.exists(raw_file):
+        try:
+            with open(raw_file) as f:
+                data = json.load(f)
+            if data:
+                latest = max(
+                    datetime.fromisoformat(a["start_date"].replace("Z", "+00:00"))
+                    for a in data if a.get("start_date")
+                )
+                return int(latest.timestamp())
+        except Exception:
+            pass
+
+    # Fall back to enriched file (has startTime in local ISO format)
+    if os.path.exists(ENRICHED_FILE):
+        try:
+            with open(ENRICHED_FILE) as f:
+                data = json.load(f)
+            if data:
+                latest = max(
+                    datetime.fromisoformat(a["startTime"])
+                    for a in data if a.get("startTime")
+                )
+                # Assume NYC time if no timezone info
+                if latest.tzinfo is None:
+                    from zoneinfo import ZoneInfo
+                    latest = latest.replace(tzinfo=ZoneInfo("America/New_York"))
+                return int(latest.timestamp())
+        except Exception:
+            pass
+
+    return None
 
 
 def fetch_new_activities(token, after_epoch):
@@ -315,20 +338,26 @@ def main():
         print(f"\nFetching detailed data for {len(new_activities)} new activities...")
         new_detailed = fetch_details_for_activities(new_activities, token)
 
-        # Merge with existing raw data
-        with open(RAW_FILE) as f:
-            existing_raw = json.load(f)
+        # Merge with existing raw data (if available)
+        if os.path.exists(RAW_FILE):
+            with open(RAW_FILE) as f:
+                existing_raw = json.load(f)
 
-        existing_ids = {a["id"] for a in existing_raw}
-        added = [a for a in new_detailed if a["id"] not in existing_ids]
+            existing_ids = {a["id"] for a in existing_raw}
+            added = [a for a in new_detailed if a["id"] not in existing_ids]
 
-        if not added:
-            print("\nAll fetched activities already exist in data. Up to date!")
-            return
+            if not added:
+                print("\nAll fetched activities already exist in data. Up to date!")
+                return
 
-        # Prepend new activities (newest first)
-        all_raw = added + existing_raw
-        print(f"\nAdded {len(added)} new activities (total: {len(all_raw)})")
+            # Prepend new activities (newest first)
+            all_raw = added + existing_raw
+            print(f"\nAdded {len(added)} new activities (total: {len(all_raw)})")
+        else:
+            # No raw file (e.g., CI environment) — save only new activities
+            all_raw = new_detailed
+            added = new_detailed
+            print(f"\nAdded {len(added)} new activities (no existing raw file to merge)")
 
     else:
         # Full fetch

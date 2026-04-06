@@ -1,0 +1,97 @@
+name: Strava Sync
+
+on:
+  schedule:
+    # Daily at 9 PM ET (2 AM UTC during EST, 1 AM UTC during EDT)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      # Cache tokens and raw data between runs.
+      # Tokens: needed so we don't require browser OAuth each run.
+      # Raw data (74MB): needed for incremental merge (avoids ~525 API calls).
+      # If cache misses, falls back to enriched file for timestamp + partial raw.
+      - name: Restore Strava cache
+        uses: actions/cache/restore@v4
+        id: cache-restore
+        with:
+          path: |
+            strava/data/.strava_tokens.json
+            strava/data/activities_raw.json
+          key: strava-data-${{ github.run_id }}
+          restore-keys: strava-data-
+
+      # If no cached tokens, bootstrap from secret
+      - name: Bootstrap tokens from secret
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        env:
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+        run: |
+          if [ -f strava/data/.strava_tokens.json ]; then
+            echo "Tokens restored from cache (partial hit)."
+            exit 0
+          fi
+          if [ -z "$STRAVA_REFRESH_TOKEN" ]; then
+            echo "::error::STRAVA_REFRESH_TOKEN secret not set. Add it in repo Settings → Secrets → Actions."
+            exit 1
+          fi
+          mkdir -p strava/data
+          echo '{
+            "token_type": "Bearer",
+            "access_token": "expired",
+            "expires_at": 0,
+            "refresh_token": "'"$STRAVA_REFRESH_TOKEN"'"
+          }' > strava/data/.strava_tokens.json
+          echo "Created tokens file from secret."
+
+      - name: Fetch activities (incremental)
+        run: python3 strava/fetch_activities.py
+
+      - name: Build dashboard HTML
+        run: python3 strava/build_dashboard.py
+
+      # Save updated tokens + raw data for next run
+      - name: Save Strava cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            strava/data/.strava_tokens.json
+            strava/data/activities_raw.json
+          key: strava-data-${{ github.run_id }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add strava/data/activities_enriched.json
+          git add strava/index.html strava/dashboard.html 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            NEW_COUNT=$(python3 -c "
+          import json
+          d = json.load(open('strava/data/activities_enriched.json'))
+          print(len(d))
+          " 2>/dev/null || echo "")
+            git commit -m "Update Strava data: ${NEW_COUNT} activities (auto-sync)"
+            git push
+          fi

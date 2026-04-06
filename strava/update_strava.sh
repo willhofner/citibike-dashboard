@@ -37,7 +37,7 @@ if git diff --quiet strava/data/ strava/index.html strava/dashboard.html 2>/dev/
     log "No changes to commit. Already up to date."
 else
     log "Committing changes..."
-    git add strava/data/activities_raw.json strava/data/activities_enriched.json
+    git add strava/data/activities_enriched.json
     git add strava/index.html strava/dashboard.html 2>/dev/null || true
 
     # Count new activities from the fetch output
