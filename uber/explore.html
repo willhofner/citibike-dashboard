@@ -220,14 +220,6 @@
     pointer-events: none;
   }
 
-  /* Runner glow pulse — opacity only, no transform (Leaflet uses transforms for positioning) */
-  .rider-glow {
-    animation: rider-pulse 1s ease-in-out infinite;
-  }
-  @keyframes rider-pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-  }
 
   .sort-row {
     display: flex;
@@ -309,16 +301,12 @@
     <div id="detailRows"></div>
   </div>
 
-  <div class="all-routes-hint" id="allRoutesHint">
-    220 pickup locations shown — click a ride to view route
-  </div>
 </div>
 
 <script>
 let RIDES = [];
 let ROUTES = {};
 let selectedRideId = null;
-let ghostLayer = null;
 let routeLayer = null;
 let startMarker = null;
 let endMarker = null;
@@ -351,9 +339,6 @@ Promise.all([
 ]).then(([data, routes]) => {
     RIDES = data.rides.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
     ROUTES = routes;
-    document.getElementById('allRoutesHint').textContent =
-      `${RIDES.length} pickup locations shown — click a ride to view route`;
-    renderGhostLayer();
     renderList();
     if (RIDES.length > 0) selectRide(RIDES[0]);
   })
@@ -361,23 +346,6 @@ Promise.all([
     console.error('Failed to load ride data:', err);
     document.getElementById('rideList').innerHTML = '<div class="no-rides">Failed to load ride data</div>';
   });
-
-// Ghost layer: all pickup points
-function renderGhostLayer() {
-  if (ghostLayer) map.removeLayer(ghostLayer);
-  ghostLayer = L.layerGroup();
-  RIDES.forEach(r => {
-    if (r.startLat && r.startLon) {
-      L.circleMarker([r.startLat, r.startLon], {
-        radius: 2.5,
-        fillColor: '#a855f7',
-        fillOpacity: 0.15,
-        stroke: false
-      }).addTo(ghostLayer);
-    }
-  });
-  ghostLayer.addTo(map);
-}
 
 // Normalize product name for filtering
 function normalizeProduct(p) {
@@ -532,77 +500,82 @@ function selectRide(ride) {
   }
 
   if (coords && coords.length >= 2) {
-    // Fit map first
+    // Fit map first, then animate after zoom completes
     map.fitBounds(L.latLngBounds(coords).pad(0.15), { maxZoom: 15 });
 
-    // Start marker (green)
-    startMarker = L.circleMarker(coords[0], {
-      radius: 7, fillColor: '#22c55e', fillOpacity: 1, color: '#22c55e', weight: 2, opacity: 0.5
-    }).addTo(map);
+    function startAnimation() {
+      // Start marker (green)
+      startMarker = L.circleMarker(coords[0], {
+        radius: 7, fillColor: '#22c55e', fillOpacity: 1, color: '#22c55e', weight: 2, opacity: 0.5
+      }).addTo(map);
 
-    // Glow layer behind the rider
-    const glow = L.circleMarker(coords[0], {
-      radius: 14, color: '#a855f7', fillColor: '#a855f7', fillOpacity: 0.3, weight: 0, className: 'rider-glow'
-    }).addTo(map);
-    activeMarkers.push(glow);
+      // Rider dot
+      const rider = L.circleMarker(coords[0], {
+        radius: 6, color: '#fff', fillColor: '#a855f7', fillOpacity: 1, weight: 2
+      }).addTo(map);
+      activeMarkers.push(rider);
 
-    // Rider dot
-    const rider = L.circleMarker(coords[0], {
-      radius: 6, color: '#fff', fillColor: '#a855f7', fillOpacity: 1, weight: 2
-    }).addTo(map);
-    activeMarkers.push(rider);
+      // Animated trail
+      const trail = L.polyline([], {
+        color: '#a855f7', weight: 4, opacity: 0.9
+      }).addTo(map);
 
-    // Animated trail
-    const trail = L.polyline([], {
-      color: '#a855f7', weight: 4, opacity: 0.9
-    }).addTo(map);
+      // Glow trail
+      const glowTrail = L.polyline([], {
+        color: '#a855f7', weight: 10, opacity: 0.15
+      }).addTo(map);
+      routeLayer = trail;
+      activeMarkers.push(glowTrail);
 
-    // Glow trail
-    const glowTrail = L.polyline([], {
-      color: '#a855f7', weight: 10, opacity: 0.15
-    }).addTo(map);
-    routeLayer = trail;
-    activeMarkers.push(glowTrail);
-
-    // Animate at consistent ground speed
-    let idx = 0;
-    const totalPoints = coords.length;
-    let totalDist = 0;
-    for (let i = 1; i < totalPoints; i++) {
-      const dlat = coords[i][0] - coords[i - 1][0];
-      const dlng = coords[i][1] - coords[i - 1][1];
-      totalDist += Math.sqrt(dlat * dlat + dlng * dlng);
-    }
-    const targetSpeed = 0.0004; // degrees per frame — consistent across all rides
-    const targetFrames = Math.max(90, totalDist / targetSpeed); // min ~1.5s
-    const baseRate = Math.max(1, Math.ceil(totalPoints / targetFrames));
-
-    function step() {
-      const pointsPerFrame = Math.max(1, baseRate);
-      const end = Math.min(idx + pointsPerFrame, totalPoints);
-
-      for (let i = idx; i < end; i++) {
-        trail.addLatLng(coords[i]);
-        glowTrail.addLatLng(coords[i]);
+      // Calculate speed based on pixel distance so all routes feel the same
+      let totalPixelDist = 0;
+      for (let i = 1; i < coords.length; i++) {
+        const p1 = map.latLngToContainerPoint(coords[i - 1]);
+        const p2 = map.latLngToContainerPoint(coords[i]);
+        totalPixelDist += p1.distanceTo(p2);
       }
-      idx = end;
-      const pos = coords[idx - 1];
-      rider.setLatLng(pos);
-      glow.setLatLng(pos);
+      const pixelsPerFrame = 12;
+      const targetFrames = Math.max(60, totalPixelDist / pixelsPerFrame);
+      const baseRate = Math.max(1, Math.ceil(coords.length / targetFrames));
 
-      if (idx < totalPoints) {
-        animFrame = requestAnimationFrame(step);
-      } else {
-        // Done — add end marker, remove glow + rider
-        map.removeLayer(glow);
-        map.removeLayer(rider);
-        endMarker = L.circleMarker(coords[coords.length - 1], {
-          radius: 7, fillColor: '#ef4444', fillOpacity: 1, color: '#ef4444', weight: 2, opacity: 0.5
-        }).addTo(map);
+      let idx = 0;
+      const totalPoints = coords.length;
+
+      function step() {
+        const end = Math.min(idx + baseRate, totalPoints);
+
+        for (let i = idx; i < end; i++) {
+          trail.addLatLng(coords[i]);
+          glowTrail.addLatLng(coords[i]);
+        }
+        idx = end;
+        const pos = coords[idx - 1];
+        rider.setLatLng(pos);
+
+        if (idx < totalPoints) {
+          animFrame = requestAnimationFrame(step);
+        } else {
+          // Done — add end marker, remove rider
+          map.removeLayer(rider);
+          endMarker = L.circleMarker(coords[coords.length - 1], {
+            radius: 7, fillColor: '#ef4444', fillOpacity: 1, color: '#ef4444', weight: 2, opacity: 0.5
+          }).addTo(map);
+        }
       }
+
+      animFrame = requestAnimationFrame(step);
     }
 
-    animFrame = requestAnimationFrame(step);
+    // Wait for zoom to finish before starting animation
+    let animStarted = false;
+    function startOnce() {
+      if (animStarted) return;
+      animStarted = true;
+      map.off('moveend', startOnce);
+      startAnimation();
+    }
+    map.once('moveend', startOnce);
+    setTimeout(startOnce, 300);
   }
 
   // Update detail overlay

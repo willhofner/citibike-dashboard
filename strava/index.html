@@ -184,14 +184,6 @@
   .leaflet-container { background: #0a0a0f; }
   .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
 
-  /* Runner glow pulse */
-  .runner-glow {
-    animation: pulse 1s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.3); }
-  }
 
   /* Run detail overlay */
   .run-detail-overlay {
@@ -577,22 +569,6 @@ function initMap() {
     map.fitBounds(L.latLngBounds(allCoords).pad(0.1));
   }
 
-  showGhostRoutes();
-}
-
-// ── Ghost routes (all routes faintly visible) ──
-function showGhostRoutes() {
-  clearGhostRoutes();
-  RUNS.forEach(run => {
-    const coords = getRunCoords(run);
-    if (!coords || coords.length < 2) return;
-    const line = L.polyline(coords, {
-      color: "#f97316",
-      weight: 1.5,
-      opacity: 0.12,
-    }).addTo(map);
-    ghostLayers.push(line);
-  });
 }
 
 function clearGhostRoutes() {
@@ -650,75 +626,89 @@ function selectRun(runId) {
   const coords = getRunCoords(run);
   if (!coords || coords.length < 2) return;
 
-  // Fit map first
-  map.fitBounds(L.latLngBounds(coords).pad(0.15));
-
   // Show detail overlay immediately
   showRunDetail(run);
 
-  // Start marker (green)
-  const startMarker = L.circleMarker(coords[0], {
-    radius: 7, color: "#22c55e", fillColor: "#22c55e", fillOpacity: 1, weight: 2,
-  }).addTo(map);
-  activeMarkers = [startMarker];
+  // Fit map first, then animate after zoom completes
+  const bounds = L.latLngBounds(coords).pad(0.15);
+  map.fitBounds(bounds);
 
-  // Glow layer behind the runner
-  const glow = L.circleMarker(coords[0], {
-    radius: 14, color: "#f97316", fillColor: "#f97316", fillOpacity: 0.3, weight: 0, className: "runner-glow",
-  }).addTo(map);
-  activeMarkers.push(glow);
+  function startAnimation() {
+    // Start marker (green)
+    const startMarker = L.circleMarker(coords[0], {
+      radius: 7, color: "#22c55e", fillColor: "#22c55e", fillOpacity: 1, weight: 2,
+    }).addTo(map);
+    activeMarkers = [startMarker];
 
-  // Runner dot
-  const runner = L.circleMarker(coords[0], {
-    radius: 6, color: "#fff", fillColor: "#f97316", fillOpacity: 1, weight: 2,
-  }).addTo(map);
-  activeMarkers.push(runner);
+    // Runner dot
+    const runner = L.circleMarker(coords[0], {
+      radius: 6, color: "#fff", fillColor: "#f97316", fillOpacity: 1, weight: 2,
+    }).addTo(map);
+    activeMarkers.push(runner);
 
-  // Animated trail
-  const trail = L.polyline([], {
-    color: "#f97316", weight: 4, opacity: 0.9,
-  }).addTo(map);
+    // Animated trail
+    const trail = L.polyline([], {
+      color: "#f97316", weight: 4, opacity: 0.9,
+    }).addTo(map);
 
-  // Glow trail
-  const glowTrail = L.polyline([], {
-    color: "#f97316", weight: 10, opacity: 0.15,
-  }).addTo(map);
-  activeRoute = trail;
-  activeMarkers.push(glowTrail);
+    // Glow trail
+    const glowTrail = L.polyline([], {
+      color: "#f97316", weight: 10, opacity: 0.15,
+    }).addTo(map);
+    activeRoute = trail;
+    activeMarkers.push(glowTrail);
 
-  let idx = 0;
-  const totalPoints = coords.length;
-  const targetFrames = 180; // ~3 seconds at 60fps
-  const baseRate = Math.max(1, Math.ceil(totalPoints / targetFrames));
-
-  function step() {
-    const pointsPerFrame = Math.max(1, Math.floor(baseRate * animSpeed));
-    const end = Math.min(idx + pointsPerFrame, totalPoints);
-
-    for (let i = idx; i < end; i++) {
-      trail.addLatLng(coords[i]);
-      glowTrail.addLatLng(coords[i]);
+    // Calculate speed based on pixel distance so all routes feel the same
+    let totalPixelDist = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const p1 = map.latLngToContainerPoint(coords[i - 1]);
+      const p2 = map.latLngToContainerPoint(coords[i]);
+      totalPixelDist += p1.distanceTo(p2);
     }
-    idx = end;
-    const pos = coords[idx - 1];
-    runner.setLatLng(pos);
-    glow.setLatLng(pos);
+    const pixelsPerFrame = 12; // consistent visual speed
+    const targetFrames = Math.max(60, totalPixelDist / pixelsPerFrame);
+    const baseRate = Math.max(1, Math.ceil(coords.length / targetFrames));
 
-    if (idx < totalPoints) {
-      animFrame = requestAnimationFrame(step);
-    } else {
-      // Done — add end marker, remove glow
-      map.removeLayer(glow);
-      const endMarker = L.circleMarker(coords[coords.length - 1], {
-        radius: 7, color: "#ef4444", fillColor: "#ef4444", fillOpacity: 1, weight: 2,
-      }).addTo(map);
-      activeMarkers.push(endMarker);
-      // Remove runner dot, keep the trail
-      map.removeLayer(runner);
+    let idx = 0;
+    const totalPoints = coords.length;
+
+    function step() {
+      const pointsPerFrame = Math.max(1, Math.floor(baseRate * animSpeed));
+      const end = Math.min(idx + pointsPerFrame, totalPoints);
+
+      for (let i = idx; i < end; i++) {
+        trail.addLatLng(coords[i]);
+        glowTrail.addLatLng(coords[i]);
+      }
+      idx = end;
+      const pos = coords[idx - 1];
+      runner.setLatLng(pos);
+
+      if (idx < totalPoints) {
+        animFrame = requestAnimationFrame(step);
+      } else {
+        // Done — add end marker
+        const endMarker = L.circleMarker(coords[coords.length - 1], {
+          radius: 7, color: "#ef4444", fillColor: "#ef4444", fillOpacity: 1, weight: 2,
+        }).addTo(map);
+        activeMarkers.push(endMarker);
+        map.removeLayer(runner);
+      }
     }
+
+    animFrame = requestAnimationFrame(step);
   }
 
-  animFrame = requestAnimationFrame(step);
+  // Wait for zoom to finish before starting animation
+  let animStarted = false;
+  function startOnce() {
+    if (animStarted) return;
+    animStarted = true;
+    map.off('moveend', startOnce);
+    startAnimation();
+  }
+  map.once('moveend', startOnce);
+  setTimeout(startOnce, 300);
 }
 
 function clearActiveRoute() {
@@ -929,7 +919,7 @@ function init() {
         showHeatmap();
       } else {
         hideHeatmap();
-        showGhostRoutes();
+
       }
     });
   });
@@ -948,7 +938,7 @@ function init() {
   document.getElementById("btnTimelapse").addEventListener("click", () => {
     if (document.getElementById("btnTimelapse").classList.contains("playing")) {
       stopAnimation();
-      showGhostRoutes();
+      clearGhostRoutes();
     } else {
       timelapse();
     }
@@ -996,7 +986,6 @@ function init() {
       hideRunDetail();
       activeRunId = null;
       document.querySelectorAll(".run-item").forEach(el => el.classList.remove("active"));
-      showGhostRoutes();
     }
   });
 

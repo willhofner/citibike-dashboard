@@ -300,13 +300,6 @@
     pointer-events: none;
   }
 
-  .rider-glow {
-    animation: rider-pulse 1s ease-in-out infinite;
-  }
-  @keyframes rider-pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-  }
 
   .sort-row {
     display: flex;
@@ -382,16 +375,12 @@
     <div id="detailContent"></div>
   </div>
 
-  <div class="all-routes-hint" id="allRoutesHint">
-    Loading...
-  </div>
 </div>
 
 <script>
 let TRIPS = [];
 let STATIONS = {};
 let selectedTripId = null;
-let ghostLayer = null;
 let routeLayers = [];
 let stationMarkers = [];
 let animFrame = null;
@@ -420,9 +409,6 @@ fetch('data/rides_enriched.json')
   .then(data => {
     TRIPS = data.trips;
     STATIONS = data.stations || {};
-    document.getElementById('allRoutesHint').textContent =
-      `${Object.keys(STATIONS).length} stations across ${TRIPS.length} trips — click a trip to view route`;
-    renderGhostLayer();
     renderList();
     if (TRIPS.length > 0) selectTrip(TRIPS[0]);
   })
@@ -430,25 +416,6 @@ fetch('data/rides_enriched.json')
     console.error('Failed to load data:', err);
     document.getElementById('rideList').innerHTML = '<div class="no-rides">Failed to load ride data</div>';
   });
-
-// Ghost layer: all station dots
-function renderGhostLayer() {
-  if (ghostLayer) map.removeLayer(ghostLayer);
-  ghostLayer = L.layerGroup();
-  Object.entries(STATIONS).forEach(([name, s]) => {
-    L.circleMarker([s.lat, s.lon], {
-      radius: 4,
-      fillColor: '#eab308',
-      fillOpacity: 0.2,
-      stroke: true,
-      color: '#eab308',
-      weight: 1,
-      opacity: 0.15
-    }).bindTooltip(displayStation(name), { permanent: false, direction: 'top', className: 'station-tooltip' })
-     .addTo(ghostLayer);
-  });
-  ghostLayer.addTo(map);
-}
 
 // Strip line suffixes from station names for display: "Canal St (6)" → "Canal St"
 function displayStation(name) {
@@ -679,13 +646,6 @@ function selectTrip(trip) {
     }).addTo(map);
     routeLayers.push(glowTrail);
 
-    // Rider glow
-    const riderGlow = L.circleMarker(flatCoords[0], {
-      radius: 14, color: legColors[0], fillColor: legColors[0],
-      fillOpacity: 0.3, weight: 0, className: 'rider-glow'
-    }).addTo(map);
-    stationMarkers.push(riderGlow);
-
     // Rider dot
     const rider = L.circleMarker(flatCoords[0], {
       radius: 6, color: '#fff', fillColor: legColors[0],
@@ -712,8 +672,18 @@ function selectTrip(trip) {
     const totalFrames = smoothCoords.length;
     let frameIdx = 0;
 
+    // Calculate speed based on pixel distance so all routes feel the same
+    let totalPixelDist = 0;
+    for (let i = 1; i < smoothCoords.length; i++) {
+      const p1 = map.latLngToContainerPoint(smoothCoords[i - 1]);
+      const p2 = map.latLngToContainerPoint(smoothCoords[i]);
+      totalPixelDist += p1.distanceTo(p2);
+    }
+    const pixelsPerFrame = 12;
+    const targetAnimFrames = Math.max(60, totalPixelDist / pixelsPerFrame);
+    const batchSize = Math.max(1, Math.ceil(totalFrames / targetAnimFrames));
+
     function animStep() {
-      const batchSize = Math.max(1, Math.ceil(totalFrames / 120)); // ~2 seconds total
       const end = Math.min(frameIdx + batchSize, totalFrames);
 
       for (let i = frameIdx; i < end; i++) {
@@ -724,20 +694,17 @@ function selectTrip(trip) {
 
       const pos = smoothCoords[frameIdx - 1];
       rider.setLatLng(pos);
-      riderGlow.setLatLng(pos);
 
       // Update color if we've crossed into a new leg
       const origIdx = Math.min(Math.floor((frameIdx / totalFrames) * flatCoords.length), flatCoords.length - 1);
       const currentColor = legColors[origIdx];
       rider.setStyle({ fillColor: currentColor });
-      riderGlow.setStyle({ color: currentColor, fillColor: currentColor });
 
       if (frameIdx < totalFrames) {
         animFrame = requestAnimationFrame(animStep);
       } else {
         // Done — remove rider, keep trail
         map.removeLayer(rider);
-        map.removeLayer(riderGlow);
       }
     }
 

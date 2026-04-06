@@ -65,7 +65,7 @@ citibike-bot/
 │       ├── activities_raw.json          # Raw API response (gitignored)
 │       └── activities_enriched.json     # Processed data for dashboard
 ├── uber/
-│   ├── explore.html            # Ride explorer (animated driving routes, ghost layer)
+│   ├── explore.html            # Ride explorer (animated driving routes)
 │   ├── dashboard.html          # Spending dashboard (stats, charts, heatmaps, city breakdown)
 │   ├── parse_rides.py          # CSV parser → enriched JSON
 │   ├── fetch_routes.py         # OSRM driving route fetcher (220 routes, incremental)
@@ -137,7 +137,6 @@ citibike-bot/
    - Green dot = start, red dot = end, glow effect on active route
    - Detail overlay: time, stations, duration, distance (mi + km), cost, bike ID
    - Keyboard navigation (arrow keys or j/k)
-   - Ghost layer showing all routes faintly in background
 
 3. **Data Pipeline**
    - `download_rides.js`: Browser console script that hits CitiBike's GraphQL API to export all rides as JSON
@@ -233,7 +232,6 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
    - **Timelapse mode**: watch all runs accumulate on the map chronologically
    - Speed control (0.25x to 10x) for animations
    - Heatmap view showing run density
-   - Ghost layer showing all routes faintly in background
    - Per-mile split bars (color-coded: green=fast, orange=mid, red=slow)
    - Detail overlay: distance, pace, duration, elevation, avg HR, calories
    - Keyboard navigation (j/k, arrows, space to play/pause, Esc to deselect)
@@ -304,7 +302,6 @@ Documented at https://www.imer.in/labnotes/01-citibike-citibike-citibike/
    - Click any ride to see animated driving route on map (OSRM street-level routing)
    - Route animation: purple dot traces actual driving path with glow trail
    - Green marker = pickup, red marker = dropoff
-   - Ghost layer: all 220 pickup points as faded purple circles
    - Detail overlay: date, time, addresses, product, distance, duration, fare, city, wait time, surge
    - Keyboard navigation (j/k, arrows, Escape)
    - Accent color: purple (#a855f7)
