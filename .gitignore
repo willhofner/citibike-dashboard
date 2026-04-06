@@ -19,4 +19,4 @@ strava/data/.launchd_stderr.log
 subway/data/gps/
 
 # Raw MTA/OMNY data exports
-2026-03-27-trailing-12-months-mta-data.csv
+subway/data/*.csv
