@@ -653,22 +653,33 @@ function selectTrip(trip) {
     }).addTo(map);
     stationMarkers.push(rider);
 
-    // Interpolate extra points between stations for smooth animation
-    function interpolateCoords(coords, pointsPerSegment) {
-      if (coords.length < 2) return coords;
-      const result = [coords[0]];
-      for (let i = 1; i < coords.length; i++) {
-        const [lat1, lon1] = coords[i - 1];
-        const [lat2, lon2] = coords[i];
-        for (let j = 1; j <= pointsPerSegment; j++) {
-          const t = j / pointsPerSegment;
-          result.push([lat1 + (lat2 - lat1) * t, lon1 + (lon2 - lon1) * t]);
-        }
+    // Interpolate so point spacing is even (consistent animation speed across segments)
+    function interpolateEvenly(pts, targetCount) {
+      if (pts.length < 2) return pts;
+      const dists = [0];
+      for (let i = 1; i < pts.length; i++) {
+        const dlat = pts[i][0] - pts[i-1][0], dlon = pts[i][1] - pts[i-1][1];
+        dists.push(dists[i-1] + Math.sqrt(dlat*dlat + dlon*dlon));
       }
+      const totalDist = dists[dists.length - 1];
+      if (totalDist === 0) return pts;
+      const result = [pts[0]];
+      let seg = 0;
+      for (let j = 1; j < targetCount; j++) {
+        const d = (j / targetCount) * totalDist;
+        while (seg < dists.length - 2 && dists[seg+1] < d) seg++;
+        const segLen = dists[seg+1] - dists[seg];
+        const t = segLen > 0 ? (d - dists[seg]) / segLen : 0;
+        result.push([
+          pts[seg][0] + (pts[seg+1][0] - pts[seg][0]) * t,
+          pts[seg][1] + (pts[seg+1][1] - pts[seg][1]) * t
+        ]);
+      }
+      result.push(pts[pts.length - 1]);
       return result;
     }
 
-    const smoothCoords = interpolateCoords(flatCoords, 30);
+    const smoothCoords = interpolateEvenly(flatCoords, 300);
     const totalFrames = smoothCoords.length;
     let frameIdx = 0;
 

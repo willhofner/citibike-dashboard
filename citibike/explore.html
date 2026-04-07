@@ -327,7 +327,35 @@ function selectRide(ride) {
   const rideColor = ride.isEbike ? '#3b82f6' : '#22c55e';
 
   if (route) {
-    const coords = route.coordinates.map(c => [c[1], c[0]]);
+    const rawCoords = route.coordinates.map(c => [c[1], c[0]]);
+
+    // Interpolate so point spacing is even (fixes bridge teleport where OSRM has sparse points)
+    function interpolateEvenly(pts, targetCount) {
+      if (pts.length < 2) return pts;
+      // Compute cumulative distances
+      const dists = [0];
+      for (let i = 1; i < pts.length; i++) {
+        const dlat = pts[i][0] - pts[i-1][0], dlon = pts[i][1] - pts[i-1][1];
+        dists.push(dists[i-1] + Math.sqrt(dlat*dlat + dlon*dlon));
+      }
+      const totalDist = dists[dists.length - 1];
+      if (totalDist === 0) return pts;
+      const result = [pts[0]];
+      let seg = 0;
+      for (let j = 1; j < targetCount; j++) {
+        const d = (j / targetCount) * totalDist;
+        while (seg < dists.length - 2 && dists[seg+1] < d) seg++;
+        const segLen = dists[seg+1] - dists[seg];
+        const t = segLen > 0 ? (d - dists[seg]) / segLen : 0;
+        result.push([
+          pts[seg][0] + (pts[seg+1][0] - pts[seg][0]) * t,
+          pts[seg][1] + (pts[seg+1][1] - pts[seg][1]) * t
+        ]);
+      }
+      result.push(pts[pts.length - 1]);
+      return result;
+    }
+    const coords = interpolateEvenly(rawCoords, 300);
 
     // Fit map first, then animate after zoom completes
     map.fitBounds(L.latLngBounds(coords).pad(0.15), { maxZoom: 15 });
