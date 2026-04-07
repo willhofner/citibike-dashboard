@@ -1,21 +1,322 @@
 {
-  "generated": "2026-04-02T19:09:17.282032",
+  "generated": "2026-04-06T19:40:41.815805",
   "summary": {
-    "totalTrips": 5,
-    "totalLegs": 6,
-    "uniqueStations": 12,
+    "totalTrips": 9,
+    "totalLegs": 11,
+    "uniqueStations": 16,
     "dateRange": [
       "2026-03-30",
-      "2026-04-01"
+      "2026-04-06"
     ],
-    "daysWithRides": 2,
+    "daysWithRides": 4,
     "mostCommonStation": "Astor Place",
     "expressTrips": 1,
-    "transferTrips": 1
+    "transferTrips": 2
   },
   "trips": [
     {
       "id": 1,
+      "date": "2026-04-06",
+      "startTime": "2026-04-06T11:10:13-04:00",
+      "endTime": "2026-04-06T11:15:04-04:00",
+      "entryStation": "Astor Place",
+      "exitStation": "14th St-Union Sq",
+      "direction": "Northbound",
+      "line": "6",
+      "isExpress": false,
+      "durationMin": 4.8,
+      "numLegs": 1,
+      "dayOfWeek": "Monday",
+      "hour": 11,
+      "month": "2026-04",
+      "legs": [
+        {
+          "entryStation": "Astor Place",
+          "exitStation": "14th St-Union Sq",
+          "entryLat": 40.7301,
+          "entryLon": -73.9909,
+          "exitLat": 40.7355,
+          "exitLon": -73.9905,
+          "direction": "Northbound",
+          "line": "6",
+          "startTime": "2026-04-06T11:10:13-04:00",
+          "endTime": "2026-04-06T11:15:04-04:00",
+          "durationMin": 4.8,
+          "maxAccuracy": 172,
+          "entryDist": 4,
+          "exitDist": 68,
+          "intermediateStations": [
+            {
+              "station": "Astor Place",
+              "lat": 40.7301,
+              "lon": -73.9909,
+              "dist_m": 5,
+              "time": "2026-04-06T11:10:13-04:00",
+              "num_points": 6
+            },
+            {
+              "station": "14th St-Union Sq",
+              "lat": 40.7355,
+              "lon": -73.9905,
+              "dist_m": 127,
+              "time": "2026-04-06T11:14:39-04:00",
+              "num_points": 5
+            }
+          ],
+          "legNumber": 1
+        }
+      ],
+      "transferStations": []
+    },
+    {
+      "id": 2,
+      "date": "2026-04-04",
+      "startTime": "2026-04-04T13:36:19-04:00",
+      "endTime": "2026-04-04T13:43:50-04:00",
+      "entryStation": "Times Sq-42nd St",
+      "exitStation": "8th St-NYU",
+      "direction": "Southbound",
+      "line": "R/W",
+      "isExpress": false,
+      "durationMin": 7.5,
+      "numLegs": 1,
+      "dayOfWeek": "Saturday",
+      "hour": 13,
+      "month": "2026-04",
+      "legs": [
+        {
+          "entryStation": "Times Sq-42nd St",
+          "exitStation": "8th St-NYU",
+          "entryLat": 40.7553,
+          "entryLon": -73.987,
+          "exitLat": 40.7302,
+          "exitLon": -73.9924,
+          "direction": "Southbound",
+          "line": "R/W",
+          "startTime": "2026-04-04T13:36:19-04:00",
+          "endTime": "2026-04-04T13:43:50-04:00",
+          "durationMin": 7.5,
+          "maxAccuracy": 1295,
+          "entryDist": 68,
+          "exitDist": 45,
+          "intermediateStations": [
+            {
+              "station": "34th St-Herald Sq",
+              "lat": 40.7498,
+              "lon": -73.9878,
+              "dist_m": 26,
+              "time": "2026-04-04T13:38:04-04:00",
+              "num_points": 10
+            },
+            {
+              "station": "28th St (R/W)",
+              "lat": 40.7453,
+              "lon": -73.9883,
+              "dist_m": 48,
+              "time": "2026-04-04T13:38:55-04:00",
+              "num_points": 7
+            },
+            {
+              "station": "23rd St (R/W)",
+              "lat": 40.7413,
+              "lon": -73.9896,
+              "dist_m": 53,
+              "time": "2026-04-04T13:39:56-04:00",
+              "num_points": 7
+            },
+            {
+              "station": "14th St-Union Sq",
+              "lat": 40.7355,
+              "lon": -73.9905,
+              "dist_m": 96,
+              "time": "2026-04-04T13:41:36-04:00",
+              "num_points": 1
+            },
+            {
+              "station": "8th St-NYU",
+              "lat": 40.7302,
+              "lon": -73.9924,
+              "dist_m": 44,
+              "time": "2026-04-04T13:43:19-04:00",
+              "num_points": 5
+            }
+          ],
+          "legNumber": 1
+        }
+      ],
+      "transferStations": []
+    },
+    {
+      "id": 3,
+      "date": "2026-04-04",
+      "startTime": "2026-04-04T11:54:41-04:00",
+      "endTime": "2026-04-04T12:18:04-04:00",
+      "entryStation": "Canal St (6)",
+      "exitStation": "34th St-Herald Sq",
+      "direction": "Mixed",
+      "line": "6/R/W",
+      "isExpress": false,
+      "durationMin": 23.4,
+      "numLegs": 2,
+      "dayOfWeek": "Saturday",
+      "hour": 11,
+      "month": "2026-04",
+      "legs": [
+        {
+          "entryStation": "Canal St (6)",
+          "exitStation": "Astor Place",
+          "entryLat": 40.7182,
+          "entryLon": -73.9998,
+          "exitLat": 40.7301,
+          "exitLon": -73.9909,
+          "direction": "Northbound",
+          "line": "6",
+          "startTime": "2026-04-04T11:54:41-04:00",
+          "endTime": "2026-04-04T11:57:34-04:00",
+          "durationMin": 2.9,
+          "maxAccuracy": 1030,
+          "entryDist": 55,
+          "exitDist": 13,
+          "intermediateStations": [
+            {
+              "station": "Canal St (6)",
+              "lat": 40.7182,
+              "lon": -73.9998,
+              "dist_m": 53,
+              "time": "2026-04-04T11:54:41-04:00",
+              "num_points": 2
+            },
+            {
+              "station": "Spring St (6)",
+              "lat": 40.7224,
+              "lon": -73.9972,
+              "dist_m": 26,
+              "time": "2026-04-04T11:54:54-04:00",
+              "num_points": 2
+            },
+            {
+              "station": "Bleecker St",
+              "lat": 40.7259,
+              "lon": -73.9944,
+              "dist_m": 22,
+              "time": "2026-04-04T11:56:35-04:00",
+              "num_points": 9
+            }
+          ],
+          "legNumber": 1
+        },
+        {
+          "entryStation": "8th St-NYU",
+          "exitStation": "34th St-Herald Sq",
+          "entryLat": 40.7302,
+          "entryLon": -73.9924,
+          "exitLat": 40.7498,
+          "exitLon": -73.9878,
+          "direction": "Northbound",
+          "line": "R/W",
+          "startTime": "2026-04-04T12:11:56-04:00",
+          "endTime": "2026-04-04T12:18:04-04:00",
+          "durationMin": 6.1,
+          "maxAccuracy": 877,
+          "entryDist": 39,
+          "exitDist": 25,
+          "intermediateStations": [
+            {
+              "station": "14th St-Union Sq",
+              "lat": 40.7355,
+              "lon": -73.9905,
+              "dist_m": 87,
+              "time": "2026-04-04T12:12:47-04:00",
+              "num_points": 9
+            },
+            {
+              "station": "23rd St (R/W)",
+              "lat": 40.7413,
+              "lon": -73.9896,
+              "dist_m": 50,
+              "time": "2026-04-04T12:14:40-04:00",
+              "num_points": 2
+            },
+            {
+              "station": "28th St (R/W)",
+              "lat": 40.7453,
+              "lon": -73.9883,
+              "dist_m": 44,
+              "time": "2026-04-04T12:16:53-04:00",
+              "num_points": 3
+            },
+            {
+              "station": "34th St-Herald Sq",
+              "lat": 40.7498,
+              "lon": -73.9878,
+              "dist_m": 133,
+              "time": "2026-04-04T12:17:41-04:00",
+              "num_points": 1
+            }
+          ],
+          "legNumber": 2
+        }
+      ],
+      "transferStations": [
+        "Astor Place"
+      ]
+    },
+    {
+      "id": 4,
+      "date": "2026-04-04",
+      "startTime": "2026-04-04T11:24:39-04:00",
+      "endTime": "2026-04-04T11:31:37-04:00",
+      "entryStation": "Astor Place",
+      "exitStation": "Canal St (6)",
+      "direction": "Southbound",
+      "line": "6",
+      "isExpress": false,
+      "durationMin": 7.0,
+      "numLegs": 1,
+      "dayOfWeek": "Saturday",
+      "hour": 11,
+      "month": "2026-04",
+      "legs": [
+        {
+          "entryStation": "Astor Place",
+          "exitStation": "Canal St (6)",
+          "entryLat": 40.7301,
+          "entryLon": -73.9909,
+          "exitLat": 40.7182,
+          "exitLon": -73.9998,
+          "direction": "Southbound",
+          "line": "6",
+          "startTime": "2026-04-04T11:24:39-04:00",
+          "endTime": "2026-04-04T11:31:37-04:00",
+          "durationMin": 7.0,
+          "maxAccuracy": 820,
+          "entryDist": 29,
+          "exitDist": 56,
+          "intermediateStations": [
+            {
+              "station": "Bleecker St",
+              "lat": 40.7259,
+              "lon": -73.9944,
+              "dist_m": 16,
+              "time": "2026-04-04T11:28:08-04:00",
+              "num_points": 19
+            },
+            {
+              "station": "Spring St (6)",
+              "lat": 40.7224,
+              "lon": -73.9972,
+              "dist_m": 20,
+              "time": "2026-04-04T11:30:21-04:00",
+              "num_points": 1
+            }
+          ],
+          "legNumber": 1
+        }
+      ],
+      "transferStations": []
+    },
+    {
+      "id": 5,
       "date": "2026-04-01",
       "startTime": "2026-04-01T23:43:59-04:00",
       "endTime": "2026-04-01T23:48:01-04:00",
@@ -69,7 +370,7 @@
       "transferStations": []
     },
     {
-      "id": 2,
+      "id": 6,
       "date": "2026-04-01",
       "startTime": "2026-04-01T21:46:04-04:00",
       "endTime": "2026-04-01T21:52:04-04:00",
@@ -131,7 +432,7 @@
       "transferStations": []
     },
     {
-      "id": 3,
+      "id": 7,
       "date": "2026-04-01",
       "startTime": "2026-04-01T18:17:40-04:00",
       "endTime": "2026-04-01T18:32:47-04:00",
@@ -278,7 +579,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 8,
       "date": "2026-03-30",
       "startTime": "2026-03-30T20:29:24-04:00",
       "endTime": "2026-03-30T20:29:46-04:00",
@@ -324,7 +625,7 @@
       "transferStations": []
     },
     {
-      "id": 5,
+      "id": 9,
       "date": "2026-03-30",
       "startTime": "2026-03-30T09:07:52-04:00",
       "endTime": "2026-03-30T09:08:33-04:00",
@@ -379,6 +680,85 @@
     }
   ],
   "stations": {
+    "Brooklyn Bridge-City Hall": {
+      "lat": 40.7131,
+      "lon": -74.0028,
+      "lines": [
+        "4",
+        "5",
+        "6",
+        "J",
+        "Z"
+      ],
+      "tripCount": 0
+    },
+    "34th St-Herald Sq": {
+      "lat": 40.7498,
+      "lon": -73.9878,
+      "lines": [
+        "B",
+        "D",
+        "F",
+        "M",
+        "N",
+        "Q",
+        "R",
+        "W"
+      ],
+      "tripCount": 1
+    },
+    "8th St-NYU": {
+      "lat": 40.7302,
+      "lon": -73.9924,
+      "lines": [
+        "R",
+        "W"
+      ],
+      "tripCount": 2
+    },
+    "Bleecker St": {
+      "lat": 40.7259,
+      "lon": -73.9944,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
+    },
+    "Canal St (N/Q/R/W)": {
+      "lat": 40.7201,
+      "lon": -74.0014,
+      "lines": [
+        "N",
+        "Q",
+        "R",
+        "W"
+      ],
+      "tripCount": 1
+    },
+    "Times Sq-42nd St": {
+      "lat": 40.7553,
+      "lon": -73.987,
+      "lines": [
+        "1",
+        "2",
+        "3",
+        "7",
+        "N",
+        "Q",
+        "R",
+        "W",
+        "S"
+      ],
+      "tripCount": 1
+    },
+    "Spring St (6)": {
+      "lat": 40.7224,
+      "lon": -73.9972,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
+    },
     "28th St (6)": {
       "lat": 40.7432,
       "lon": -73.984,
@@ -386,6 +766,31 @@
         "6"
       ],
       "tripCount": 0
+    },
+    "28th St (R/W)": {
+      "lat": 40.7453,
+      "lon": -73.9883,
+      "lines": [
+        "R",
+        "W"
+      ],
+      "tripCount": 0
+    },
+    "23rd St (6)": {
+      "lat": 40.739,
+      "lon": -73.9847,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 0
+    },
+    "Astor Place": {
+      "lat": 40.7301,
+      "lon": -73.9909,
+      "lines": [
+        "6"
+      ],
+      "tripCount": 5
     },
     "14th St-Union Sq": {
       "lat": 40.7355,
@@ -400,23 +805,7 @@
         "R",
         "W"
       ],
-      "tripCount": 3
-    },
-    "Bleecker St": {
-      "lat": 40.7259,
-      "lon": -73.9944,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
-    },
-    "Spring St (6)": {
-      "lat": 40.7224,
-      "lon": -73.9972,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
+      "tripCount": 4
     },
     "Canal St (6)": {
       "lat": 40.7182,
@@ -426,17 +815,22 @@
         "J",
         "Z"
       ],
-      "tripCount": 1
+      "tripCount": 3
     },
-    "Brooklyn Bridge-City Hall": {
-      "lat": 40.7131,
-      "lon": -74.0028,
+    "33rd St (6)": {
+      "lat": 40.746,
+      "lon": -73.9827,
       "lines": [
-        "4",
-        "5",
-        "6",
-        "J",
-        "Z"
+        "6"
+      ],
+      "tripCount": 0
+    },
+    "23rd St (R/W)": {
+      "lat": 40.7413,
+      "lon": -73.9896,
+      "lines": [
+        "R",
+        "W"
       ],
       "tripCount": 0
     },
@@ -451,50 +845,6 @@
         "S"
       ],
       "tripCount": 1
-    },
-    "33rd St (6)": {
-      "lat": 40.746,
-      "lon": -73.9827,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
-    },
-    "8th St-NYU": {
-      "lat": 40.7302,
-      "lon": -73.9924,
-      "lines": [
-        "R",
-        "W"
-      ],
-      "tripCount": 1
-    },
-    "Canal St (N/Q/R/W)": {
-      "lat": 40.7201,
-      "lon": -74.0014,
-      "lines": [
-        "N",
-        "Q",
-        "R",
-        "W"
-      ],
-      "tripCount": 1
-    },
-    "Astor Place": {
-      "lat": 40.7301,
-      "lon": -73.9909,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 3
-    },
-    "23rd St (6)": {
-      "lat": 40.739,
-      "lon": -73.9847,
-      "lines": [
-        "6"
-      ],
-      "tripCount": 0
     }
   }
 }

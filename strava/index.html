@@ -658,15 +658,9 @@ function selectRun(runId) {
     activeRoute = trail;
     activeMarkers.push(glowTrail);
 
-    // Calculate speed based on pixel distance so all routes feel the same
-    let totalPixelDist = 0;
-    for (let i = 1; i < coords.length; i++) {
-      const p1 = map.latLngToContainerPoint(coords[i - 1]);
-      const p2 = map.latLngToContainerPoint(coords[i]);
-      totalPixelDist += p1.distanceTo(p2);
-    }
-    const pixelsPerFrame = 12; // consistent visual speed
-    const targetFrames = Math.max(60, totalPixelDist / pixelsPerFrame);
+    // Fixed animation duration so all routes feel consistent regardless of zoom
+    const targetSeconds = 3;
+    const targetFrames = targetSeconds * 60;
     const baseRate = Math.max(1, Math.ceil(coords.length / targetFrames));
 
     let idx = 0;
