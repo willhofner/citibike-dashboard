@@ -20,3 +20,9 @@ subway/data/gps/
 
 # Raw MTA/OMNY data exports
 subway/data/*.csv
+
+# Personal journal (not for public)
+thoughts.md
+
+# Burrow UI evolution screenshots
+burrow/screenshots/

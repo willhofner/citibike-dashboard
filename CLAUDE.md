@@ -18,11 +18,29 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ## Project Overview
 
-**One-liner**: A personal activity dashboard -- turning CitiBike rides, Strava runs, Uber rides, and Apple Watch data into beautiful, interactive visualizations.
+**One-liner**: A personal activity dashboard -- turning CitiBike rides, Strava runs, Uber rides, and Apple Watch data into beautiful, interactive visualizations. And the birthplace of **Burrow** — a fog-of-war city explorer that shows you the shape of your life on a map.
 
 ### What We're Building
 
-A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), Books (Goodreads library), and Subway (5 trips detected from GPS). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), Books (Goodreads library), and Subway (9 trips detected from GPS). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+
+### The Bigger Vision: Burrow
+
+The dashboards are individual lenses. **Burrow** is the unified view — every mode of transportation painted on one canvas, with fog everywhere you haven't been. It's the GTA fog-of-war mechanic applied to your real city.
+
+The insight: a heatmap shows density ("you go to the East Village a lot"). Burrow shows *coverage* ("you've never set foot in Sunset Park"). One validates habits. The other provokes curiosity.
+
+The name is a double entendre — Borough + burrow. *Breadth yields depth. By fanning out, you burrow down.* There are 6 million people in this city with 6 million different hyperlocal spheres, and every one of them is worth checking out.
+
+**Why it resonates:**
+- A dark patch on your map nags at you. You don't need an algorithm to tell you to go there. You just see it and think "huh, I've never been to Red Hook."
+- A lack of fog cover is a badge of honor. People who've explored their city wear it in their heads already. Burrow gives it a visual.
+- The cloudless island — you take the subway to Prospect Park, spend the day there, subway home. There's a cleared circle around the park, surrounded by fog. But if you *bike* there, there's a tunnel through the fog. The shape of how you got there matters.
+- The frustration of a missed recording is real. An uncaptured subway ride means stolen exploration credit. That emotional pull — *I want proof that I left my burrow* — is the product.
+
+**Long-term vision:** A native iOS app. Just allow location access and your fog lifts automatically, regardless of transportation mode. No Overland, no CSV exports, no data pipelines. Universal. Every city. But NYC is the perfect proving ground — the density makes coverage meaningful, and New Yorkers are obsessively proud of knowing their city.
+
+**Current state:** Web prototype using existing dashboard data (Strava GPS traces, CitiBike OSRM routes, Uber start/end points, Subway station locations). Proof of concept that the visual works and the mechanic hits emotionally.
 
 ### Tech Stack
 
@@ -105,6 +123,8 @@ citibike-bot/
 │       ├── gps/                         # Daily GPS files: YYYY-MM-DD.json (gitignored)
 │       ├── rides_enriched.json          # Detected subway rides with station data
 │       └── *.csv                        # OMNY exports from omny.info (gitignored)
+├── burrow/
+│   └── index.html              # Burrow — fog-of-war city explorer (unified map, all modes)
 └── references/
     ├── index_redesign.html     # Landing page redesign draft
     ├── tweet_animation/
@@ -539,11 +559,63 @@ NYC subway has **tap-in only, no tap-out**. OMNY exports from `omny.info` have t
 
 ---
 
+## Burrow (Fog-of-War City Explorer)
+
+### The Idea
+
+Every run you've taken, every bike ride, every subway exit, every Uber drop-off — they all paint on the same canvas. Everywhere you've been lifts the fog. Everywhere you haven't is dark. You open Burrow and you see *your* New York. The shape of your life on a map.
+
+This isn't a heatmap. A heatmap shows where you go a lot. Burrow shows where you've *never been*. The dark patches are the product. They nag at you. They make you want to go.
+
+### What's Built
+
+1. **Fog Map** (`burrow/index.html`)
+   - Full interactive Leaflet map of NYC covered in fog overlay
+   - Zoom constrained to NYC bounds (can't zoom out to other cities)
+   - All transportation data unified on one canvas
+   - Fog cleared along routes and around stations with configurable radii
+   - Coverage % stat for Manhattan
+   - Accent color: emerald #10b981
+
+### Defogging Rules (by transportation mode)
+
+Each mode of transportation clears fog differently based on how much of the city you actually *experience* while traveling:
+
+| Mode | Defogging Style | Default Radius | Rationale |
+|------|----------------|----------------|-----------|
+| **Running** (Strava) | Trail — fog cleared along full GPS trace | 80m (one block each side) | You're above ground, taking in the city at human speed |
+| **Biking** (CitiBike) | Trail — fog cleared along OSRM route | 80m (one block each side) | Above ground, eyes open, experiencing the streets. Note: routes are OSRM shortest-path estimates, not actual GPS — a known limitation |
+| **Subway** (MTA) | Dumbbell — circles at entry + exit stations only | 500m (~2 long blocks) | You didn't see anything underground. But you emerged somewhere and explored. Wide radius acknowledges the walking you did after exiting |
+| **Uber** | Dumbbell — circles at pickup + dropoff only | 500m (~2 long blocks) | "Counting above-ground Uber travel would be stolen valor." You arrived somewhere, that's what counts |
+
+All radii are system configs — adjustable on the fly to experiment with what feels "vibe-accurate" without redeploying.
+
+**Future consideration:** Ubers and above-ground subway segments could get a very slim trail radius to show you passed through, but for MVP they're dumbbells only.
+
+### Data Sources (for web prototype)
+
+- **Strava**: `activities_enriched.json` → `latlng` arrays (actual GPS traces, highest fidelity)
+- **CitiBike**: `rides_enriched.json` → start/end stations, `routes.json` → OSRM route coordinates keyed by `startStation|endStation`
+- **Uber**: `rides_enriched.json` → start/end lat/lon (NYC rides only, 83 of 220), `routes.json` → OSRM route coordinates keyed by ride ID
+- **Subway**: `rides_enriched.json` → entry/exit station lat/lon per leg (9 trips, 11 legs)
+
+### Coverage Metrics
+
+- **Coverage %**: Grid cells visited / total grid cells within borough boundary
+- **Grid granularity**: ~50m cells — fine enough to reward exploring a new block, coarse enough to not be creepy
+- Potential future scores: per-borough breakdown, depth score (how concentrated is your daily radius), exploration streaks
+
+### The North Star: Native iOS App
+
+The web prototype proves the visual. The real product is a native app where you just allow location access and your fog lifts automatically. No data exports, no CSV parsing, no Overland crashes. The frustration of a missed subway ride — riding home from 96th St on the 1/2/3, transferring at 42nd to the NRQW, finishing at 8th Ave, and none of it recorded — that frustration disappears. Every step counts. Every exploration gets credit.
+
+---
+
 ## Landing Page
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline.
+1. **Activity cards**: 2-column grid with Burrow, HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
 
@@ -556,7 +628,7 @@ The landing page (`index.html`) has two sections:
 3. **Own your data** -- Everything runs locally, no third-party services required
 4. **Data tells the story** -- Let the numbers speak
 5. **Personal first** -- This is for one user's data, not a platform
-6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444, HofSubways=yellow #eab308
+6. **Dark theme** -- All UI uses the dark color scheme (--bg: #0a0a0f). Accent colors: Burrow=emerald #10b981, HofBikes=blue #3b82f6, HofRuns=orange #f97316, HofRides=purple #a855f7, HofWalks=green #22c55e, HofBeats=red #ef4444, HofSubways=yellow #eab308
 7. **Consistent naming** -- All pages use the `Hof<span>Brand</span>` h1 pattern. Titles: `HofBrand — Dashboard` or `HofBrand — Ride Explorer`. Nav links: plain `Home` + sibling page name (no arrows). Explorers use `.back-link` in sidebar, dashboards use `.nav-links` in header.
 
 ---
@@ -579,12 +651,14 @@ The landing page (`index.html`) has two sections:
 
 ## Personal Preferences
 
+- **NEVER edit `thoughts.md`** -- This is the user's personal journal. Read-only inspiration, not instruction. Some entries are the most valuable creative direction he's ever discovered; others are contradictory, unrelated, or exploratory. Treat contents as context and motivation, never as specs. Do not write to, append to, or modify this file under any circumstances.
 - **Always use `python3`** -- Never `python`
 - **Always use `pip3`** -- Never `pip`
 - **NEVER use port 5000 on macOS** -- Conflicts with AirPlay Receiver. Use 8000+.
 - **Git workflow**: "merge", "ship", "push", "commit" all mean the same thing — commit all changes + push to GitHub. Don't ask which one they meant.
 - **Web searches require NO approval** -- Search freely, report findings.
 - **Always validate HTML pages with headless browser before presenting to user** -- Use Playwright (`python3 -m playwright`) to load the page, check for JS errors, verify elements render. Start a local server (`python3 -m http.server 8080`), load the page with `wait_until='networkidle'`, check console errors, verify key elements exist. Playwright is installed (`pip3 install --break-system-packages playwright && python3 -m playwright install chromium`).
+- **Screenshot every Burrow UI change** -- After any visual edit to `burrow/index.html`, take a Playwright screenshot and save to `burrow/screenshots/NNN-description.png` with incrementing number. Check existing files for next number. This tracks the visual evolution over time. The screenshots folder is gitignored.
 
 ---
 

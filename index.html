@@ -19,6 +19,7 @@
     --purple: #a855f7;
     --red: #ef4444;
     --amber: #eab308;
+    --emerald: #10b981;
   }
 
   body {
@@ -81,6 +82,9 @@
   .card.rides:hover { border-color: var(--purple); box-shadow: 0 8px 24px rgba(168,85,247,0.15); }
   .card.reads:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(234,179,8,0.15); }
   .card.subways:hover { border-color: var(--amber); box-shadow: 0 8px 24px rgba(234,179,8,0.15); }
+  .card.burrow:hover { border-color: var(--emerald); box-shadow: 0 8px 24px rgba(16,185,129,0.15); }
+
+  .card.burrow { grid-column: 1 / -1; }
 
   .card-top {
     display: flex;
@@ -133,6 +137,7 @@
   .card.rides .brand { color: rgba(168,85,247,0.6); }
   .card.reads .brand { color: rgba(234,179,8,0.6); }
   .card.subways .brand { color: rgba(234,179,8,0.6); }
+  .card.burrow .brand { color: rgba(16,185,129,0.6); }
 
   .card p {
     font-size: 13px;
@@ -165,6 +170,7 @@
   .card.rides .card-stat .val { color: var(--purple); }
   .card.reads .card-stat .val { color: var(--amber); }
   .card.subways .card-stat .val { color: var(--amber); }
+  .card.burrow .card-stat .val { color: var(--emerald); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -193,6 +199,7 @@
   .card.rides .card-links a:hover { color: var(--purple); }
   .card.reads .card-links a:hover { color: var(--amber); }
   .card.subways .card-links a:hover { color: var(--amber); }
+  .card.burrow .card-links a:hover { color: var(--emerald); }
 
   .jobs {
     margin-top: 40px;
@@ -253,6 +260,25 @@
   <p class="subtitle">Personal activity data — bikes, runs, rides, subways, walks, heart rate, and books</p>
 
   <div class="cards">
+    <div onclick="location.href='burrow/index.html'" class="card burrow">
+      <div class="card-top">
+        <div class="icon">🗺️</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>Burrow</h2>
+      <div class="brand">All Modes · NYC</div>
+      <p>Your city, defogged. Every run, ride, and subway trip lifts the fog on one unified map of New York City.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">—%</div><div class="lbl">Coverage</div></div>
+        <div class="card-stat"><div class="val">1</div><div class="lbl">Boroughs</div></div>
+        <div class="card-stat"><div class="val">400+</div><div class="lbl">Routes</div></div>
+      </div>
+      <div class="card-links">
+        <a href="burrow/3d.html" onclick="event.stopPropagation()">3D Buildings</a>
+        <a href="burrow/flat.html" onclick="event.stopPropagation()">Flat View</a>
+      </div>
+    </div>
+
     <div onclick="location.href='citibike/explore.html'" class="card bikes">
       <div class="card-top">
         <div class="icon">🚲</div>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Burrow — NYC Explorer</title>
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #12121a;
+    --border: #1e1e2e;
+    --text: #e0e0e8;
+    --text-dim: #8888a0;
+    --emerald: #10b981;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  /* Cloud canvas overlays the map */
+  #fog-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Title overlay */
+  .title-overlay {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+    pointer-events: auto;
+  }
+  .title-overlay h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: rgba(224,224,232,0.5);
+    letter-spacing: -0.5px;
+  }
+  .title-overlay h1 span { color: var(--emerald); opacity: 0.6; }
+  .title-overlay .nav-link {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+  }
+  .title-overlay .nav-link:hover { opacity: 1; color: var(--emerald); }
+
+  /* Stats overlay — bottom left */
+  .stats-overlay {
+    position: fixed;
+    bottom: 24px;
+    left: 16px;
+    z-index: 10;
+    background: rgba(18,18,26,0.88);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    line-height: 1.6;
+    backdrop-filter: blur(8px);
+    min-width: 180px;
+  }
+  .stats-overlay .stat-label { color: var(--text-dim); }
+  .stats-overlay .stat-val { color: var(--emerald); font-weight: 600; }
+  .stats-overlay .stat-row { display: flex; justify-content: space-between; gap: 16px; }
+
+  /* Coverage overlay — bottom right */
+  .coverage-overlay {
+    position: fixed;
+    bottom: 24px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(18,18,26,0.88);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+  .coverage-overlay .pct { font-size: 28px; font-weight: 700; color: var(--emerald); line-height: 1; }
+  .coverage-overlay .pct-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  /* Config panel — top right */
+  .config-panel {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    background: rgba(18,18,26,0.92);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+    overflow: hidden;
+    width: 220px;
+  }
+  .config-toggle {
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .config-toggle:hover { color: var(--text); }
+  .config-toggle .arrow { transition: transform 0.2s; font-size: 10px; }
+  .config-toggle .arrow.open { transform: rotate(180deg); }
+  .config-body { display: none; padding: 0 14px 14px; }
+  .config-body.open { display: block; }
+  .config-row { margin-bottom: 10px; }
+  .config-row label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+  .config-row label .cfg-val { color: var(--emerald); font-weight: 600; }
+  .config-row input[type=range] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 4px; background: var(--border); border-radius: 2px; outline: none;
+  }
+  .config-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 14px; border-radius: 50%; background: var(--emerald); cursor: pointer;
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
+    position: fixed; inset: 0; z-index: 2000; background: var(--bg);
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+    transition: opacity 0.5s;
+  }
+  .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+  .loading-overlay .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--border);
+    border-top-color: var(--emerald); border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  .loading-overlay .load-text { color: var(--text-dim); font-size: 13px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="load-text">Loading activity data...</div>
+</div>
+
+<div class="title-overlay">
+  <h1>Bur<span>row</span></h1>
+  <a class="nav-link" href="../index.html">Home</a>
+  <a class="nav-link" href="flat.html" style="margin-left:12px">Flat View</a>
+</div>
+
+<div class="stats-overlay" id="stats">
+  <div class="stat-row"><span class="stat-label">Runs / Activities</span><span class="stat-val" id="stat-runs">—</span></div>
+  <div class="stat-row"><span class="stat-label">Bike rides</span><span class="stat-val" id="stat-bikes">—</span></div>
+  <div class="stat-row"><span class="stat-label">Subway trips</span><span class="stat-val" id="stat-subway">—</span></div>
+  <div class="stat-row"><span class="stat-label">Uber rides</span><span class="stat-val" id="stat-uber">—</span></div>
+  <div class="stat-row" style="border-top:1px solid var(--border);padding-top:6px;margin-top:4px"><span class="stat-label">Total routes</span><span class="stat-val" id="stat-total">—</span></div>
+</div>
+
+<div class="coverage-overlay" id="coverage">
+  <div class="pct" id="coverage-pct">—%</div>
+  <div class="pct-label">Manhattan explored</div>
+</div>
+
+<div class="config-panel">
+  <div class="config-toggle" id="configToggle">
+    <span>Settings</span>
+    <span class="arrow" id="configArrow">▼</span>
+  </div>
+  <div class="config-body" id="configBody">
+    <div class="config-row">
+      <label>Trail radius <span class="cfg-val" id="trailRadiusVal">200m</span></label>
+      <input type="range" id="trailRadius" min="50" max="500" value="200" step="10">
+    </div>
+    <div class="config-row">
+      <label>Station radius <span class="cfg-val" id="stationRadiusVal">500m</span></label>
+      <input type="range" id="stationRadius" min="100" max="1000" value="500" step="50">
+    </div>
+    <div class="config-row">
+      <label>Fog opacity <span class="cfg-val" id="fogOpacityVal">0.85</span></label>
+      <input type="range" id="fogOpacity" min="0.3" max="0.98" value="0.85" step="0.01">
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+<canvas id="fog-canvas"></canvas>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── Config ─────────────────────────────────
+  const cfg = {
+    trailRadius: 200,
+    stationRadius: 500,
+    fogOpacity: 0.85
+  };
+
+  // ─── NYC Bounds ─────────────────────────────
+  const NYC_SW = [-74.15, 40.53]; // [lng, lat] for MapLibre
+  const NYC_NE = [-73.58, 40.92];
+
+  // Manhattan rough bounding box for coverage calc
+  const MAN_SW = [40.700, -74.020];
+  const MAN_NE = [40.882, -73.907];
+  const COVERAGE_CELL_M = 50;
+
+  // ─── Map Setup (MapLibre GL) ────────────────
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://tiles.openfreemap.org/styles/positron',
+    center: [-73.99, 40.735],
+    zoom: 14,
+    pitch: 50,
+    bearing: -15,
+    minZoom: 12,
+    maxZoom: 18,
+    maxBounds: [NYC_SW, NYC_NE]
+  });
+
+  map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+
+  // ─── 3D Buildings ───────────────────────────
+  map.on('load', () => {
+    // Find label layer to insert buildings below
+    const layers = map.getStyle().layers;
+    let labelLayerId;
+    for (const layer of layers) {
+      if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
+        labelLayerId = layer.id;
+        break;
+      }
+    }
+
+    // Add 3D building extrusions with cartoonish pastel colors
+    map.addLayer({
+      id: '3d-buildings',
+      source: 'openmaptiles',
+      'source-layer': 'building',
+      type: 'fill-extrusion',
+      minzoom: 14,
+      paint: {
+        'fill-extrusion-color': [
+          'interpolate', ['linear'],
+          ['coalesce', ['get', 'render_height'], 10],
+          0, '#fde9a9',     // short: warm cream
+          15, '#bbf7d0',    // low-rise: mint green
+          40, '#c4b5fd',    // mid-rise: lavender
+          80, '#fda4af',    // tall: coral pink
+          150, '#93c5fd',   // very tall: sky blue
+          300, '#f0abfc'    // skyscrapers: orchid
+        ],
+        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 10],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+        'fill-extrusion-opacity': 0.8
+      }
+    }, labelLayerId);
+
+    // Data loads after map style is ready
+    loadAllData();
+  });
+
+  // ─── Unified data store ─────────────────────
+  const fogData = {
+    trails: [],   // each: { points: [[lat,lng],...] }
+    stations: []  // each: { lat, lng }
+  };
+
+  let stats = { runs: 0, bikes: 0, subway: 0, uber: 0 };
+
+  // ─── Iconic NYC skyscrapers that poke through clouds ──
+  const skyscrapers = [
+    { name: 'One WTC',          lat: 40.7127, lng: -74.0134, height: 541 },
+    { name: 'Empire State',     lat: 40.7484, lng: -73.9857, height: 443 },
+    { name: '432 Park Ave',     lat: 40.7614, lng: -73.9718, height: 426 },
+    { name: 'One Vanderbilt',   lat: 40.7531, lng: -73.9786, height: 427 },
+    { name: '30 Hudson Yards',  lat: 40.7534, lng: -73.9987, height: 395 },
+    { name: 'Bank of America',  lat: 40.7555, lng: -73.9846, height: 366 },
+    { name: 'Chrysler Bldg',    lat: 40.7516, lng: -73.9755, height: 319 },
+    { name: '3 WTC',            lat: 40.7112, lng: -74.0124, height: 329 },
+    { name: '53W53',            lat: 40.7614, lng: -73.9776, height: 320 },
+    { name: 'Steinway Tower',   lat: 40.7648, lng: -73.9732, height: 435 },
+    { name: 'Central Park Twr', lat: 40.7662, lng: -73.9810, height: 472 },
+    { name: '35 Hudson Yards',  lat: 40.7537, lng: -74.0003, height: 308 },
+    { name: 'Met Life Tower',   lat: 40.7415, lng: -73.9863, height: 213 },
+    { name: 'Woolworth Bldg',   lat: 40.7123, lng: -74.0083, height: 241 },
+    { name: '56 Leonard',       lat: 40.7190, lng: -74.0054, height: 250 },
+    { name: '30 Rock',          lat: 40.7589, lng: -73.9797, height: 259 },
+    { name: 'Citigroup Center', lat: 40.7582, lng: -73.9710, height: 279 },
+  ];
+
+  // ─── Seeded random ──────────────────────────
+  function seededRandom(seed) {
+    let s = Math.abs(seed) || 1;
+    return function() {
+      s = (s * 16807 + 0) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  // ─── Cloud Drawing ──────────────────────────
+  const fogCanvas = document.getElementById('fog-canvas');
+  const fogCtx = fogCanvas.getContext('2d');
+
+  function redrawFog() {
+    const w = fogCanvas.width = fogCanvas.clientWidth;
+    const h = fogCanvas.height = fogCanvas.clientHeight;
+    const ctx = fogCtx;
+    ctx.clearRect(0, 0, w, h);
+
+    const zoom = map.getZoom();
+    const center = map.getCenter();
+    const bounds = map.getBounds();
+
+    // Meters per pixel at current zoom/lat
+    const metersPerPixel = 40075016.686 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, zoom + 8);
+    const trailRadiusPx = cfg.trailRadius / metersPerPixel;
+    const stationRadiusPx = cfg.stationRadius / metersPerPixel;
+    const sampleRate = zoom <= 12 ? 8 : zoom <= 13 ? 4 : zoom <= 14 ? 2 : 1;
+
+    const pad = 0.02;
+    const visS = bounds.getSouth() - pad;
+    const visN = bounds.getNorth() + pad;
+    const visW = bounds.getWest() - pad;
+    const visE = bounds.getEast() + pad;
+
+    // Helper: project lat/lng to screen pixel
+    function toScreen(lat, lng) {
+      const p = map.project([lng, lat]);
+      return p;
+    }
+
+    // ── Step 1: Build visited mask ──
+    const maskCanvas = document.createElement('canvas');
+    maskCanvas.width = w;
+    maskCanvas.height = h;
+    const mctx = maskCanvas.getContext('2d');
+
+    mctx.strokeStyle = 'white';
+    mctx.lineCap = 'round';
+    mctx.lineJoin = 'round';
+    mctx.lineWidth = trailRadiusPx * 2;
+    for (const trail of fogData.trails) {
+      const pts = trail.points;
+      if (pts.length === 0) continue;
+      mctx.beginPath();
+      let started = false;
+      for (let i = 0; i < pts.length; i += sampleRate) {
+        const p = pts[i];
+        if (p[0] < visS || p[0] > visN || p[1] < visW || p[1] > visE) {
+          started = false; continue;
+        }
+        const px = toScreen(p[0], p[1]);
+        if (!started) { mctx.moveTo(px.x, px.y); started = true; }
+        else { mctx.lineTo(px.x, px.y); }
+      }
+      mctx.stroke();
+    }
+
+    mctx.fillStyle = 'white';
+    for (const st of fogData.stations) {
+      if (st.lat < visS || st.lat > visN || st.lng < visW || st.lng > visE) continue;
+      const px = toScreen(st.lat, st.lng);
+      mctx.beginPath();
+      mctx.arc(px.x, px.y, stationRadiusPx, 0, Math.PI * 2);
+      mctx.fill();
+    }
+
+    const maskData = mctx.getImageData(0, 0, w, h).data;
+    function isVisited(px, py) {
+      if (px < 0 || py < 0 || px >= w || py >= h) return false;
+      return maskData[(Math.floor(py) * w + Math.floor(px)) * 4] > 128;
+    }
+
+    function cellVisitedness(cx, cy, checkR) {
+      let v = 0;
+      const samples = 12;
+      for (let s = 0; s < samples; s++) {
+        const a = (s / samples) * Math.PI * 2;
+        if (isVisited(cx + Math.cos(a) * checkR * 0.5, cy + Math.sin(a) * checkR * 0.5)) v++;
+      }
+      if (isVisited(cx, cy)) v += 4;
+      return v / (samples + 4);
+    }
+
+    // ── Step 2: Draw cartoon clouds ──
+    const geoStep = 0.005;
+
+    function puff(px, py, pr, color, alpha) {
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(px, py, pr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawCloud(ctx, cx, cy, scale, opacity, seed) {
+      const rng = seededRandom(seed);
+      const shapeType = Math.floor(rng() * 5);
+      let puffs = [];
+
+      if (shapeType === 0) {
+        const n = 7 + Math.floor(rng() * 4);
+        for (let i = 0; i < n; i++) {
+          const t = (i / (n - 1)) - 0.5;
+          puffs.push({
+            dx: t * scale * 2.2 + (rng() - 0.5) * scale * 0.3,
+            dy: (rng() - 0.5) * scale * 0.4,
+            r: scale * (0.35 + rng() * 0.3) * (1 - Math.abs(t) * 0.5)
+          });
+        }
+      } else if (shapeType === 1) {
+        puffs.push({ dx: 0, dy: -scale * 0.1, r: scale * (0.6 + rng() * 0.3) });
+        const n = 6 + Math.floor(rng() * 3);
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2 + rng() * 0.5;
+          const d = scale * (0.4 + rng() * 0.3);
+          puffs.push({ dx: Math.cos(a) * d, dy: Math.sin(a) * d * 0.7, r: scale * (0.25 + rng() * 0.25) });
+        }
+      } else if (shapeType === 2) {
+        const n = 4 + Math.floor(rng() * 3);
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2 + rng() * 1.2;
+          const d = scale * (0.1 + rng() * 0.25);
+          puffs.push({ dx: Math.cos(a) * d, dy: Math.sin(a) * d, r: scale * (0.35 + rng() * 0.2) });
+        }
+      } else if (shapeType === 3) {
+        const a = rng() * Math.PI * 0.3 - 0.15;
+        const n = 8 + Math.floor(rng() * 4);
+        for (let i = 0; i < n; i++) {
+          const t = (i / (n - 1)) - 0.5;
+          puffs.push({
+            dx: Math.cos(a) * t * scale * 2.5 + (rng() - 0.5) * scale * 0.15,
+            dy: Math.sin(a) * t * scale * 2.5 + (rng() - 0.5) * scale * 0.25,
+            r: scale * (0.2 + rng() * 0.15) * (1 - Math.abs(t) * 0.6)
+          });
+        }
+      } else {
+        const n = 5 + Math.floor(rng() * 3);
+        for (let i = 0; i < n; i++) {
+          const a = rng() * Math.PI * 2;
+          const d = scale * rng() * 0.6;
+          puffs.push({ dx: Math.cos(a) * d, dy: Math.sin(a) * d * 0.8, r: scale * (0.3 + rng() * 0.4) });
+        }
+      }
+
+      const rot = rng() * Math.PI * 2;
+      const cosR = Math.cos(rot), sinR = Math.sin(rot);
+
+      for (const p of puffs) {
+        const rx = p.dx * cosR - p.dy * sinR;
+        const ry = p.dx * sinR + p.dy * cosR;
+        puff(cx + rx, cy + ry + p.r * 0.18, p.r, '#b0b8c4', opacity * 0.12);
+      }
+      for (const p of puffs) {
+        const rx = p.dx * cosR - p.dy * sinR;
+        const ry = p.dx * sinR + p.dy * cosR;
+        puff(cx + rx, cy + ry, p.r, '#ffffff', opacity * cfg.fogOpacity);
+      }
+      for (let i = 0; i < Math.min(3, puffs.length); i++) {
+        const p = puffs[i];
+        const rx = p.dx * cosR - p.dy * sinR;
+        const ry = p.dx * sinR + p.dy * cosR;
+        puff(cx + rx, cy + ry - p.r * 0.25, p.r * 0.7, '#eef2ff', opacity * 0.25);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Tile clouds in geographic space
+    const startLat = Math.floor((bounds.getSouth() - geoStep * 2) / geoStep) * geoStep;
+    const startLng = Math.floor((bounds.getWest() - geoStep * 2) / geoStep) * geoStep;
+    const endLat = bounds.getNorth() + geoStep * 2;
+    const endLng = bounds.getEast() + geoStep * 2;
+    const cloudScale = Math.max(30, 500 / metersPerPixel);
+
+    for (let glat = startLat; glat <= endLat; glat += geoStep) {
+      const row = Math.round(glat / geoStep);
+      const lngOffset = (row % 2) * geoStep * 0.5;
+      for (let glng = startLng + lngOffset; glng <= endLng; glng += geoStep) {
+        const px = toScreen(glat, glng);
+        const seed = Math.abs(Math.floor(glat * 100000) * 73856093 ^ Math.floor(glng * 100000) * 19349663);
+        const jRng = seededRandom(seed + 7);
+        const jx = px.x + (jRng() - 0.5) * cloudScale * 1.2;
+        const jy = px.y + (jRng() - 0.5) * cloudScale * 1.2;
+
+        const v = cellVisitedness(jx, jy, cloudScale);
+        if (v > 0.6) continue;
+        const opacity = Math.min(1, 1 - v * 1.3);
+        if (opacity <= 0.05) continue;
+
+        const sizeVar = 0.7 + jRng() * 0.8;
+        drawCloud(ctx, jx, jy, cloudScale * sizeVar, opacity, seed);
+      }
+    }
+
+    // ── Step 3: Skyscrapers poking through clouds ──
+    // Draw cartoon building tops above the cloud layer at iconic locations
+    for (const bldg of skyscrapers) {
+      if (bldg.lat < visS || bldg.lat > visN || bldg.lng < visW || bldg.lng > visE) continue;
+      const px = toScreen(bldg.lat, bldg.lng);
+
+      // Scale building top size by height and zoom
+      const bScale = Math.max(3, (bldg.height / 50) / metersPerPixel);
+      if (bScale < 4) continue; // too small to see
+
+      // Only show if area is fogged (unvisited) — that's the whole point
+      const vis = cellVisitedness(px.x, px.y, bScale * 2);
+      if (vis > 0.8) continue; // building is in clear area, map already shows it
+
+      const topW = bScale * 1.2;
+      const topH = bScale * 0.4;
+
+      // Building top face (isometric diamond)
+      ctx.globalAlpha = 0.9;
+      // Top color based on height
+      const hue = (bldg.height / 541) * 280; // 0=warm → 280=cool for tallest
+      ctx.fillStyle = `hsl(${hue}, 70%, 75%)`;
+      ctx.beginPath();
+      ctx.moveTo(px.x, px.y - topH);
+      ctx.lineTo(px.x + topW, px.y);
+      ctx.lineTo(px.x, px.y + topH);
+      ctx.lineTo(px.x - topW, px.y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Outline
+      ctx.strokeStyle = `hsl(${hue}, 50%, 55%)`;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.7;
+      ctx.stroke();
+
+      // Antenna/spire for the tallest
+      if (bldg.height > 400) {
+        ctx.globalAlpha = 0.6;
+        ctx.strokeStyle = `hsl(${hue}, 40%, 60%)`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(px.x, px.y - topH);
+        ctx.lineTo(px.x, px.y - topH - bScale * 0.8);
+        ctx.stroke();
+        // Blinking light
+        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(px.x, px.y - topH - bScale * 0.8, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // Throttled redraw — one frame at a time
+  let fogDirty = false;
+  function requestFogRedraw() {
+    if (!fogDirty) {
+      fogDirty = true;
+      requestAnimationFrame(() => {
+        redrawFog();
+        fogDirty = false;
+      });
+    }
+  }
+  map.on('move', requestFogRedraw);
+  map.on('zoom', requestFogRedraw);
+  map.on('resize', requestFogRedraw);
+  map.on('pitch', requestFogRedraw);
+  map.on('rotate', requestFogRedraw);
+
+  // ─── Coverage Calculation ───────────────────
+  function computeCoverage() {
+    const latStep = COVERAGE_CELL_M / 111320;
+    const lngStep = COVERAGE_CELL_M / (111320 * Math.cos(40.78 * Math.PI / 180));
+    const rows = Math.ceil((MAN_NE[0] - MAN_SW[0]) / latStep);
+    const cols = Math.ceil((MAN_NE[1] - MAN_SW[1]) / lngStep);
+    const visited = new Set();
+    const trailCellR = Math.ceil(cfg.trailRadius / COVERAGE_CELL_M);
+    const stationCellR = Math.ceil(cfg.stationRadius / COVERAGE_CELL_M);
+
+    function markCell(lat, lng, cellRadius) {
+      const cr = Math.floor((lat - MAN_SW[0]) / latStep);
+      const cc = Math.floor((lng - MAN_SW[1]) / lngStep);
+      for (let dr = -cellRadius; dr <= cellRadius; dr++) {
+        for (let dc = -cellRadius; dc <= cellRadius; dc++) {
+          if (dr*dr + dc*dc > cellRadius*cellRadius) continue;
+          const r = cr + dr, c = cc + dc;
+          if (r >= 0 && r < rows && c >= 0 && c < cols) visited.add(r * cols + c);
+        }
+      }
+    }
+
+    for (const trail of fogData.trails) {
+      const pts = trail.points;
+      for (let i = 0; i < pts.length; i += 5) {
+        const p = pts[i];
+        if (p[0] >= MAN_SW[0] && p[0] <= MAN_NE[0] && p[1] >= MAN_SW[1] && p[1] <= MAN_NE[1])
+          markCell(p[0], p[1], trailCellR);
+      }
+    }
+    for (const st of fogData.stations) {
+      if (st.lat >= MAN_SW[0] && st.lat <= MAN_NE[0] && st.lng >= MAN_SW[1] && st.lng <= MAN_NE[1])
+        markCell(st.lat, st.lng, stationCellR);
+    }
+
+    const pct = (visited.size / (rows * cols) * 100).toFixed(1);
+    document.getElementById('coverage-pct').textContent = pct + '%';
+  }
+
+  // ─── Data Loading ───────────────────────────
+  async function loadAllData() {
+    const [stravaData, citiRides, citiRoutes, subwayData, uberData] = await Promise.all([
+      fetch('../strava/data/activities_enriched.json').then(r => r.json()).catch(() => []),
+      fetch('../citibike/data/rides_enriched.json').then(r => r.json()).catch(() => []),
+      fetch('../citibike/data/routes.json').then(r => r.json()).catch(() => ({})),
+      fetch('../subway/data/rides_enriched.json').then(r => r.json()).catch(() => ({ trips: [] })),
+      fetch('../uber/data/rides_enriched.json').then(r => r.json()).catch(() => ({ rides: [] }))
+    ]);
+
+    let stravaCount = 0;
+    for (const activity of stravaData) {
+      if (activity.latlng && activity.latlng.length > 0) {
+        fogData.trails.push({ points: activity.latlng });
+        stravaCount++;
+      }
+    }
+    stats.runs = stravaCount;
+
+    let bikeCount = 0;
+    for (const ride of citiRides) {
+      const key = ride.startStation + '|' + ride.endStation;
+      const route = citiRoutes[key];
+      if (route && route.coordinates && route.coordinates.length > 0) {
+        const points = route.coordinates.map(c => [c[1], c[0]]);
+        fogData.trails.push({ points });
+        bikeCount++;
+      }
+    }
+    stats.bikes = bikeCount;
+
+    let subwayCount = 0;
+    for (const trip of (subwayData.trips || [])) {
+      for (const leg of (trip.legs || [])) {
+        if (leg.entryLat && leg.entryLon) fogData.stations.push({ lat: leg.entryLat, lng: leg.entryLon });
+        if (leg.exitLat && leg.exitLon) fogData.stations.push({ lat: leg.exitLat, lng: leg.exitLon });
+      }
+      subwayCount++;
+    }
+    stats.subway = subwayCount;
+
+    let uberCount = 0;
+    for (const ride of (uberData.rides || [])) {
+      if (ride.city !== 'New York City') continue;
+      if (ride.startLat && ride.startLon) fogData.stations.push({ lat: ride.startLat, lng: ride.startLon });
+      if (ride.endLat && ride.endLon) fogData.stations.push({ lat: ride.endLat, lng: ride.endLon });
+      uberCount++;
+    }
+    stats.uber = uberCount;
+
+    document.getElementById('stat-runs').textContent = stats.runs;
+    document.getElementById('stat-bikes').textContent = stats.bikes;
+    document.getElementById('stat-subway').textContent = stats.subway;
+    document.getElementById('stat-uber').textContent = stats.uber;
+    document.getElementById('stat-total').textContent = stats.runs + stats.bikes + stats.subway + stats.uber;
+
+    redrawFog();
+    computeCoverage();
+    document.getElementById('loading').classList.add('hidden');
+  }
+
+  // ─── Config Panel ───────────────────────────
+  document.getElementById('configToggle').addEventListener('click', () => {
+    document.getElementById('configBody').classList.toggle('open');
+    document.getElementById('configArrow').classList.toggle('open');
+  });
+
+  function bindSlider(id, configKey, suffix, transform) {
+    const slider = document.getElementById(id);
+    const valEl = document.getElementById(id + 'Val');
+    slider.addEventListener('input', () => {
+      const v = transform ? transform(slider.value) : parseFloat(slider.value);
+      cfg[configKey] = v;
+      valEl.textContent = suffix === 'm' ? Math.round(v) + 'm' : v.toFixed(2);
+      redrawFog();
+      computeCoverage();
+    });
+  }
+
+  bindSlider('trailRadius', 'trailRadius', 'm');
+  bindSlider('stationRadius', 'stationRadius', 'm');
+  bindSlider('fogOpacity', 'fogOpacity', '', parseFloat);
+
+})();
+</script>
+</body>
+</html>
