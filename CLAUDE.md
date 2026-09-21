@@ -22,7 +22,7 @@ Write production-quality code. Follow existing patterns. Ship working features. 
 
 ### What We're Building
 
-A personal activity dashboard for visualizing life data. Live with CitiBike (318 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), Books (Goodreads library), and Subway (9 trips detected from GPS). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
+A personal activity dashboard for visualizing life data. Live with CitiBike (489 rides), Strava (85 runs, 391 miles), Uber (220 rides, $7.7K spent, 23 cities), Apple Watch heart rate (508K readings, 4.5 years), Books (Goodreads library), and Subway (9 trips detected from GPS). This is a personal site for showing friends — not public-facing. Strava data auto-syncs daily.
 
 ### The Bigger Vision: Burrow
 
@@ -40,12 +40,12 @@ The name is a double entendre — Borough + burrow. *Breadth yields depth. By fa
 
 **Long-term vision:** A native iOS app. Just allow location access and your fog lifts automatically, regardless of transportation mode. No Overland, no CSV exports, no data pipelines. Universal. Every city. But NYC is the perfect proving ground — the density makes coverage meaningful, and New Yorkers are obsessively proud of knowing their city.
 
-**Current state:** Web prototype using existing dashboard data (Strava GPS traces, CitiBike OSRM routes, Uber start/end points, Subway station locations). Proof of concept that the visual works and the mechanic hits emotionally.
+**Current state:** Web prototype live at willhofner.com. Native iOS app in active development — building toward first TestFlight build. Goal: background location tracking + real-time fog-of-war, no data exports needed.
 
 ### Tech Stack
 
 - **Frontend**: Vanilla HTML/CSS/JS (no build tools, no frameworks)
-- **Maps**: Leaflet.js with CartoDB dark tiles
+- **Maps**: Leaflet.js with OpenStreetMap tiles inverted to dark via a CSS filter on `.leaflet-tile-pane` (switched from CartoDB dark tiles on 2026-09-20 when Carto began requiring an API key). Burrow 3D uses MapLibre + OpenFreeMap vector tiles.
 - **Charts**: Chart.js
 - **Heatmaps**: Leaflet.heat
 - **Routing**: OSRM (Open Source Routing Machine) for estimated bike/driving routes
@@ -68,12 +68,14 @@ citibike-bot/
 │   ├── index.html              # HofBikes dashboard (stats, maps, charts, rankings)
 │   ├── explore.html            # HofBikes ride explorer (animated bike routes)
 │   ├── download_rides.js       # Browser console script to export rides from CitiBike account
+│   ├── merge_rides.py          # Merge a new export into a fresh dated raw file (dedupes by rideId)
+│   ├── build_pages.py          # Bake rides_enriched.json + routes.json into index.html / explore.html + landing card
 │   ├── parse_rides.py          # Raw JSON → enriched JSON processor
 │   ├── fetch_routes.py         # OSRM bike route fetcher for station pairs
 │   └── data/
-│       ├── citibike_rides_2026-02-27.json   # Raw ride data from GraphQL export (318 rides)
+│       ├── citibike_rides_2026-09-20.json   # Raw ride data from GraphQL export (489 rides, newest file wins)
 │       ├── rides_enriched.json              # Processed rides with coordinates + metadata
-│       ├── routes.json                      # OSRM bike routes for 74 unique station pairs
+│       ├── routes.json                      # OSRM bike routes for 125 unique station pairs
 │       └── station_coords.json              # Station name → lat/lon mapping from GBFS
 ├── strava/
 │   ├── index.html              # HofRuns run explorer (animated routes, heatmap, timelapse)
@@ -84,6 +86,7 @@ citibike-bot/
 │   ├── update_strava.sh        # Full pipeline: fetch → build → commit + push
 │   └── data/
 │       ├── .strava_tokens.json          # OAuth tokens (gitignored)
+│       ├── .strava_secrets.json         # Client ID + secret (gitignored, read by fetch_activities.py)
 │       ├── activities_raw.json          # Raw API response (gitignored)
 │       └── activities_enriched.json     # Processed data for dashboard
 ├── uber/
@@ -124,7 +127,19 @@ citibike-bot/
 │       ├── rides_enriched.json          # Detected subway rides with station data
 │       └── *.csv                        # OMNY exports from omny.info (gitignored)
 ├── burrow/
-│   └── index.html              # Burrow — fog-of-war city explorer (unified map, all modes)
+│   ├── index.html              # Burrow — fog-of-war city explorer (unified map, all modes)
+│   └── Burrow/                 # Native iOS app (SwiftUI + MapKit + Core Location)
+│       ├── Burrow.xcodeproj/   # Xcode project
+│       ├── Burrow/             # App source
+│       │   ├── BurrowApp.swift         # App entry point
+│       │   ├── LocationManager.swift   # Core Location manager (background tracking)
+│       │   ├── LocationStore.swift     # SwiftData persistence for coordinates
+│       │   ├── FogOverlay.swift        # Custom MKOverlay for fog rendering
+│       │   ├── FogOverlayRenderer.swift # Core Graphics fog renderer (draws fog + clips holes)
+│       │   ├── MapView.swift           # UIViewRepresentable wrapping MKMapView
+│       │   ├── ContentView.swift       # Main SwiftUI view (map + coverage %)
+│       │   └── Assets.xcassets/        # App icons and colors
+│       └── Info.plist                  # Privacy descriptions + background modes
 └── references/
     ├── index_redesign.html     # Landing page redesign draft
     ├── tweet_animation/
@@ -169,15 +184,19 @@ citibike-bot/
    - `download_rides.js`: Browser console script that hits CitiBike's GraphQL API to export all rides as JSON
    - `parse_rides.py`: Enriches rides with station coordinates (from GBFS), computes metadata
    - `fetch_routes.py`: Fetches OSRM bike routes for all unique station pairs
+   - `merge_rides.py`: Merges a fresh export into a new dated raw file, deduping by `rideId`
+   - `build_pages.py`: Bakes enriched rides + routes into both HTML pages and refreshes the landing card stats. **Run after every data refresh** — the pages do not fetch JSON at runtime.
    - Data source: GraphQL endpoint `account.citibikenyc.com/bikesharefe-gql` (no official API exists)
+   - Refresh flow (2026-09-20): log into account.citibikenyc.com/ride-history, run the export logic with a cutoff of the newest known `startTimeMs`, then `merge_rides.py new.json` → `parse_rides.py` → `fetch_routes.py` → `build_pages.py`
+   - Known gotcha: the GraphQL list endpoint returns the cursor ride again on the next page, so exports contain duplicates. The original 2026-02-27 export had 31 duplicate rides (318 entries, 287 unique). Always dedupe by `rideId`.
 
 ### Key Stats
 
-- 318 rides, Sep 2024 — Dec 2025
-- $669.26 total spent, 35.1 hours on bikes
-- 50 unique stations, 74 unique routes
-- 62% ebike rides
-- Home base: Lafayette St & E 8 St (134 starts)
+- 489 rides, Sep 2024 — Sep 2026 (refreshed 2026-09-20)
+- $640.47 total spent, 57.1 hours on bikes
+- 80 unique stations, 125 unique routes
+- 39% ebike rides (2026 is almost all classic: 16 ebike of 202)
+- Home bases: Cooper Square & Astor Pl (129 starts), Lafayette St & E 8 St (128), Broadway & E 19 St (120)
 
 ### Data Formats
 
@@ -235,6 +254,7 @@ citibike-bot/
 2. **Data Pipeline**
    - `fetch_activities.py`: OAuth2 flow + Strava API pull (supports `--incremental` and `--full`)
    - Tokens cached in `.strava_tokens.json` (auto-refresh, no browser needed after first auth)
+   - Client secret lives in `strava/data/.strava_secrets.json` (gitignored) or the `STRAVA_CLIENT_SECRET` env var. It was hardcoded in `fetch_activities.py` and committed to the public repo until 2026-09-20; that secret must be treated as burned and rotated when the Strava app is recreated.
    - `build_dashboard.py`: builds static HTML with data baked in
    - `update_strava.sh`: full pipeline script (fetch → build → commit + push)
 
@@ -246,6 +266,7 @@ citibike-bot/
 
 ### Strava API Setup
 
+- **Status (2026-09-20)**: Strava set app 206236 to **Inactive**. Every API call returns 403 `Application Status: Inactive` even with a valid refreshed token. Both the launchd job and the GitHub Action have failed nightly since 2026-08-18; last successful sync was 2026-06-27. Fix: reactivate or recreate the app at strava.com/settings/api, then update `.strava_secrets.json` locally and the `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` / `STRAVA_REFRESH_TOKEN` GitHub secrets.
 - **App ID**: 206236
 - **OAuth callback**: `http://localhost:8888/callback`
 - **Scopes**: `read,activity:read_all`
@@ -492,10 +513,11 @@ citibike-bot/
 
 ### Key Stats
 
-- 5 trips, 6 legs
+- 15 trips, 17 legs (re-parsed 2026-09-20 from 14 GPS days)
 - Lines: 6, 4/5, R/W
-- Key stations: Astor Place, Union Sq, Brooklyn Bridge-City Hall, Grand Central, Canal St
-- Date range: Mar 30 — Apr 2, 2026
+- Key stations: Astor Place, Union Sq, 8th St-NYU, Canal St, Grand Central
+- Date range: Mar 30 — May 30, 2026
+- GPS collection: Overland stopped posting after 2026-05-31 (52,648 points across 14 days on Railway). The app needs to be re-enabled on the phone for new data.
 
 ### GPS Detection Methodology
 
@@ -611,6 +633,134 @@ The web prototype proves the visual. The real product is a native app where you 
 
 ---
 
+## Burrow iOS App
+
+### Status: Active Development (April 2026)
+
+Building the native iOS app — the "North Star" described above. Web prototype proved the visual works. Now shipping a TestFlight MVP so the founder can dog-food real-time fog-of-war exploration on his phone.
+
+### MVP Scope (TestFlight v0.1)
+
+The app does exactly three things:
+1. **Collects location in the background** — even when the app is closed or phone is locked
+2. **Stores every coordinate locally on-device** — no server, no accounts, no syncing
+3. **Renders the fog map with defogged trails** — when you open the app, you see where you've been
+
+That's it. No historical data import, no transportation mode detection, no social features. Just your phone, your GPS, your map.
+
+### Tech Stack
+
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| **UI** | SwiftUI | Fastest path for a one-person team |
+| **Maps** | MapKit (`MKMapView` via `UIViewRepresentable`) | Native performance, dark map style built-in, proper overlay system for fog rendering |
+| **Location** | Core Location (`CLLocationManager`) | `allowsBackgroundLocationUpdates` + "Always" authorization = GPS points even when app is killed |
+| **Persistence** | SwiftData | On-device storage for location coordinates. Simple model, no server needed |
+| **Fog rendering** | Core Graphics in custom `MKOverlayRenderer` | Draw filled fog rect, then `CGContext.clear()` circles/trails along the path. Same concept as web canvas clipping, different API |
+
+**Why not MapboxGL or Leaflet in a WebView?** Native MapKit gets smoother performance, proper background location permission UX, and App Store reviewers won't flag it. WebView-based maps in a native shell creates friction with background location justification.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│  ContentView (SwiftUI)                      │
+│  ┌─────────────────────────────────────┐    │
+│  │  MapView (UIViewRepresentable)      │    │
+│  │  ┌───────────────────────────────┐  │    │
+│  │  │  MKMapView                    │  │    │
+│  │  │  + FogOverlay (MKOverlay)     │  │    │
+│  │  │  + FogOverlayRenderer         │  │    │
+│  │  └───────────────────────────────┘  │    │
+│  └─────────────────────────────────────┘    │
+│  Coverage: 2.3% of Manhattan                │
+└─────────────────────────────────────────────┘
+        │                       │
+        ▼                       ▼
+┌──────────────┐    ┌──────────────────────┐
+│ LocationManager │  │ LocationStore        │
+│ (Core Location) │  │ (SwiftData)          │
+│ - Always auth   │  │ - LocationPoint model│
+│ - Background    │  │ - lat, lon, timestamp│
+│   updates       │  │ - accuracy           │
+│ - Significant   │  │                      │
+│   change monitor│  │ Coverage calculator  │
+└──────────────┘    │ - 50m grid cells     │
+                    │ - Manhattan boundary  │
+                    └──────────────────────┘
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `BurrowApp.swift` | App entry point, SwiftData container setup |
+| `LocationManager.swift` | `CLLocationManager` wrapper — requests "Always" permission, receives background updates, feeds locations to store |
+| `LocationStore.swift` | SwiftData `@Model` for `LocationPoint` (lat, lon, timestamp, accuracy). Query interface for fog rendering |
+| `FogOverlay.swift` | `MKOverlay` subclass — defines the overlay's bounding rect (all of NYC) |
+| `FogOverlayRenderer.swift` | `MKOverlayRenderer` subclass — Core Graphics rendering: fill fog, clip circles along stored paths |
+| `MapView.swift` | `UIViewRepresentable` wrapping `MKMapView` — needed because SwiftUI's `Map` doesn't support custom overlay renderers |
+| `ContentView.swift` | Main view — full-screen map + coverage % label overlay |
+| `Info.plist` | `NSLocationAlwaysAndWhenInUseUsageDescription`, `NSLocationWhenInUseUsageDescription`, `UIBackgroundModes: [location]` |
+
+### Location Permission Flow
+
+Apple's "Always" location permission is a two-step process:
+
+1. **First ask** → user sees "Allow While Using App" / "Allow Once" / "Don't Allow" (no "Always" option)
+2. **After granting "While Using"** → system prompts again later to upgrade to "Always"
+3. Can trigger the upgrade prompt programmatically after initial grant
+
+For TestFlight, testers will grant it. For App Store eventually, need to demonstrate value first — show the fog, let them walk with "While Using", then pitch the upgrade.
+
+### Privacy Strings
+
+```
+NSLocationAlwaysAndWhenInUseUsageDescription:
+"Burrow tracks your location to reveal the parts of the city you've explored, even when the app is closed."
+
+NSLocationWhenInUseUsageDescription:
+"Burrow uses your location to show where you are on the map and lift the fog as you explore."
+```
+
+### Defogging Rules (MVP)
+
+For the native app, every GPS point defogs the same way — no transportation mode detection needed:
+
+| What | How | Radius |
+|------|-----|--------|
+| **Every GPS point** | Circle cleared around coordinate | 80m (one block each side) |
+| **Connected points** | Trail cleared between consecutive points within 5 min | 80m wide trail |
+| **Stale gaps** | Points >5 min apart = separate circles, no connecting trail | Prevents false trails across subway rides or drives |
+
+This is simpler than the web version's per-mode rules. The native app doesn't know *how* you traveled — it just knows *where you were*. And that's fine for MVP. The shape of your path emerges naturally from GPS density.
+
+### Coverage Calculation
+
+- **Grid**: ~50m cells overlaid on Manhattan (same as web prototype)
+- **Manhattan boundary**: Polygon defining the borough outline
+- **Coverage %**: cells with ≥1 GPS point / total cells within boundary
+- **Future**: Brooklyn toggle (re-center map, different boundary polygon), global view
+
+### TestFlight Deployment
+
+1. **Prerequisites**: Apple Developer account ($99/year), Xcode, valid provisioning profile with Background Modes (Location) entitlement
+2. **Build**: Archive in Xcode (Product → Archive)
+3. **Upload**: Send to App Store Connect via Xcode organizer
+4. **Review**: Apple reviews TestFlight builds (usually <24 hours)
+5. **Install**: Add testers in App Store Connect → install via TestFlight app
+
+### Future iOS Features (Post-MVP)
+
+- **Historical data import**: Pull in web prototype data (Strava GPS traces, CitiBike routes, etc.) to seed the map
+- **Borough toggle**: Brooklyn, Queens, Bronx, Staten Island — each with its own coverage %
+- **Global mode**: Full globe covered in fog, defog as you travel anywhere
+- **Transportation mode detection**: Use `CMMotionActivityManager` to detect walking/running/cycling/driving
+- **Exploration streaks**: Consecutive days with new coverage
+- **Share card**: Screenshot-ready view of your fog map for sharing
+
+---
+
 ## Landing Page
 
 The landing page (`index.html`) has two sections:
@@ -646,6 +796,9 @@ The landing page (`index.html`) has two sections:
 | Overland not sending data | Token mismatch or endpoint URL wrong | Check Overland app endpoint URL includes `?token=...`; verify Railway service is running |
 | Railway GPS data lost on redeploy | Volume not mounted | Ensure Railway volume is mounted at `/data` in service settings |
 | GPS data not pulling locally | Env vars not set | Run with `RECEIVER_URL=... RECEIVER_TOKEN=... python3 subway/pull_gps.py` |
+| Map tiles look wrong / light | Tile pane CSS filter missing or provider changed | All Leaflet pages use `tile.openstreetmap.org` with `invert(1) hue-rotate(180deg)` filter for dark; Burrow flat uses the same tiles unfiltered (light) |
+| Strava sync 403 on every call | Strava app set to Inactive | See Strava API Setup — reactivate/recreate the app and rotate the secret |
+| CitiBike ride count too high | GraphQL pagination repeats the cursor ride on each page | `merge_rides.py` dedupes by `rideId`; never trust raw export counts |
 
 ---
 

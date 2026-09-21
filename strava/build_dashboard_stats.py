@@ -417,7 +417,7 @@ def build_html(data_json, stats_json):
 
   /* Leaflet overrides */
   .leaflet-container {{ background: #0a0a0f; }}
-  .leaflet-tile-pane {{ filter: saturate(0.5) brightness(1.5) contrast(1.05); }}
+  .leaflet-tile-pane {{ filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.8) contrast(1.05); }}
 </style>
 </head>
 <body>
@@ -622,7 +622,7 @@ function renderRouteMap() {{
 
   L.control.zoom({{ position: "topright" }}).addTo(map);
 
-  L.tileLayer("https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png", {{
+  L.tileLayer("https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
     maxZoom: 19
   }}).addTo(map);
 
@@ -656,7 +656,7 @@ function renderHeatMap() {{
 
   L.control.zoom({{ position: "topright" }}).addTo(map);
 
-  L.tileLayer("https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png", {{
+  L.tileLayer("https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
     maxZoom: 19
   }}).addTo(map);
 

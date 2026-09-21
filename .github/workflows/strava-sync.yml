@@ -61,6 +61,9 @@ jobs:
           echo "Created tokens file from secret."
 
       - name: Fetch activities (incremental)
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
         run: python3 strava/fetch_activities.py
 
       - name: Build dashboard HTML

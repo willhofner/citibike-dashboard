@@ -10,6 +10,7 @@ books/data/Goodreads_Library.csv
 
 # Strava secrets and logs
 strava/data/.strava_tokens.json
+strava/data/.strava_secrets.json
 strava/data/activities_raw.json
 strava/data/.update.log
 strava/data/.launchd_stdout.log
@@ -26,3 +27,6 @@ thoughts.md
 
 # Burrow UI evolution screenshots
 burrow/screenshots/
+
+# Node
+node_modules/

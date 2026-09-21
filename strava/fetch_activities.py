@@ -22,8 +22,15 @@ from urllib.parse import urlparse, parse_qs
 import requests
 
 # ── Config ──────────────────────────────────────────────────────────────────
-CLIENT_ID = "206236"
-CLIENT_SECRET = "0b1f866f9080597ae8f5edf97763ad8dc70b3fa0"
+CLIENT_ID = os.environ.get("STRAVA_CLIENT_ID", "206236")
+# Never hardcode the secret. Read from env (GitHub Actions) or a gitignored file (local).
+_SECRETS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", ".strava_secrets.json")
+CLIENT_SECRET = os.environ.get("STRAVA_CLIENT_SECRET", "")
+if not CLIENT_SECRET and os.path.exists(_SECRETS_FILE):
+    with open(_SECRETS_FILE) as _f:
+        CLIENT_SECRET = json.load(_f).get("client_secret", "")
+if not CLIENT_SECRET:
+    sys.exit("Missing Strava client secret: set STRAVA_CLIENT_SECRET or create strava/data/.strava_secrets.json")
 REDIRECT_URI = "http://localhost:8888/callback"
 SCOPES = "read,activity:read_all"
 

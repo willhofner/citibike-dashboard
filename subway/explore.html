@@ -228,7 +228,7 @@
     height: 100vh;
   }
   #rideMap { height: 100%; width: 100%; }
-  .leaflet-tile-pane { filter: saturate(0.5) brightness(1.5) contrast(1.05); }
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.8) contrast(1.05); }
 
   .ride-detail-overlay {
     position: absolute;
@@ -397,9 +397,8 @@ const map = L.map('rideMap', {
   zoomControl: true
 });
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-  subdomains: 'abcd',
   maxZoom: 19
 }).addTo(map);
 

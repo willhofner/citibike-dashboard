@@ -4,7 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "npx serve . -l $PORT",
-    "restartPolicyType": "ON_FAILURE"
+    "startCommand": "node server.js",
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckPath": "/healthz"
   }
 }
