@@ -7,6 +7,8 @@
 // Local: SITE_USER=me SITE_PASS=secret PORT=8787 node server.js
 
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const handler = require("serve-handler");
 
 const PORT = process.env.PORT || 3000;
@@ -23,9 +25,20 @@ function authorized(req) {
   return decoded.slice(0, idx) === USER && decoded.slice(idx + 1) === PASS;
 }
 
+// Paths that live in the repo but are not part of the site.
+const HIDDEN = /^\/(\.|node_modules(\/|$)|server\.js$|package(-lock)?\.json$|railway\.json$|CLAUDE\.md$|ROADMAP\.md$|thoughts\.md$|references(\/|$))/;
+
+function notFound(res) {
+  res.writeHead(404, { "Content-Type": "text/plain" });
+  res.end("Not found");
+}
+
 const server = http.createServer((req, res) => {
+  const url = new URL(req.url, "http://localhost");
+  let pathname = decodeURIComponent(url.pathname);
+
   // Cheap health check for Railway, never gated.
-  if (req.url === "/healthz") {
+  if (pathname === "/healthz") {
     res.writeHead(200, { "Content-Type": "text/plain" });
     return res.end("ok");
   }
@@ -37,11 +50,21 @@ const server = http.createServer((req, res) => {
     });
     return res.end("This site is private.");
   }
-  return handler(req, res, {
-    public: __dirname,
-    cleanUrls: false,
-    headers: [{ source: "**/*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }],
-  });
+  if (HIDDEN.test(pathname) || pathname.includes("..")) return notFound(res);
+
+  // Resolve directory requests to their index.html ourselves; never list directories.
+  const abs = path.join(__dirname, pathname);
+  if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) {
+    if (!pathname.endsWith("/")) {
+      res.writeHead(301, { Location: pathname + "/" + url.search });
+      return res.end();
+    }
+    if (!fs.existsSync(path.join(abs, "index.html"))) return notFound(res);
+    req.url = pathname + "index.html" + url.search;
+  }
+
+  res.setHeader("X-Robots-Tag", "noindex, nofollow");
+  return handler(req, res, { public: __dirname, cleanUrls: false, directoryListing: false });
 });
 
 server.listen(PORT, () => {
