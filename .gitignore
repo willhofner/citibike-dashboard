@@ -30,3 +30,4 @@ burrow/screenshots/
 
 # Node
 node_modules/
+strava/data/web_export_*.json

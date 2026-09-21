@@ -84,7 +84,8 @@ citibike-bot/
 │   ├── fetch_activities.py     # OAuth + Strava API data fetcher (supports --incremental)
 │   ├── build_dashboard.py      # Builds static HTML with baked-in data
 │   ├── build_dashboard_stats.py # Builds dashboard stats
-│   ├── update_strava.sh        # Full pipeline: fetch → build → commit + push
+│   ├── update_strava.sh        # Full pipeline: fetch → build → commit + push (API path, dead while the app is inactive)
+│   ├── ingest_web.py           # Merge a website-session export (no API) into activities_enriched.json
 │   └── data/
 │       ├── .strava_tokens.json          # OAuth tokens (gitignored)
 │       ├── .strava_secrets.json         # Client ID + secret (gitignored, read by fetch_activities.py)
@@ -269,7 +270,18 @@ citibike-bot/
 
 ### Strava API Setup
 
-- **Status (2026-09-20)**: Strava set app 206236 to **Inactive**. Every API call returns 403 `Application Status: Inactive` even with a valid refreshed token. Both the launchd job and the GitHub Action have failed nightly since 2026-08-18; last successful sync was 2026-06-27. Fix: reactivate or recreate the app at strava.com/settings/api, then update `.strava_secrets.json` locally and the `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` / `STRAVA_REFRESH_TOKEN` GitHub secrets.
+- **Status (2026-09-20)**: Strava set app 206236 to **Inactive** and now gates API access behind a paid subscription ("API access is subscriber-only"). Every API call returns 403. The nightly launchd job and GitHub Action have failed since 2026-08-18. Will does not want the subscription for this, so **the API path is retired** in favor of the website-session path below. Last API sync: 2026-06-28.
+
+### Website-session refresh (current path, no API, no subscription)
+
+Strava's own site endpoints answer with a logged-in browser session:
+- `GET /athlete/training_activities?page=N&per_page=20` — activity list (`start_date_local_raw`, `distance_raw`, `moving_time_raw`, `elevation_gain_raw`, `sport_type`)
+- `GET /activities/<id>/streams?stream_types[]=latlng&stream_types[]=time&stream_types[]=heartrate&stream_types[]=distance&stream_types[]=altitude&stream_types[]=velocity_smooth` — full streams (HR only when the recording had it)
+- `GET /activities/<id>` HTML — calories are scraped from the stats table
+
+Flow: log into strava.com in a browser, run the collector (page through the list until `start_date_local_raw` reaches the newest known activity, then fetch streams per activity, ~0.5s apart), save the payload as `strava/data/web_export_<date>.json` (gitignored), then `python3 strava/ingest_web.py <file>` → `build_dashboard.py` → `build_dashboard_stats.py` → update the landing HofRuns card. `ingest_web.py` encodes the polyline itself, derives per-mile splits and best efforts from the distance/time streams, and never overwrites a record the API produced (those carry gear and official splits). Records from this path have `"source": "strava-web"`.
+
+First web refresh 2026-09-20: 27 new runs since June 28 → 234 activities, 144 runs, 663 mi.
 - **App ID**: 206236
 - **OAuth callback**: `http://localhost:8888/callback`
 - **Scopes**: `read,activity:read_all`
@@ -278,11 +290,11 @@ citibike-bot/
 
 ### Key Stats
 
-- 175 total activities (85 runs, 74 rides, 10 weight training, 5 hikes, 1 walk)
-- 391 miles total running distance
-- 4.6 mi average run, 18.5 mi longest run (NYRR 18M)
-- Date range: Apr 2021 — Mar 2026
-- All 85 runs have GPS routes (latlng streams) and polylines
+- 234 total activities, 144 runs (refreshed 2026-09-20 via the website session)
+- 663 miles total running distance, 109.4 hours
+- 4.6 mi average run, 18.5 mi longest run (NYRR 18M), 9:53/mi average pace
+- Date range: Apr 2021 — Sep 2026
+- All runs have GPS routes (latlng streams) and polylines
 
 ### Data Format
 
@@ -802,7 +814,7 @@ The landing page (`index.html`) has two sections:
 | Railway GPS data lost on redeploy | Volume not mounted | Ensure Railway volume is mounted at `/data` in service settings |
 | GPS data not pulling locally | Env vars not set | Run with `RECEIVER_URL=... RECEIVER_TOKEN=... python3 subway/pull_gps.py` |
 | Map tiles look wrong / light | Tile pane CSS filter missing or provider changed | All Leaflet pages use `tile.openstreetmap.org` with `invert(1) hue-rotate(180deg)` filter for dark; Burrow flat uses the same tiles unfiltered (light) |
-| Strava sync 403 on every call | Strava app set to Inactive | See Strava API Setup — reactivate/recreate the app and rotate the secret |
+| Strava sync 403 on every call | Strava app Inactive; API is now subscriber-only | Use the website-session refresh (Strava section). Do not pay for the API |
 | CitiBike ride count too high | GraphQL pagination repeats the cursor ride on each page | `merge_rides.py` dedupes by `rideId`; never trust raw export counts |
 
 ---
