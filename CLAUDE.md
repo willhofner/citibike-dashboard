@@ -62,8 +62,9 @@ citibike-bot/
 ├── CLAUDE.md                   # Project context (you are here)
 ├── ROADMAP.md                  # Product roadmap
 ├── .gitignore
-├── package.json                # Minimal config (Railway deploy)
-├── railway.json                # Railway deployment config
+├── package.json                # Node deps (serve-handler) + `npm start`
+├── server.js                   # Static server with optional HTTP Basic Auth gate (SITE_USER / SITE_PASS env)
+├── railway.json                # Railway deployment config (start: node server.js, healthcheck /healthz)
 ├── citibike/
 │   ├── index.html              # HofBikes dashboard (stats, maps, charts, rankings)
 │   ├── explore.html            # HofBikes ride explorer (animated bike routes)
@@ -151,6 +152,8 @@ citibike-bot/
 ## Key Architecture Decisions
 
 - **Static JSON, no server**: Explorers fetch enriched JSON at runtime via `fetch()`. Dashboards have data baked in at build time via Python. No backend needed.
+- **Password gate (2026-09-20)**: `server.js` serves the static tree and, when `SITE_USER` and `SITE_PASS` are set on the Railway service, requires HTTP Basic Auth on every path except `/healthz`. With the variables unset the site is open, so a deploy can never lock anyone out. It also sends `X-Robots-Tag: noindex`. Rationale: the site publishes home-adjacent GPS traces and addresses; it is meant for friends, not the open web.
+- **One Strava sync path**: the GitHub Action is the source of truth. The local launchd job committed the same files separately from April to June 2026 and its pushes stopped landing, which forced a manual merge on 2026-09-20. Unload the launchd agent (`launchctl unload ~/Library/LaunchAgents/com.hofner.strava-update.plist`) or expect the histories to diverge again.
 - **Routes are pre-fetched**: OSRM routes are fetched once and stored in `routes.json` files. HTML files reference this cached data.
 - **No build system**: Everything is static files. Python scripts are used for one-time data processing, not as a runtime dependency.
 - **Incremental sync for Strava**: `fetch_activities.py` defaults to incremental mode — uses Strava's `after` param to only fetch new activities since last sync, then merges into existing data.
@@ -792,7 +795,9 @@ The landing page (`index.html`) has two sections:
 | OSRM routing fails | Rate limiting or API down | Add delays, check `router.project-osrm.org` status |
 | Strava token refresh fails | App deauthorized or tokens corrupted | Delete `.strava_tokens.json`, re-run `fetch_activities.py` (will open browser for re-auth) |
 | Strava daily sync not running | launchd agent unloaded or laptop off | `launchctl list \| grep hofner` to check; `launchctl load ~/Library/LaunchAgents/com.hofner.strava-update.plist` to reload |
-| Landing page stats stale | Stats in `index.html` are hardcoded | Manually update the card stat values after a sync (not yet automated) |
+| Landing page stats stale | Stats in `index.html` are hardcoded | HofBikes card is updated by `citibike/build_pages.py`; the others still need manual edits |
+| Site asks for a password | `SITE_USER` / `SITE_PASS` are set on Railway | Intended. Remove the variables to open the site |
+| `git push` rejected (non-fast-forward) | launchd and the GitHub Action both committed Strava data | Merge and take the union of activities; keep only the Action running |
 | Overland not sending data | Token mismatch or endpoint URL wrong | Check Overland app endpoint URL includes `?token=...`; verify Railway service is running |
 | Railway GPS data lost on redeploy | Volume not mounted | Ensure Railway volume is mounted at `/data` in service settings |
 | GPS data not pulling locally | Env vars not set | Run with `RECEIVER_URL=... RECEIVER_TOKEN=... python3 subway/pull_gps.py` |
