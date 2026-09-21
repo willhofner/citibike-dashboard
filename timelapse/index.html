@@ -207,6 +207,10 @@ function frame(now) {
   if (lastFrame == null) lastFrame = now;
   const dt = (now - lastFrame) / 1000; lastFrame = now;
   clock = Math.min(t1, clock + dt * daysPerSec * DAY);
+  // Skip quiet stretches: nothing drawing and the next trip is more than 10 days away.
+  if (active.length === 0 && nextIdx < EVENTS.length && EVENTS[nextIdx].t - clock > 10 * DAY) {
+    clock = EVENTS[nextIdx].t - 2 * DAY;
+  }
   // start every event whose time has arrived
   while (nextIdx < EVENTS.length && EVENTS[nextIdx].t <= clock) {
     startActive(EVENTS[nextIdx], now); nextIdx++;
@@ -220,10 +224,11 @@ function frame(now) {
 function setPlaying(on) {
   playing = on; lastFrame = null;
   document.getElementById('play').textContent = on ? '❚❚ Pause' : '▶ Play';
-  if (on) {
-    if (clock >= t1) seek(t0);
-    requestAnimationFrame(frame);
-  }
+  if (on) requestAnimationFrame(frame);
+}
+function togglePlay() {
+  if (!playing && clock >= t1) seek(t0);   // pressing play at the end starts over
+  setPlaying(!playing);
 }
 
 // Jump the clock: everything before it becomes a finished trace, nothing is mid-draw.
@@ -241,7 +246,7 @@ function seek(ts) {
 }
 
 // ── Controls ──
-document.getElementById('play').onclick = () => setPlaying(!playing);
+document.getElementById('play').onclick = togglePlay;
 document.getElementById('restart').onclick = () => { setPlaying(false); seek(t0); };
 function setSpeed(i) {
   daysPerSec = SPEEDS[Math.max(0, Math.min(SPEEDS.length - 1, i))];
@@ -258,13 +263,13 @@ document.querySelectorAll('.counter').forEach(el => el.addEventListener('click',
 }));
 document.addEventListener('keydown', ev => {
   if (ev.target.tagName === 'INPUT') return;
-  if (ev.code === 'Space') { ev.preventDefault(); setPlaying(!playing); }
+  if (ev.code === 'Space') { ev.preventDefault(); togglePlay(); }
   if (ev.code === 'ArrowRight') { const was = playing; playing = false; seek(clock + DAY); if (was) setPlaying(true); }
   if (ev.code === 'ArrowLeft') { const was = playing; playing = false; seek(clock - DAY); if (was) setPlaying(true); }
   if (ev.key === '+' || ev.key === '=') setSpeed(SPEEDS.indexOf(daysPerSec) + 1);
   if (ev.key === '-') setSpeed(SPEEDS.indexOf(daysPerSec) - 1);
 });
-setSpeed(2);
+setSpeed(5);
 </script>
 </body>
 </html>
