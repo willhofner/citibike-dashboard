@@ -85,7 +85,7 @@ Turn Strava run data into a marathon training companion. NYC Marathon is Novembe
 
 ---
 
-## 8. Unified Animation
+## 8. Unified Animation — DONE 2026-09-20 as HofLapse (`timelapse/index.html`)
 One map, all transport modes, playing chronologically. The demo piece.
 
 - Timeline scrubber: watch a day/week/month play out

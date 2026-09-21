@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HofLapse — Timelapse</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e; --text: #e0e0e8; --text-dim: #8888a0;
+    --run: #f97316; --bike: #3b82f6; --subway: #eab308; --uber: #a855f7; --other: #10b981;
+  }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; overflow: hidden; }
+  #map { position: absolute; inset: 0; background: #0a0a0f; }
+  .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(0.35) brightness(0.8) contrast(1.05); }
+  .leaflet-control-attribution { background: rgba(10,10,15,0.7) !important; color: var(--text-dim) !important; font-size: 10px; }
+  .leaflet-control-attribution a { color: var(--text-dim) !important; }
+  .leaflet-control-zoom a { background: var(--card) !important; color: var(--text) !important; border-color: var(--border) !important; }
+
+  /* Header */
+  .hud { position: absolute; top: 16px; left: 16px; z-index: 1000; background: rgba(18,18,26,0.92); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; min-width: 300px; backdrop-filter: blur(8px); }
+  .hud h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .hud h1 span { color: var(--run); }
+  .hud .nav { font-size: 12px; margin-top: 2px; }
+  .hud .nav a { color: var(--text-dim); text-decoration: none; margin-right: 12px; }
+  .hud .nav a:hover { color: var(--text); }
+  .date { font-size: 34px; font-weight: 800; letter-spacing: -1px; margin-top: 12px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .date small { display: block; font-size: 13px; font-weight: 500; color: var(--text-dim); letter-spacing: 0; margin-top: 4px; }
+  .counters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+  .counter { cursor: pointer; user-select: none; opacity: 1; transition: opacity .2s; }
+  .counter.off { opacity: 0.3; }
+  .counter .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .counter .l { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-top: 3px; }
+  .counter.run .n { color: var(--run); } .counter.bike .n { color: var(--bike); } .counter.subway .n { color: var(--subway); } .counter.uber .n { color: var(--uber); }
+  .miles { margin-top: 12px; font-size: 12px; color: var(--text-dim); }
+  .miles b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Now playing */
+  .now { position: absolute; top: 16px; right: 16px; z-index: 1000; background: rgba(18,18,26,0.92); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; max-width: 320px; backdrop-filter: blur(8px); display: none; }
+  .now.visible { display: block; }
+  .now .tag { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+  .now .label { font-size: 14px; font-weight: 600; margin-top: 4px; }
+  .now .sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  /* Transport bar */
+  .bar { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 1000; width: min(920px, calc(100% - 32px)); background: rgba(18,18,26,0.94); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px 12px; backdrop-filter: blur(8px); }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .btn { background: var(--card); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn:hover { border-color: var(--text-dim); }
+  .btn.primary { background: var(--run); border-color: var(--run); color: #0a0a0f; min-width: 92px; }
+  .speed { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
+  .speed .v { color: var(--text); font-weight: 700; min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+  .speed button { width: 28px; height: 28px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); color: var(--text); cursor: pointer; font-size: 15px; }
+  input[type=range] { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--run) var(--pct, 0%), #2a2a3a var(--pct, 0%)); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2px solid var(--run); cursor: pointer; }
+  .ticks { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: 6px; padding: 0 2px; font-variant-numeric: tabular-nums; }
+  .hint { font-size: 11px; color: var(--text-dim); margin-left: auto; }
+  @media (max-width: 720px) {
+    .hud { min-width: 0; right: 16px; padding: 12px 14px; }
+    .date { font-size: 26px; }
+    .now { display: none !important; }
+    .hint { display: none; }
+    .bar { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="hud">
+  <h1>Hof<span>Lapse</span></h1>
+  <div class="nav"><a href="../index.html">Home</a><a href="../burrow/3d.html">Burrow</a><a href="../strava/index.html">HofRuns</a><a href="../citibike/explore.html">HofBikes</a></div>
+  <div class="date" id="dateBig">—<small id="dateSmall">loading…</small></div>
+  <div class="counters">
+    <div class="counter run" data-mode="run"><div class="n" id="cRun">0</div><div class="l">Runs</div></div>
+    <div class="counter bike" data-mode="bike"><div class="n" id="cBike">0</div><div class="l">Bikes</div></div>
+    <div class="counter subway" data-mode="subway"><div class="n" id="cSubway">0</div><div class="l">Subways</div></div>
+    <div class="counter uber" data-mode="uber"><div class="n" id="cUber">0</div><div class="l">Ubers</div></div>
+  </div>
+  <div class="miles"><b id="miles">0</b> miles on the map · tap a mode to hide it</div>
+</div>
+
+<div class="now" id="now"><div class="tag" id="nowTag"></div><div class="label" id="nowLabel"></div><div class="sub" id="nowSub"></div></div>
+
+<div class="bar">
+  <div class="row">
+    <button class="btn primary" id="play">▶ Play</button>
+    <button class="btn" id="restart" title="Back to the beginning">⟲</button>
+    <div class="speed"><span>Speed</span><button id="slower">−</button><span class="v" id="speedVal">1 day/s</span><button id="faster">+</button></div>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <span class="hint">space to play · ← → to step a day</span>
+  </div>
+  <div class="ticks"><span id="tickStart"></span><span id="tickEnd"></span></div>
+</div>
+
+<script>
+// ── Map ──
+const NYC = L.latLngBounds([[40.49, -74.27], [40.92, -73.68]]);
+const map = L.map('map', { zoomControl: true, attributionControl: true, preferCanvas: true }).fitBounds([[40.70, -74.03], [40.80, -73.93]]);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }).addTo(map);
+
+const COLORS = { run: '#f97316', bike: '#3b82f6', subway: '#eab308', uber: '#a855f7', other: '#10b981' };
+const NAMES = { run: 'Run', bike: 'CitiBike', subway: 'Subway', uber: 'Uber', other: 'Activity' };
+const DAY = 86400;
+
+// ── State ──
+let EVENTS = [];           // sorted by t
+let t0 = 0, t1 = 0;        // clock bounds (seconds)
+let clock = 0;             // current virtual time
+let playing = false;
+let lastFrame = null;
+let daysPerSec = 1;        // playback speed
+const SPEEDS = [0.25, 0.5, 1, 2, 4, 7, 14, 30];
+const enabled = { run: true, bike: true, subway: true, uber: true, other: true };
+const DRAW_SECS = 0.9;     // real seconds a trace takes to draw at 1 day/s; scaled by speed
+let nextIdx = 0;           // first event not yet started
+const active = [];         // events currently drawing: {e, startedAt(real ms)}
+const doneLayers = new Map(); // event index -> polyline
+const activeLayers = new Map(); // event index -> {line, dot}
+const counts = { run: 0, bike: 0, subway: 0, uber: 0, other: 0 };
+let miles = 0;
+
+const fmtDate = ts => new Date(ts * 1000).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+const fmtMonth = ts => new Date(ts * 1000).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', year: 'numeric' });
+
+// ── Load ──
+fetch('data/events.json').then(r => r.json()).then(d => {
+  EVENTS = d.events.map((e, i) => ({ ...e, i }));
+  t0 = EVENTS[0].t - DAY; t1 = EVENTS[EVENTS.length - 1].t + DAY;
+  document.getElementById('tickStart').textContent = fmtMonth(t0);
+  document.getElementById('tickEnd').textContent = fmtMonth(t1);
+  seek(t0);
+  renderHud();
+});
+
+// ── Rendering ──
+function styleFor(e, done) {
+  const c = COLORS[e.mode] || COLORS.other;
+  if (e.mode === 'subway') return { color: c, weight: done ? 2.5 : 4, opacity: done ? 0.55 : 1, dashArray: done ? '6 6' : null };
+  if (e.mode === 'uber') return { color: c, weight: done ? 1.5 : 3, opacity: done ? 0.35 : 0.95 };
+  if (e.mode === 'bike') return { color: c, weight: done ? 2 : 3.5, opacity: done ? 0.45 : 1 };
+  return { color: c, weight: done ? 2 : 3.5, opacity: done ? 0.5 : 1 };
+}
+
+function addDone(e) {
+  if (doneLayers.has(e.i)) return;
+  const line = L.polyline(e.path, styleFor(e, true));
+  if (enabled[e.mode]) line.addTo(map);
+  doneLayers.set(e.i, line);
+  counts[e.mode]++; miles += e.mi || 0;
+}
+
+function startActive(e, now) {
+  const line = L.polyline([e.path[0]], styleFor(e, false)).addTo(map);
+  const dot = L.circleMarker(e.path[0], { radius: 5, color: '#fff', weight: 2, fillColor: COLORS[e.mode] || COLORS.other, fillOpacity: 1 }).addTo(map);
+  if (!enabled[e.mode]) { map.removeLayer(line); map.removeLayer(dot); }
+  activeLayers.set(e.i, { line, dot });
+  active.push({ e, startedAt: now });
+  showNow(e);
+}
+
+function finishActive(a) {
+  const l = activeLayers.get(a.e.i);
+  if (l) { map.removeLayer(l.line); map.removeLayer(l.dot); activeLayers.delete(a.e.i); }
+  addDone(a.e);
+}
+
+function tickActive(now) {
+  const drawMs = Math.max(120, (DRAW_SECS / Math.max(daysPerSec, 0.25)) * 1000);
+  for (let k = active.length - 1; k >= 0; k--) {
+    const a = active[k];
+    const p = Math.min(1, (now - a.startedAt) / drawMs);
+    const n = Math.max(2, Math.round(p * a.e.path.length));
+    const l = activeLayers.get(a.e.i);
+    if (l) { l.line.setLatLngs(a.e.path.slice(0, n)); l.dot.setLatLng(a.e.path[n - 1]); }
+    if (p >= 1) { finishActive(a); active.splice(k, 1); }
+  }
+}
+
+function showNow(e) {
+  const box = document.getElementById('now');
+  box.classList.add('visible');
+  document.getElementById('nowTag').textContent = NAMES[e.mode] || e.mode;
+  document.getElementById('nowTag').style.color = COLORS[e.mode] || COLORS.other;
+  document.getElementById('nowLabel').textContent = e.label;
+  document.getElementById('nowSub').textContent = `${fmtDate(e.t)} · ${e.sub}`;
+}
+
+function renderHud() {
+  document.getElementById('dateBig').firstChild.textContent = clock ? new Date(clock * 1000).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+  document.getElementById('dateSmall').textContent = clock ? new Date(clock * 1000).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long' }) : '';
+  document.getElementById('cRun').textContent = counts.run;
+  document.getElementById('cBike').textContent = counts.bike;
+  document.getElementById('cSubway').textContent = counts.subway;
+  document.getElementById('cUber').textContent = counts.uber;
+  document.getElementById('miles').textContent = Math.round(miles).toLocaleString();
+  const pct = t1 > t0 ? ((clock - t0) / (t1 - t0)) * 100 : 0;
+  const s = document.getElementById('scrub');
+  s.value = Math.round(pct * 10); s.style.setProperty('--pct', pct + '%');
+}
+
+// ── Clock ──
+function frame(now) {
+  if (!playing) return;
+  if (lastFrame == null) lastFrame = now;
+  const dt = (now - lastFrame) / 1000; lastFrame = now;
+  clock = Math.min(t1, clock + dt * daysPerSec * DAY);
+  // start every event whose time has arrived
+  while (nextIdx < EVENTS.length && EVENTS[nextIdx].t <= clock) {
+    startActive(EVENTS[nextIdx], now); nextIdx++;
+  }
+  tickActive(now);
+  renderHud();
+  if (clock >= t1 && active.length === 0) { setPlaying(false); return; }
+  requestAnimationFrame(frame);
+}
+
+function setPlaying(on) {
+  playing = on; lastFrame = null;
+  document.getElementById('play').textContent = on ? '❚❚ Pause' : '▶ Play';
+  if (on) {
+    if (clock >= t1) seek(t0);
+    requestAnimationFrame(frame);
+  }
+}
+
+// Jump the clock: everything before it becomes a finished trace, nothing is mid-draw.
+function seek(ts) {
+  clock = Math.max(t0, Math.min(t1, ts));
+  for (const a of active) { const l = activeLayers.get(a.e.i); if (l) { map.removeLayer(l.line); map.removeLayer(l.dot); } }
+  active.length = 0; activeLayers.clear();
+  doneLayers.forEach(l => map.removeLayer(l)); doneLayers.clear();
+  for (const m in counts) counts[m] = 0; miles = 0;
+  nextIdx = 0;
+  while (nextIdx < EVENTS.length && EVENTS[nextIdx].t <= clock) { addDone(EVENTS[nextIdx]); nextIdx++; }
+  const last = nextIdx > 0 ? EVENTS[nextIdx - 1] : null;
+  if (last) showNow(last); else document.getElementById('now').classList.remove('visible');
+  renderHud();
+}
+
+// ── Controls ──
+document.getElementById('play').onclick = () => setPlaying(!playing);
+document.getElementById('restart').onclick = () => { setPlaying(false); seek(t0); };
+function setSpeed(i) {
+  daysPerSec = SPEEDS[Math.max(0, Math.min(SPEEDS.length - 1, i))];
+  document.getElementById('speedVal').textContent = daysPerSec < 1 ? `${daysPerSec} day/s` : `${daysPerSec} day${daysPerSec > 1 ? 's' : ''}/s`;
+}
+document.getElementById('faster').onclick = () => setSpeed(SPEEDS.indexOf(daysPerSec) + 1);
+document.getElementById('slower').onclick = () => setSpeed(SPEEDS.indexOf(daysPerSec) - 1);
+const scrub = document.getElementById('scrub');
+scrub.addEventListener('input', () => { const was = playing; playing = false; seek(t0 + (scrub.value / 1000) * (t1 - t0)); if (was) setPlaying(true); });
+document.querySelectorAll('.counter').forEach(el => el.addEventListener('click', () => {
+  const m = el.dataset.mode; enabled[m] = !enabled[m]; el.classList.toggle('off', !enabled[m]);
+  doneLayers.forEach((l, i) => { if (EVENTS[i].mode === m) enabled[m] ? l.addTo(map) : map.removeLayer(l); });
+  activeLayers.forEach((l, i) => { if (EVENTS[i].mode === m) { if (enabled[m]) { l.line.addTo(map); l.dot.addTo(map); } else { map.removeLayer(l.line); map.removeLayer(l.dot); } } });
+}));
+document.addEventListener('keydown', ev => {
+  if (ev.target.tagName === 'INPUT') return;
+  if (ev.code === 'Space') { ev.preventDefault(); setPlaying(!playing); }
+  if (ev.code === 'ArrowRight') { const was = playing; playing = false; seek(clock + DAY); if (was) setPlaying(true); }
+  if (ev.code === 'ArrowLeft') { const was = playing; playing = false; seek(clock - DAY); if (was) setPlaying(true); }
+  if (ev.key === '+' || ev.key === '=') setSpeed(SPEEDS.indexOf(daysPerSec) + 1);
+  if (ev.key === '-') setSpeed(SPEEDS.indexOf(daysPerSec) - 1);
+});
+setSpeed(2);
+</script>
+</body>
+</html>

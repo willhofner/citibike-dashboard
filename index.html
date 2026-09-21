@@ -85,6 +85,9 @@
   .card.burrow:hover { border-color: var(--emerald); box-shadow: 0 8px 24px rgba(16,185,129,0.15); }
 
   .card.burrow { grid-column: 1 / -1; }
+  .card.lapse { grid-column: 1 / -1; }
+  .card.lapse:hover { border-color: var(--orange); box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
+  .card.lapse .card-stat .val { color: var(--orange); }
 
   .card-top {
     display: flex;
@@ -276,6 +279,24 @@
       <div class="card-links">
         <a href="burrow/3d.html" onclick="event.stopPropagation()">3D Buildings</a>
         <a href="burrow/flat.html" onclick="event.stopPropagation()">Flat View</a>
+      </div>
+    </div>
+
+    <div onclick="location.href='timelapse/index.html'" class="card lapse">
+      <div class="card-top">
+        <div class="icon">🎞️</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofLapse</h2>
+      <div class="brand">All modes</div>
+      <p>Every run, bike ride, subway trip and Uber painted onto one map in the order they happened, 2021 to today. Play, scrub, or step by day.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">731</div><div class="lbl">Trips</div></div>
+        <div class="card-stat"><div class="val">4</div><div class="lbl">Modes</div></div>
+        <div class="card-stat"><div class="val">5.5 yrs</div><div class="lbl">Timeline</div></div>
+      </div>
+      <div class="card-links">
+        <a href="timelapse/index.html" onclick="event.stopPropagation()">Play Timelapse</a>
       </div>
     </div>
 

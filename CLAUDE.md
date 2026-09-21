@@ -142,6 +142,10 @@ citibike-bot/
 │       │   ├── ContentView.swift       # Main SwiftUI view (map + coverage %)
 │       │   └── Assets.xcassets/        # App icons and colors
 │       └── Info.plist                  # Privacy descriptions + background modes
+├── timelapse/
+│   ├── index.html              # HofLapse — unified timelapse of every mode (play, scrub, step by day)
+│   ├── build_events.py         # Builds the compact event feed from every mode's enriched data
+│   └── data/events.json        # 731 trips with downsampled paths (~1.5 MB), sorted by start time
 └── references/
     ├── index_redesign.html     # Landing page redesign draft
     ├── tweet_animation/
@@ -776,11 +780,27 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 ---
 
+## HofLapse (Unified Timelapse)
+
+### What's Built (2026-09-20)
+
+1. **Timelapse page** (`timelapse/index.html`)
+   - One Leaflet map, a virtual clock, and every trip drawn in the order it happened: runs (orange), CitiBike (blue), subway (yellow, dashed), Uber NYC (purple)
+   - Play/pause, speed from 0.25 to 30 days per second, a scrubber across the whole timeline, ← → to step a day, space to play
+   - Each trip animates as a bright trace with a moving dot, then settles into a faint persistent line, so the map accumulates like the HofRuns timelapse
+   - HUD: current date, per-mode counters (click to hide a mode), miles on the map; "now playing" card with the trip's label
+   - Runs outside NYC still play but the map stays framed on the city
+
+2. **Data feed** (`timelapse/build_events.py` → `timelapse/data/events.json`)
+   - Runs: Strava `latlng` downsampled to ≤160 points. Bikes: OSRM route for the station pair. Subway: entry → intermediate stations → exit. Uber: OSRM driving route, NYC rides only
+   - Times are local wall-clock seconds so all modes sort together (Strava's local-time-with-Z quirk is handled here)
+   - **Run after any data refresh**, then the page picks it up at load (fetched at runtime, not baked in)
+
 ## Landing Page
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
 
