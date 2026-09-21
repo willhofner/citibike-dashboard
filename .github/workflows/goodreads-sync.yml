@@ -1,0 +1,37 @@
+name: Goodreads Sync
+
+on:
+  schedule:
+    # Daily at 6 AM ET (10:00 UTC)
+    - cron: '0 10 * * *'
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Public shelf RSS, no credentials. User id lives in books/data/goodreads_config.json.
+      - name: Fetch shelves from Goodreads
+        run: python3 books/fetch_goodreads.py
+
+      - name: Commit and push if anything changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add books/data/books.json index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            COUNT=$(python3 -c "import json;print(json.load(open('books/data/books.json'))['summary']['totalBooks'])")
+            git commit -m "Update Goodreads data: ${COUNT} books read (auto-sync)"
+            git push
+          fi

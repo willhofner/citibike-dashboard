@@ -114,9 +114,11 @@ citibike-bot/
 ├── books/
 │   ├── index.html              # HofReads — bookshelf dashboard
 │   ├── stack-of-books.jpg      # Dashboard hero image
+│   ├── fetch_goodreads.py      # Pulls read / currently-reading / to-read from Goodreads public shelf RSS → books.json + landing card
 │   └── data/
-│       ├── Goodreads_Library.csv        # Raw Goodreads export (gitignored)
-│       └── books.json                   # Processed book data
+│       ├── goodreads_config.json        # {"user_id": "<digits>"} — not secret, committed
+│       ├── Goodreads_Library.csv        # Old manual export (gitignored, no longer used)
+│       └── books.json                   # Built by fetch_goodreads.py; fetched by the page at runtime
 ├── subway/
 │   ├── explore.html            # HofSubways ride explorer (animated MTA routes)
 │   ├── dashboard.html          # HofSubways dashboard (spending, heatgrid, line breakdown)
@@ -483,10 +485,15 @@ First web refresh 2026-09-20: 27 new runs since June 28 → 234 activities, 144 
    - Stack-of-books hero image at top
    - Accent color: amber #eab308
 
-2. **Data Pipeline**
-   - Source: Goodreads Library export (CSV), gitignored
-   - Processed data: `books/data/books.json`
-   - Cover images: fetched from Open Library API via ISBN (`covers.openlibrary.org`)
+   - **Reading now** row (face-out covers) and a second **Want to Read** shelf with quieter, desaturated spines that light up on hover (added 2026-09-21)
+   - Detail card uses the Goodreads cover first, Open Library as fallback; shows Goodreads average and a link out
+
+2. **Data Pipeline (automatic since 2026-09-21)**
+   - Source: Goodreads public shelf RSS, no login: `https://www.goodreads.com/review/list_rss/<user_id>?shelf=<shelf>&per_page=200&page=N`. The `shelf` param is honored; 200 per page is the max. Fields used: `book_id`, `title`, `author_name`, `isbn`, `book/num_pages`, `user_rating`, `user_read_at`, `user_date_added`, `book_published`, `average_rating`, `book_large_image_url`, `user_review`, `link`
+   - `books/fetch_goodreads.py` pulls `read`, `currently-reading`, `to-read`, writes `books/data/books.json` (`books`, `currentlyReading`, `toRead`, `summary`), and updates the landing HofReads card. It only rewrites when something changed, so the daily job does not commit timestamps
+   - `.github/workflows/goodreads-sync.yml` runs it daily at 6 AM ET and pushes; Railway redeploys. **The profile must be public** and the user id must be in `books/data/goodreads_config.json`
+   - The page fetches `data/books.json` at runtime (no longer baked in), so a data commit is all it takes
+   - Custom exclusive shelves (e.g. `re-shelved`) are ignored
 
 ---
 
@@ -802,7 +809,7 @@ The landing page (`index.html`) has two sections:
 
 1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, and HofReads. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
-2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (currently just Strava Sync — daily at 9 PM). Green dot = active. Update this section when new scheduled jobs are added.
+2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 
 ---
 

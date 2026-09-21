@@ -330,6 +330,27 @@
   }
   .controls button:hover { border-color: var(--amber); color: var(--text); }
   .controls button.active { background: var(--amber); color: #0a0a0f; border-color: var(--amber); font-weight: 600; }
+
+  /* Reading now */
+  .reading-now { max-width: 900px; margin: 0 auto 26px; padding: 0 20px; }
+  .reading-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--amber); margin-bottom: 10px; text-align: center; }
+  .reading-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .reading-card { display: flex; gap: 14px; align-items: center; background: var(--bg-card); border: 1px solid #2a2a30; border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: border-color .15s; max-width: 360px; }
+  .reading-card:hover { border-color: var(--amber); }
+  .reading-card img, .reading-cover-fallback { width: 54px; height: 80px; object-fit: cover; border-radius: 3px; box-shadow: 0 4px 12px rgba(0,0,0,.5); background: #2a2015; flex-shrink: 0; }
+  .reading-title { font-weight: 600; font-size: 14px; line-height: 1.25; }
+  .reading-author, .reading-pages { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
+
+  /* Want to read shelf: same shelf, quieter spines until they are read */
+  .shelf-heading { text-align: center; margin: 56px 0 18px; }
+  .shelf-heading h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .shelf-heading p { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .shelf-heading .n { color: var(--amber); font-weight: 600; }
+  .shelf-unread .shelf-books > div { filter: saturate(0.4) brightness(0.78); transition: filter .2s; }
+  .shelf-unread .shelf-books > div:hover { filter: none; }
+  .detail-unread { color: var(--amber); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .detail-link { color: var(--amber); text-decoration: none; font-size: 13px; }
+  .sync-note { text-align: center; color: var(--text-dim); font-size: 11px; margin: 28px 0 40px; opacity: .7; }
 </style>
 </head>
 <body>
@@ -352,6 +373,8 @@
   <div class="stat"><div class="stat-val" id="stat-fives">5</div><div class="stat-label">5-Star Books</div></div>
 </div>
 
+<div class="reading-now" id="readingNow" style="display:none"></div>
+
 <div class="controls">
   <button class="active" data-filter="all">All</button>
   <button data-filter="5">5 Stars</button>
@@ -365,60 +388,18 @@
 
 <div class="bookcase" id="bookcase"></div>
 
+<div class="shelf-heading" id="toReadHeading" style="display:none">
+  <h2>Want to Read</h2>
+  <p><span class="n">0</span> books on the list · <span class="p"></span></p>
+</div>
+<div class="bookcase" id="bookcase-toread"></div>
+<p class="sync-note" id="syncNote"></p>
+
 <script>
-const books = [
-  {"id":1,"title":"How to Read Skyscrapers","author":"Edward Denison","pages":256,"isbn":"0789335573","rating":3,"review":null,"dateRead":"2026-02-01","yearPublished":2019},
-  {"id":2,"title":"No Country for Old Men","author":"Cormac McCarthy","pages":309,"isbn":"0375706674","rating":3,"review":"Written like a screenplay","dateRead":"2026-02-01","yearPublished":2005},
-  {"id":3,"title":"Endurance","author":"Alfred Lansing","pages":282,"isbn":"0786706716","rating":5,"review":"Unbelievable. Favorite book of 2025.","dateRead":"2025-12-07","yearPublished":1959},
-  {"id":4,"title":"The Midnight Library","author":"Matt Haig","pages":288,"isbn":"0525559477","rating":4,"review":"Awesome premise. Had to put it down for a full month at one point.","dateRead":"2025-06-01","yearPublished":2020},
-  {"id":5,"title":"A Court of Thorns and Roses","author":"Sarah J. Maas","pages":419,"isbn":"1635575567","rating":3,"review":"Szn 1 of GOT, but somehow hornier. Pretty sick plot / world, not mad Riley got me to read this.","dateRead":"2025-05-01","yearPublished":2015},
-  {"id":6,"title":"Touching the Void","author":"Joe Simpson","pages":218,"isbn":"0060730552","rating":4,"review":"Insane story. Favorite book of the year so far.","dateRead":"2025-04-01","yearPublished":1988},
-  {"id":7,"title":"The Three-Body Problem","author":"Liu Cixin","pages":472,"isbn":null,"rating":4,"review":null,"dateRead":"2024-05-27","yearPublished":2006},
-  {"id":8,"title":"The Last Lecture","author":"Randy Pausch","pages":217,"isbn":null,"rating":4,"review":"Especially the last 1/4 of this book was incredible. Most emotional book I've ever read.","dateRead":"2024-03-15","yearPublished":2008},
-  {"id":9,"title":"Peak Performance","author":"Brad Stulberg","pages":240,"isbn":"162336793X","rating":4,"review":"Perfect book to listen to on runs. TL;DR: Find something bigger.","dateRead":"2024-02-11","yearPublished":2017},
-  {"id":10,"title":"The Hate You Give","author":"Angie Thomas","pages":444,"isbn":null,"rating":3,"review":null,"dateRead":"2023-10-23","yearPublished":2017},
-  {"id":11,"title":"The Price of Tomorrow","author":"Jeff Booth","pages":232,"isbn":"1999257405","rating":5,"review":null,"dateRead":"2023-01-01","yearPublished":2020},
-  {"id":12,"title":"The Last Olympian","author":"Rick Riordan","pages":381,"isbn":"1423101472","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2009},
-  {"id":13,"title":"The Titan's Curse","author":"Rick Riordan","pages":352,"isbn":null,"rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2007},
-  {"id":14,"title":"The Sea of Monsters","author":"Rick Riordan","pages":279,"isbn":"0120000318","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2006},
-  {"id":15,"title":"The Battle of the Labyrinth","author":"Rick Riordan","pages":361,"isbn":null,"rating":4,"review":null,"dateRead":"2023-01-01","yearPublished":2008},
-  {"id":16,"title":"The Lightning Thief","author":"Rick Riordan","pages":377,"isbn":"0786838655","rating":4,"review":"Such a fun series. Read the entire thing in Europe.","dateRead":"2023-01-01","yearPublished":2005},
-  {"id":17,"title":"Elon Musk","author":"Walter Isaacson","pages":688,"isbn":"1982181281","rating":4,"review":"Simply lock in.","dateRead":"2023-01-01","yearPublished":2023},
-  {"id":18,"title":"An Astronaut's Guide to Life on Earth","author":"Chris Hadfield","pages":295,"isbn":"0316253014","rating":4,"review":"Powerful lessons from space. Good bit of Hadfield's story as well.","dateRead":"2023-01-01","yearPublished":2013},
-  {"id":19,"title":"The Inner Game of Tennis","author":"W. Timothy Gallwey","pages":134,"isbn":"0679778314","rating":3,"review":"Your teacher self vs. Your student self. Good bit of actual tennis tips.","dateRead":"2023-01-01","yearPublished":1974},
-  {"id":20,"title":"Permanent Record","author":"Edward Snowden","pages":339,"isbn":"1250237238","rating":4,"review":"One of the most eye-opening books I've ever read.","dateRead":"2023-01-01","yearPublished":2019},
-  {"id":21,"title":"Caffeine","author":"Michael Pollan","pages":2,"isbn":null,"rating":3,"review":"America runs on uppers.","dateRead":"2023-01-01","yearPublished":2020},
-  {"id":22,"title":"Layered Money","author":"Nik Bhatia","pages":180,"isbn":null,"rating":3,"review":"Bitcoin.","dateRead":"2023-01-01","yearPublished":2021},
-  {"id":23,"title":"The Deficit Myth","author":"Stephanie Kelton","pages":327,"isbn":"1541736184","rating":3,"review":"It's all keystrokes.","dateRead":"2023-01-01","yearPublished":2020},
-  {"id":24,"title":"The Alchemist","author":"Paulo Coelho","pages":182,"isbn":"0062315005","rating":4,"review":"Tied for my 2023 BOTY","dateRead":"2023-01-01","yearPublished":1988},
-  {"id":25,"title":"Woke, Inc.","author":"Vivek Ramaswamy","pages":368,"isbn":"1546090789","rating":3,"review":null,"dateRead":"2023-01-01","yearPublished":2021},
-  {"id":26,"title":"The Art of War","author":"Sun Tzu","pages":170,"isbn":null,"rating":3,"review":"Classic. Didn't realize half this book is actual battle strats lol. Thought the whole thing was allegorical.","dateRead":"2022-01-01","yearPublished":null},
-  {"id":27,"title":"Atomic Habits","author":"James Clear","pages":319,"isbn":null,"rating":3,"review":null,"dateRead":"2022-01-07","yearPublished":2018},
-  {"id":28,"title":"Shoe Dog","author":"Phil Knight","pages":400,"isbn":"1501135910","rating":5,"review":null,"dateRead":null,"yearPublished":2016},
-  {"id":29,"title":"The Lion Tracker's Guide To Life","author":"Boyd Varty","pages":160,"isbn":"0358099773","rating":3,"review":null,"dateRead":null,"yearPublished":2014},
-  {"id":30,"title":"The Power of Now","author":"Eckhart Tolle","pages":229,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":1997},
-  {"id":31,"title":"Rich Dad, Poor Dad","author":"Robert T. Kiyosaki","pages":195,"isbn":"0751532711","rating":3,"review":null,"dateRead":null,"yearPublished":1997},
-  {"id":32,"title":"Outliers","author":"Malcolm Gladwell","pages":309,"isbn":"0316017922","rating":3,"review":null,"dateRead":null,"yearPublished":2008},
-  {"id":33,"title":"The Power of Habit","author":"Charles Duhigg","pages":375,"isbn":"1400069289","rating":3,"review":null,"dateRead":null,"yearPublished":2012},
-  {"id":34,"title":"Never Split the Difference","author":"Chris Voss","pages":274,"isbn":"0062407805","rating":3,"review":null,"dateRead":null,"yearPublished":2016},
-  {"id":35,"title":"How to Win Friends & Influence People","author":"Dale Carnegie","pages":288,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":1936},
-  {"id":36,"title":"Elon Musk","author":"Ashlee Vance","pages":392,"isbn":"0062301233","rating":4,"review":null,"dateRead":null,"yearPublished":2015},
-  {"id":37,"title":"How to Win at the Sport of Business","author":"Mark Cuban","pages":67,"isbn":"0983988536","rating":3,"review":null,"dateRead":null,"yearPublished":2011},
-  {"id":38,"title":"Steve Jobs","author":"Walter Isaacson","pages":630,"isbn":"1451648537","rating":4,"review":null,"dateRead":null,"yearPublished":2011},
-  {"id":39,"title":"The Everything Store","author":"Brad Stone","pages":384,"isbn":"0316219266","rating":4,"review":null,"dateRead":null,"yearPublished":2013},
-  {"id":40,"title":"Extreme Ownership","author":"Jocko Willink","pages":320,"isbn":"1250067057","rating":3,"review":null,"dateRead":null,"yearPublished":2015},
-  {"id":41,"title":"Where the Crawdads Sing","author":"Delia Owens","pages":384,"isbn":"0735219117","rating":5,"review":null,"dateRead":null,"yearPublished":2018},
-  {"id":42,"title":"The Boys in the Boat","author":"Daniel James Brown","pages":404,"isbn":"067002581X","rating":5,"review":null,"dateRead":null,"yearPublished":2013},
-  {"id":43,"title":"Sapiens","author":"Yuval Noah Harari","pages":512,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":2011},
-  {"id":44,"title":"2030","author":"Mauro F. Guill\u00e9n","pages":288,"isbn":"1250268176","rating":3,"review":null,"dateRead":null,"yearPublished":2020},
-  {"id":45,"title":"The Bitcoin Standard","author":"Saifedean Ammous","pages":304,"isbn":"1119473861","rating":4,"review":null,"dateRead":null,"yearPublished":2018},
-  {"id":46,"title":"Zero to One","author":"Peter Thiel","pages":195,"isbn":"0804139296","rating":3,"review":null,"dateRead":null,"yearPublished":2014},
-  {"id":47,"title":"The Theory of Everything","author":"Stephen W. Hawking","pages":176,"isbn":"0641587716","rating":3,"review":null,"dateRead":null,"yearPublished":2002},
-  {"id":48,"title":"Start with Why","author":"Simon Sinek","pages":256,"isbn":"1591842808","rating":3,"review":null,"dateRead":null,"yearPublished":2009},
-  {"id":49,"title":"The Internet of Money","author":"Andreas M. Antonopoulos","pages":200,"isbn":null,"rating":3,"review":null,"dateRead":null,"yearPublished":2016},
-  {"id":50,"title":"Our Final Invention","author":"James Barrat","pages":322,"isbn":"0312622376","rating":4,"review":null,"dateRead":null,"yearPublished":2013},
-  {"id":51,"title":"Bitcoin: Hard Money You Can't F*ck With","author":"Jason A. Williams","pages":221,"isbn":"1838318410","rating":3,"review":null,"dateRead":null,"yearPublished":2020}
-];
+// Data is fetched from data/books.json (built by fetch_goodreads.py from Goodreads RSS)
+let books = [];
+let currentlyReading = [];
+let toRead = [];
 
 // Curated spine color palette (rich, book-like)
 const SPINE_COLORS = [
@@ -453,7 +434,7 @@ function getSpineColor(book) {
 }
 
 function getSpineWidth(pages) {
-  return Math.max(24, Math.min(62, pages * 0.075 + 18));
+  return Math.max(24, Math.min(62, (pages || 280) * 0.075 + 18));
 }
 
 function getBookHeight(book) {
@@ -494,12 +475,15 @@ function formatDate(d) {
 }
 
 // Sort: dated books first (most recent), then undated
-const sorted = [...books].sort((a, b) => {
-  if (a.dateRead && b.dateRead) return b.dateRead.localeCompare(a.dateRead);
-  if (a.dateRead && !b.dateRead) return -1;
-  if (!a.dateRead && b.dateRead) return 1;
-  return 0;
-});
+function sortRead(list) {
+  return [...list].sort((a, b) => {
+    if (a.dateRead && b.dateRead) return b.dateRead.localeCompare(a.dateRead);
+    if (a.dateRead && !b.dateRead) return -1;
+    if (!a.dateRead && b.dateRead) return 1;
+    return 0;
+  });
+}
+let sorted = [];
 
 let selectedId = null;
 let currentFilter = 'all';
@@ -510,15 +494,19 @@ function getFiltered() {
 }
 
 function renderBookcase() {
-  const bookcase = document.getElementById('bookcase');
+  renderShelf(document.getElementById('bookcase'), getFiltered(), false);
+  renderShelf(document.getElementById('bookcase-toread'), toRead, true);
+}
+
+function renderShelf(bookcase, filtered, unread) {
+  if (!bookcase) return;
   // Save scroll position if re-rendering
   const oldScroll = bookcase.querySelector('.shelf-books')?.scrollLeft || 0;
   bookcase.innerHTML = '';
-
-  const filtered = getFiltered();
+  if (!filtered.length) return;
 
   const shelfEl = document.createElement('div');
-  shelfEl.className = 'shelf';
+  shelfEl.className = unread ? 'shelf shelf-unread' : 'shelf';
 
   const viewport = document.createElement('div');
   viewport.className = 'shelf-viewport';
@@ -663,9 +651,12 @@ function showDetail(book) {
   const color = getSpineColor(book);
   const dateStr = formatDate(book.dateRead);
 
-  const coverHtml = book.isbn
-    ? `<div class="detail-cover"><img src="https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg" alt="${book.title}" onerror="this.parentElement.innerHTML='<div class=\\'detail-cover-fallback\\' style=\\'background:linear-gradient(180deg,color-mix(in srgb,${color.bg},white 10%),${color.bg},color-mix(in srgb,${color.bg},black 8%));\\'></div>'"></div>`
-    : `<div class="detail-cover"><div class="detail-cover-fallback" style="background:linear-gradient(180deg,color-mix(in srgb,${color.bg},white 10%),${color.bg},color-mix(in srgb,${color.bg},black 8%))"></div></div>`;
+  const isUnread = toRead.includes(book);
+  const isReading = currentlyReading.includes(book);
+  const fallback = `<div class="detail-cover-fallback" style="background:linear-gradient(180deg,color-mix(in srgb,${color.bg},white 10%),${color.bg},color-mix(in srgb,${color.bg},black 8%))"></div>`;
+  const coverSrc = book.cover || (book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null);
+  const coverHtml = `<div class="detail-cover">${coverSrc ? `<img src="${coverSrc}" alt="" onerror="this.outerHTML=this.dataset.fb" data-fb='${fallback.replace(/'/g, "&#39;")}'>` : fallback}</div>`;
+  const addedStr = formatDate(book.dateAdded);
 
   el.innerHTML = `
     <div class="detail-top">
@@ -673,11 +664,14 @@ function showDetail(book) {
       <div class="detail-info">
         <div class="detail-title">${book.title}</div>
         <div class="detail-author">${book.author}</div>
-        <div class="detail-stars">${stars(book.rating)}</div>
+        ${book.rating ? `<div class="detail-stars">${stars(book.rating)}</div>` : `<div class="detail-unread">${isUnread ? 'Want to read' : isReading ? 'Reading now' : 'Not rated'}</div>`}
         <div class="detail-meta">
-          <div class="detail-meta-item"><span class="label">Pages </span><span class="value">${book.pages.toLocaleString()}</span></div>
+          <div class="detail-meta-item"><span class="label">Pages </span><span class="value">${book.pages ? book.pages.toLocaleString() : '—'}</span></div>
           ${book.yearPublished ? `<div class="detail-meta-item"><span class="label">Published </span><span class="value">${book.yearPublished}</span></div>` : ''}
           ${dateStr ? `<div class="detail-meta-item"><span class="label">Read </span><span class="value">${dateStr}</span></div>` : ''}
+          ${!dateStr && addedStr ? `<div class="detail-meta-item"><span class="label">Added </span><span class="value">${addedStr}</span></div>` : ''}
+          ${book.avgRating ? `<div class="detail-meta-item"><span class="label">Goodreads avg </span><span class="value">${book.avgRating}</span></div>` : ''}
+          ${book.link ? `<div class="detail-meta-item"><a class="detail-link" href="${book.link}" target="_blank" rel="noopener">Goodreads ↗</a></div>` : ''}
         </div>
         ${book.review ? `<div class="detail-review">"${book.review}"</div>` : ''}
       </div>
@@ -711,12 +705,50 @@ document.addEventListener('keydown', e => {
 window.addEventListener('resize', () => {
   renderBookcase();
   if (selectedId) {
-    const book = books.find(b => b.id === selectedId);
+    const book = [...books, ...toRead, ...currentlyReading].find(b => b.id === selectedId);
     if (book) showDetail(book);
   }
 });
 
-renderBookcase();
+function renderReadingNow() {
+  const el = document.getElementById('readingNow');
+  if (!currentlyReading.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.innerHTML = `<div class="reading-label">Reading now</div><div class="reading-row">` + currentlyReading.map(b => `
+    <div class="reading-card" data-id="${b.id}">
+      ${b.cover ? `<img src="${b.cover}" alt="">` : `<div class="reading-cover-fallback"></div>`}
+      <div class="reading-info"><div class="reading-title">${b.title}</div><div class="reading-author">${b.author}</div>${b.pages ? `<div class="reading-pages">${b.pages.toLocaleString()} pages</div>` : ''}</div>
+    </div>`).join('') + `</div>`;
+  el.querySelectorAll('.reading-card').forEach(card => card.addEventListener('click', () => {
+    const book = currentlyReading.find(b => String(b.id) === card.dataset.id);
+    selectedId = book.id; showDetail(book); document.querySelector('.detail-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }));
+}
+
+function renderHeader(summary) {
+  const pages = books.reduce((n, b) => n + (b.pages || 0), 0);
+  const rated = books.filter(b => b.rating);
+  document.querySelector('.subtitle').innerHTML = `<span class="count">${books.length}</span> books read` + (toRead.length ? ` · <span class="count">${toRead.length}</span> on the list` : '');
+  document.getElementById('stat-books').textContent = books.length;
+  document.getElementById('stat-pages').textContent = pages.toLocaleString();
+  document.getElementById('stat-avg').textContent = rated.length ? (rated.reduce((n, b) => n + b.rating, 0) / rated.length).toFixed(1) : '—';
+  document.getElementById('stat-fives').textContent = books.filter(b => b.rating === 5).length;
+  const h = document.getElementById('toReadHeading');
+  if (toRead.length) { h.style.display = ''; h.querySelector('.n').textContent = toRead.length; const tp = toRead.reduce((n, b) => n + (b.pages || 0), 0); h.querySelector('.p').textContent = tp ? `${tp.toLocaleString()} pages waiting` : ''; }
+  if (summary && summary.generatedLabel) document.getElementById('syncNote').textContent = summary.generatedLabel;
+}
+
+fetch('data/books.json', { cache: 'no-cache' }).then(r => r.json()).then(d => {
+  books = d.books || [];
+  currentlyReading = d.currentlyReading || [];
+  // Newest additions first on the want-to-read shelf
+  toRead = [...(d.toRead || [])].sort((a, b) => (b.dateAdded || '').localeCompare(a.dateAdded || ''));
+  sorted = sortRead(books);
+  const label = d.generated ? `Synced from Goodreads ${new Date(d.generated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : '';
+  renderHeader({ generatedLabel: label });
+  renderReadingNow();
+  renderBookcase();
+});
 </script>
 
 </body>

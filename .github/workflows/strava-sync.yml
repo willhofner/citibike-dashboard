@@ -1,9 +1,9 @@
 name: Strava Sync
 
+# RETIRED 2026-09-21: Strava made API access subscriber-only and set the app inactive, so this
+# failed every night. Runs now come from the website-session refresh (see CLAUDE.md, Strava).
+# The schedule is removed; the manual trigger stays in case API access ever returns.
 on:
-  schedule:
-    # Daily at 9 PM ET (2 AM UTC during EST, 1 AM UTC during EDT)
-    - cron: '0 2 * * *'
   workflow_dispatch: # Manual trigger from GitHub UI
 
 permissions:
