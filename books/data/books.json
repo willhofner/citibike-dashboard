@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-03T14:27:56.551611+00:00",
+ "generated": "2026-10-04T15:01:50.404435+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
   "totalBooks": 57,
@@ -213,7 +213,7 @@
    "dateRead": "2025-05-01",
    "dateAdded": "2025-07-02",
    "yearPublished": 2015,
-   "avgRating": 4.13,
+   "avgRating": 4.12,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1620324329l/50659467._SY475_.jpg",
    "link": "https://www.goodreads.com/review/show/7703331725?utm_medium=api&utm_source=rss",
    "shelves": []
