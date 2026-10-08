@@ -1,15 +1,31 @@
 {
- "generated": "2026-10-07T17:05:12.830697+00:00",
+ "generated": "2026-10-08T17:04:36.663782+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
-  "totalBooks": 57,
-  "totalPages": 17409,
+  "totalBooks": 58,
+  "totalPages": 17933,
   "avgRating": 3.5,
   "fiveStars": 6,
-  "toRead": 74,
+  "toRead": 81,
   "currentlyReading": 0
  },
  "books": [
+  {
+   "id": 18966806,
+   "title": "Morning Star (Red Rising Saga, #3)",
+   "author": "Pierce Brown",
+   "pages": 524,
+   "isbn": null,
+   "rating": 4,
+   "review": "Haymakers left and right",
+   "dateRead": "2026-10-06",
+   "dateAdded": "2026-10-08",
+   "yearPublished": 2016,
+   "avgRating": 4.55,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1461354277l/18966806.jpg",
+   "link": "https://www.goodreads.com/review/show/9009575155?utm_medium=api&utm_source=rss",
+   "shelves": []
+  },
   {
    "id": 18966819,
    "title": "Golden Son (Red Rising Saga, #2)",
@@ -277,7 +293,7 @@
    "dateRead": null,
    "dateAdded": "2024-03-15",
    "yearPublished": 2014,
-   "avgRating": 4.18,
+   "avgRating": 4.19,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1545547886l/43261065.jpg",
    "link": "https://www.goodreads.com/review/show/4305838145?utm_medium=api&utm_source=rss",
    "shelves": []
@@ -925,6 +941,132 @@
  ],
  "currentlyReading": [],
  "toRead": [
+  {
+   "id": 299215,
+   "title": "The Road to Serfdom",
+   "author": "Friedrich A. Hayek",
+   "pages": 274,
+   "isbn": "0226320618",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 1944,
+   "avgRating": 4.13,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1327787673l/299215.jpg",
+   "link": "https://www.goodreads.com/review/show/9009513000?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 5129,
+   "title": "Brave New World",
+   "author": "Aldous Huxley",
+   "pages": 288,
+   "isbn": "0060929871",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 1932,
+   "avgRating": 3.99,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1575509280l/5129._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9009497101?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 6289283,
+   "title": "Born to Run: A Hidden Tribe, Superathletes, and the Greatest Race the World Has Never Seen",
+   "author": "Christopher McDougall",
+   "pages": 287,
+   "isbn": null,
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 2009,
+   "avgRating": 4.29,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1631519495l/6289283._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9009492523?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 34684622,
+   "title": "Leonardo da Vinci",
+   "author": "Walter Isaacson",
+   "pages": 600,
+   "isbn": "1501139150",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 2017,
+   "avgRating": 4.16,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1523543570l/34684622._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9009488860?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 8664353,
+   "title": "Unbroken: A World War II Story of Survival, Resilience and Redemption",
+   "author": "Laura Hillenbrand",
+   "pages": 475,
+   "isbn": "1400064163",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 2010,
+   "avgRating": 4.38,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1327861115l/8664353.jpg",
+   "link": "https://www.goodreads.com/review/show/9009486969?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 60869516,
+   "title": "Into the Wild",
+   "author": "Jon Krakauer",
+   "pages": 217,
+   "isbn": null,
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 1996,
+   "avgRating": 4.11,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1650755924l/60869516._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9009483713?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
+   "id": 78508,
+   "title": "The River of Doubt: Theodore Roosevelt's Darkest Journey",
+   "author": "Candice Millard",
+   "pages": 416,
+   "isbn": "0767913736",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-08",
+   "yearPublished": 2005,
+   "avgRating": 4.19,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1430014768l/78508.jpg",
+   "link": "https://www.goodreads.com/review/show/9009475303?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
   {
    "id": 3828902,
    "title": "Thinking In Systems: A Primer",
