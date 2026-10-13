@@ -1,12 +1,12 @@
 {
- "generated": "2026-10-12T19:30:04.282234+00:00",
+ "generated": "2026-10-13T17:14:09.634687+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
   "totalBooks": 58,
   "totalPages": 17933,
   "avgRating": 3.5,
   "fiveStars": 6,
-  "toRead": 81,
+  "toRead": 82,
   "currentlyReading": 0
  },
  "books": [
@@ -533,7 +533,7 @@
    "dateRead": null,
    "dateAdded": "2024-03-15",
    "yearPublished": 2020,
-   "avgRating": 3.64,
+   "avgRating": 3.65,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1593380722l/49127551.jpg",
    "link": "https://www.goodreads.com/review/show/4305839442?utm_medium=api&utm_source=rss",
    "shelves": []
@@ -941,6 +941,24 @@
  ],
  "currentlyReading": [],
  "toRead": [
+  {
+   "id": 242376245,
+   "title": "Theo of Golden",
+   "author": "Allen  Levi",
+   "pages": 400,
+   "isbn": "1668236516",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-13",
+   "yearPublished": 2023,
+   "avgRating": 4.32,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1761744192l/242376245._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9022731151?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
   {
    "id": 299215,
    "title": "The Road to Serfdom",
