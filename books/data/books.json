@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-15T14:32:21.872691+00:00",
+ "generated": "2026-10-16T14:24:04.935571+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
   "totalBooks": 58,
@@ -885,7 +885,7 @@
    "dateRead": "2023-01-01",
    "dateAdded": "2024-03-15",
    "yearPublished": 1988,
-   "avgRating": 4.01,
+   "avgRating": 4.0,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1654371463l/18144590._SY475_.jpg",
    "link": "https://www.goodreads.com/review/show/6265687037?utm_medium=api&utm_source=rss",
    "shelves": []
