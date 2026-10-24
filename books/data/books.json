@@ -1,9 +1,9 @@
 {
- "generated": "2026-10-22T14:45:24.146499+00:00",
+ "generated": "2026-10-24T13:43:15.439601+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
   "totalBooks": 58,
-  "totalPages": 17933,
+  "totalPages": 17930,
   "avgRating": 3.5,
   "fiveStars": 6,
   "toRead": 83,
@@ -606,7 +606,7 @@
    "id": 31869077,
    "title": "The Internet of Money",
    "author": "Andreas M. Antonopoulos",
-   "pages": 200,
+   "pages": 197,
    "isbn": null,
    "rating": 3,
    "review": null,
