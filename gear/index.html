@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>HofCamp — Gear Floor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the gear laid out on the floor fills one big stage; a slim header above, a jump list of every item below */
+:root{
+  --bg:#eceae4;--stage:#e4e1d9;--ink:#22262a;--muted:#686c6e;--line:#cfcabd;--chip:#f6f4ef;
+  --accent:#b97c0e;--accent-ink:#fff;--sam:#2f6f8f;--ours:#8a5a1a;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#16191b;--stage:#1d2124;--ink:#e9e7e1;--muted:#9aa09f;--line:#30363a;--chip:#22272a;
+  --accent:#e2a62b;--accent-ink:#1a1306;--sam:#7fb8d6;--ours:#e0a866;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16191b;--stage:#1d2124;--ink:#e9e7e1;--muted:#9aa09f;--line:#30363a;--chip:#22272a;
+  --accent:#e2a62b;--accent-ink:#1a1306;--sam:#7fb8d6;--ours:#e0a866;color-scheme:dark}
+html,body{background:var(--bg);color:var(--ink)}
+body{font:15px/1.5 var(--body)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;display:flex;flex-direction:column;gap:14px}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 20px}
+.eyebrow{font:600 .72rem/1 var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+h1 span{color:var(--accent)}
+.eyebrow a.home{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}
+.eyebrow a.home:hover{color:var(--ink)}
+h1{font:700 clamp(2rem,6vw,3rem)/1 var(--display);margin:6px 0 0;text-wrap:balance}
+.count{font:400 .8rem var(--mono);color:var(--muted)}
+.stage{position:relative;height:min(72vh,680px);min-height:400px;border-radius:14px;overflow:hidden;background:var(--stage);border:1px solid var(--line);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.stage canvas.hot{cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:600 .85rem/1.3 var(--body);padding:7px 11px;border-radius:8px;white-space:nowrap;transform:translate(-50%,calc(-100% - 16px));opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.tip small{display:block;font:400 .7rem var(--mono);opacity:.75}
+.hint{position:absolute;left:14px;bottom:12px;right:14px;font:400 .72rem var(--mono);color:var(--muted);pointer-events:none}
+.bar{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.bar>*{pointer-events:auto}
+.title{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:8px 12px;max-width:min(360px,100%)}
+.title b{display:block;font:700 1.25rem/1.1 var(--display)}
+.title span{font:400 .75rem var(--mono);color:var(--muted)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button{font:600 .85rem var(--body);border-radius:999px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--chip);color:var(--ink)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.loading[hidden]{display:none}
+.loading{position:absolute;inset:0;display:grid;place-items:center;font:500 .9rem var(--mono);color:var(--muted);pointer-events:none}
+.list{display:flex;flex-direction:column;gap:10px}
+.arrange{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--chip)}
+.seg button{border:0;border-radius:0;background:transparent;padding:7px 14px;font:600 .85rem var(--body);color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.group .eyebrow{min-width:64px}
+.chip{font:500 .85rem var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--ink);display:inline-flex;gap:6px;align-items:center}
+.chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.dot-sam{background:var(--sam)}.dot-ours{background:var(--ours)}
+.chip .two{font:400 .68rem var(--mono);color:var(--muted)}
+.note{font-size:.82rem;color:var(--muted);margin:0;max-width:72ch}
+</style>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow"><a class="home" href="../">Home</a> · Will, Ri &amp; Sam · shared camp kit</div>
+      <h1>Hof<span>Camp</span></h1>
+    </div>
+    <div class="count" id="count">Loading gear…</div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="bar">
+      <div class="title" id="title" hidden><b id="tName"></b><span id="tSub"></span></div>
+      <div class="btns">
+        <button id="toggle" class="primary" hidden>Unpack</button>
+        <button id="back" hidden>Back to floor</button>
+      </div>
+    </div>
+    <div class="tip" id="tip"></div>
+    <div class="loading" id="loading">Laying out the gear…</div>
+    <div class="hint" id="hint">Click any item to pick it up · hover to see its name · drag to look around</div>
+  </div>
+
+  <div class="arrange"><span class="eyebrow">Arrange</span>
+    <div class="seg" role="group" aria-label="Arrange the floor">
+      <button id="ar-free" aria-pressed="true">Laid out</button><button id="ar-owner" aria-pressed="false">By owner</button><button id="ar-cat" aria-pressed="false">By category</button>
+    </div></div>
+  <div class="list" id="list"></div>
+  <p class="note">Each item is a 3D model generated with Meshy AI from the product photos and scaled to its real size. Packed items unpack when you pick them up: the Patagonia duffel, the bear bag kit, the tent, Rumpl, both sleeping pads, sleeping bag, chair, tarp, both towels, cooler, cutting board and tools, cookware, saw, paracord, binoculars, the stove kit inside the GSI pot, water filter and multi-tool holster. Both headlamps and the lantern switch on. Each second water shoe is a mirror image of the first.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/meshopt_decoder.js"></script>
+<script>
+(function(){
+const PI=Math.PI;
+/* ---------- the inventory ----------
+   size = real-world length (m) of the item's longest side once laid down.
+   rot  = how the Meshy model is turned to lie the way it would on a floor. */
+const ITEMS=[
+ /* back row: the big stuff */
+ {id:'duffel',name:'Patagonia Black Hole Duffel 55L',owner:'sam',sub:'carries most of the kit',
+  closed:{f:'duffel',size:.58},open:{f:'duffel-open',size:.58},pos:[-1.3,-.62],ry:-.2},
+ {id:'tent',name:'Coleman Peak1 2P tent',owner:'sam',sub:'88 × 52 in floor · 42 in peak',
+  closed:{f:'tent-packed',rot:[0,0,PI/2],size:.50},open:{f:'tent',size:1.10,axis:'y'},pos:[-.62,-.6],ry:-.35},
+ {id:'nemo',name:'NEMO Switchback foam pad',owner:'sam',sub:'72 in, folds like an accordion',
+  closed:{f:'nemo-packed',size:.51},open:{f:'nemo',size:1.83},pos:[.02,-.62],ry:.1},
+ {id:'sleepbag',name:'Green sleeping bag',owner:'ours',sub:'mummy bag',
+  closed:{f:'sleepbag-packed',size:.40},open:{f:'sleepbag',size:2.0},pos:[.62,-.6],ry:.3},
+ {id:'bearbag',name:'Bear bag hanging kit',owner:'ours',sub:'20 L dry bag, rope, carabiners · packs into a mesh cube',
+  closed:{f:'bearbag-packed',size:.34},open:{f:'bearbag',rot:[-PI/2,0,0],size:.48},pos:[1.27,-.6],ry:.05},
+ /* middle row */
+ {id:'rumpl',name:'Rumpl Backcountry Puffy',owner:'sam',sub:'1-person blanket',
+  closed:{f:'rumpl-packed',rot:[0,0,PI/2],size:.38},open:{f:'rumpl',rot:[-PI/2,0,0],size:1.90},pos:[-1.32,.02],ry:.3},
+ {id:'chair',name:'REI Flexlite Camp Dreamer chair',owner:'sam',sub:'packs into its own sack',
+  closed:{f:'chair-packed',size:.38},open:{f:'chair',size:.95,axis:'y'},pos:[-.8,.04],ry:-.2},
+ {id:'tarp',name:'CARTMAN 6 × 8 ft tarp',owner:'ours',sub:'waterproof, grommeted',
+  closed:{f:'tarp-packed',size:.34},open:{f:'tarp',size:2.44,flat:true},pos:[-.28,.03],ry:.15},
+ {id:'pad',name:'Overmont ultralight sleeping pad',owner:'ours',sub:'inflatable, built-in pillow',
+  closed:{f:'pad-packed',rot:[0,0,PI/2],size:.30},open:{f:'pad',size:1.90},pos:[.2,.04],ry:.4},
+ {id:'filter',name:'Katadyn gravity water filter',owner:'sam',sub:'hang it and let it drip',
+  closed:{f:'filter-packed',rot:[-PI/2,0,0],size:.25},open:{f:'filter',rot:[-PI/2,0,0],size:.52},pos:[.66,.03],ry:-.15},
+ {id:'boiler',name:'GSI Halulite Boiler 1.1 L',owner:'sam',sub:'stove kit nests inside',
+  closed:{f:'boiler',size:.15},open:{parts:[{f:'stove',size:.27,axis:'y',at:[0,0]},{f:'ferro',size:.24,flat:true,at:[.24,.05],ry:.5}]},pos:[1.1,.04],ry:.6},
+ {id:'shoes',name:'Quick-dry water shoes',owner:'ours',sub:'black pair',
+  closed:{f:'shoe',size:.27,pair:.115},pos:[1.5,.06],ry:-.35},
+ /* front row: the small stuff */
+ {id:'shoes2',name:'Beige water shoes',owner:'ours',sub:"men's 6",
+  closed:{f:'shoe2',size:.25,pair:.105},pos:[-1.32,.6],ry:.3},
+ {id:'headlamp',name:'Black Diamond Cosmo headlamp',owner:'sam',sub:'',
+  closed:{f:'headlamp',size:.19},light:{at:[0,.02,.975]},focusRy:-1.3,pos:[-.85,.62],ry:.4},
+ {id:'headlamp2',name:'Energizer headlamp',owner:'ours',sub:'',
+  closed:{f:'headlamp2',size:.19},light:{at:[0,0,.95]},focusRy:-1.3,pos:[-.45,.62],ry:-.3},
+ {id:'multitool',name:'Coast Mackenzie MT400C multi-tool',owner:'sam',sub:'18-in-1, in its nylon holster',
+  closed:{f:'holster',size:.14,axis:'y'},open:{f:'multitool',rot:[-PI/2,0,0],size:.17},pos:[-.05,.62],ry:.2},
+ {id:'soap',name:'Biodegradable camp soap',owner:'ours',sub:'citrus',
+  closed:{f:'soap',size:.15,axis:'y'},pos:[.62,.6],ry:.2},
+ {id:'deet',name:"Ben's 30% DEET repellent",owner:'sam',sub:'3.4 oz pump',
+  closed:{f:'deet',size:.15,axis:'y'},pos:[-1.62,1.08],ry:.3},
+ {id:'bronner',name:"Dr. Bronner's peppermint soap",owner:'sam',sub:'2 oz',
+  closed:{f:'bronner',size:.11,axis:'y'},pos:[-1.62,1.5],ry:-.2},
+ {id:'nalgene',name:'Nalgene 32 oz wide-mouth',owner:'sam',sub:'',
+  closed:{f:'nalgene',size:.235,axis:'y'},pos:[.9,.6],ry:-.4},
+ {id:'nalgene2',name:'Nalgene 32 oz wide-mouth',owner:'ours',sub:'',
+  closed:{f:'nalgene',size:.235,axis:'y'},pos:[1.78,1.08],ry:.3},
+ {id:'lantern',name:'Black Diamond Moji lantern',owner:'sam',sub:'',
+  closed:{f:'lantern',rot:[PI,0,0],size:.085},light:{glow:true},pos:[1.16,.6],ry:0},
+ {id:'whistle',name:'Emergency whistle',owner:'sam',sub:'on a lanyard',
+  closed:{f:'whistle',size:.36},pos:[1.48,.62],ry:.5},
+ /* fourth row */
+ {id:'towel',name:'REI Co-op Multi Towel',owner:'sam',sub:'quick-dry',
+  closed:{f:'towel-packed',size:.30},open:{f:'towel',size:.92,flat:true},pos:[-1.05,1.05],ry:.15},
+ {id:'sleepbag2',name:'Second sleeping bag',owner:'sam',sub:'packed in its stuff sack',
+  closed:{f:'sleepbag2-packed',size:.34,axis:'y'},pos:[-.5,1.05],ry:-.2},
+ {id:'rinse',name:'Rinse Wash & Fold bag',owner:'ours',sub:'the second duffel',
+  closed:{f:'rinse',size:.66},pos:[.18,1.08],ry:.1},
+ {id:'cooler',name:'Insulated cooler bag',owner:'ours',sub:'soft-sided, two compartments',
+  closed:{f:'cooler-packed',size:.36},open:{f:'cooler',size:.42},pos:[.88,1.06],ry:-.25},
+ {id:'power',name:'Power banks',owner:'ours',sub:'six bricks',
+  closed:{f:'power',size:.3,flat:true},pos:[1.45,1.06],ry:.1},
+ /* fifth row: the kitchen */
+ {id:'pots',name:'Camp cookware set',owner:'ours',sub:'nests in its black drawstring bag',
+  closed:{f:'potbag',size:.24},open:{f:'pots',size:.5},pos:[-1.2,1.56],ry:.3},
+ {id:'saw',name:'Folding pruning saw',owner:'ours',sub:'',
+  closed:{f:'saw-packed',size:.27,flat:true},open:{f:'saw',size:.5,flat:true},pos:[-.62,1.56],ry:.4},
+ {id:'board',name:'Cutting board & kitchen tools',owner:'ours',sub:'tongs, knife, spork',
+  closed:{parts:[{f:'board',size:.34,at:[0,0]},{f:'tools',size:.26,flat:true,y:.02,at:[0,0],ry:.15}]},
+  open:{parts:[{f:'board',size:.34,at:[0,0]},{f:'tools',size:.26,flat:true,at:[.31,0],ry:1.57}]},pos:[-.02,1.56],ry:-.15},
+ {id:'ktowel',name:'Kitchen towel',owner:'ours',sub:'',
+  closed:{f:'ktowel-packed',size:.22},open:{f:'ktowel',size:.6,flat:true},pos:[.55,1.56],ry:.2},
+ {id:'cord',name:'Paracord kit',owner:'sam',sub:'four hanks and cord tensioners',
+  closed:{f:'cord-packed',size:.26},open:{f:'cord',size:.5},pos:[1.05,1.56],ry:-.2},
+ {id:'bino',name:'Nocs Standard Issue 8×25 binoculars',owner:'sam',sub:'in their drawstring pouch',
+  closed:{f:'bino-packed',size:.15},open:{f:'bino',size:.42},pos:[1.48,1.56],ry:.3},
+];
+const OWNER={sam:"Sam's",ours:'Ours'};
+
+/* ---------- DOM ---------- */
+const $=id=>document.getElementById(id);
+const stage=$('stage'),tip=$('tip');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- renderer / scene ---------- */
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(35,1,.02,60);
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=.25;controls.maxDistance=10;controls.maxPolarAngle=PI*.48;
+
+const hemi=new THREE.HemisphereLight(0xfffaf0,0x7a6a58,.65);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,.85);
+sun.position.set(2,5,3);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-3,right:3,top:3,bottom:-3,near:.5,far:14});sun.shadow.bias=-.0005;sun.shadow.radius=3;
+scene.add(sun);
+const fill=new THREE.DirectionalLight(0xdfe8ff,.3);fill.position.set(-3,2,-2);scene.add(fill);
+
+// plank floor (like the apartment hallway the photos were taken in)
+function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=renderer.capabilities.getMaxAnisotropy();return t}
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const wood=tex(1024,1024,(g,w,h)=>{
+  const rows=10,rh=h/rows;
+  for(let r=0;r<rows;r++){let x=-rnd()*300;
+    while(x<w){const len=260+rnd()*380,l=44+rnd()*10,hue=28+rnd()*6;
+      g.fillStyle=`hsl(${hue},${26+rnd()*8}%,${l}%)`;g.fillRect(x,r*rh,len,rh);
+      g.globalAlpha=.10;for(let k=0;k<9;k++){g.strokeStyle=rnd()<.5?'#5a3416':'#f3d3a3';g.lineWidth=1+rnd()*2;g.beginPath();const y=r*rh+rnd()*rh;g.moveTo(x,y);g.bezierCurveTo(x+len*.3,y+(rnd()-.5)*8,x+len*.6,y+(rnd()-.5)*8,x+len,y+(rnd()-.5)*6);g.stroke()}
+      g.globalAlpha=1;g.fillStyle='rgba(60,32,12,.55)';g.fillRect(x,r*rh,2,rh);x+=len}
+    g.fillStyle='rgba(60,32,12,.6)';g.fillRect(0,r*rh,w,2)}
+});
+wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(1.85,1.75);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(3.7,3.5),new THREE.MeshStandardMaterial({map:wood,roughness:.62,metalness:0}));
+floor.rotation.x=-PI/2;floor.position.z=.4;floor.receiveShadow=true;scene.add(floor);
+const groundMat=new THREE.MeshLambertMaterial();
+const ground=new THREE.Mesh(new THREE.CircleGeometry(30,48),groundMat);ground.rotation.x=-PI/2;ground.position.y=-.002;ground.receiveShadow=true;scene.add(ground);
+let dirty=true;
+function applyTheme(){const bg=new THREE.Color(css('--stage')||'#e4e1d9').convertSRGBToLinear();scene.background=bg;scene.fog=new THREE.Fog(bg,8,20);groundMat.color=bg.clone().multiplyScalar(.9);dirty=true}
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---------- loading models ---------- */
+let useMeshopt=!!window.MeshoptDecoder;
+const decoderReady=useMeshopt?MeshoptDecoder.ready.then(()=>true,()=>false):Promise.resolve(false);
+function b64(j){const s=atob(j.data),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a.buffer}
+// three r128 renders compressed (normalized integer) positions correctly but raycasts them as raw integers,
+// which makes clicks land on the wrong item. Convert positions to plain floats once, after loading.
+function dequant(root){root.traverse(o=>{if(!o.isMesh)return;const a=o.geometry.attributes.position;if(!a||!a.normalized)return;
+  const src=a.isInterleavedBufferAttribute?a.data.array:a.array,m=src instanceof Int8Array?127:src instanceof Uint8Array?255:src instanceof Int16Array?32767:src instanceof Uint16Array?65535:1,signed=m===127||m===32767;
+  const n=a.count,out=new Float32Array(n*3),f=v=>{v/=m;return signed?Math.max(v,-1):v};
+  for(let i=0;i<n;i++){out[i*3]=f(a.getX(i));out[i*3+1]=f(a.getY(i));out[i*3+2]=f(a.getZ(i))}
+  o.geometry.setAttribute('position',new THREE.BufferAttribute(out,3));o.geometry.computeBoundingBox();o.geometry.computeBoundingSphere()})}
+async function loadGLB(f){
+  const ok=await decoderReady;
+  const tryLoad=async dir=>{const r=await fetch(dir+'/'+f+'.json');if(!r.ok)throw new Error(f);const buf=b64(await r.json());
+    const L=new THREE.GLTFLoader();if(dir==='m')L.setMeshoptDecoder(MeshoptDecoder);
+    return new Promise((res,rej)=>L.parse(buf,'',g=>{dequant(g.scene);res(g.scene)},rej))};
+  if(ok){try{return await tryLoad('m')}catch(e){}}
+  return tryLoad('q');
+}
+// turn, scale to real size, sit on the floor, center on its own origin
+function fit(model,spec){
+  const pivot=new THREE.Group();const turn=new THREE.Group();
+  if(spec.rot)turn.rotation.set(...spec.rot);
+  turn.add(model);pivot.add(turn);
+  if(spec.flat)layFlat(model,turn);
+  let box=new THREE.Box3().setFromObject(pivot);const size=box.getSize(new THREE.Vector3());
+  const k=spec.size/(spec.axis==='y'?size.y:Math.max(size.x,size.y,size.z));
+  turn.scale.setScalar(k);
+  box=new THREE.Box3().setFromObject(pivot);const c=box.getCenter(new THREE.Vector3());
+  turn.position.set(-c.x,-box.min.y,-c.z);
+  if(spec.flat){ // rest on the bulk of the sheet, ignoring stray low points
+    pivot.updateMatrixWorld(true);const ys=[],v=new THREE.Vector3();
+    model.traverse(o=>{if(!o.isMesh)return;const p=o.geometry.attributes.position,st=Math.max(1,Math.floor(p.count/6000));
+      for(let i=0;i<p.count;i+=st){vtx(p,i,v).applyMatrix4(o.matrixWorld);ys.push(v.y)}});
+    ys.sort((a,b)=>a-b);turn.position.y-=ys[Math.floor(ys.length*.03)]-.004;
+  }
+  model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;if(o.material){o.material.side=THREE.DoubleSide;if(o.material.map)o.material.map.anisotropy=renderer.capabilities.getMaxAnisotropy()}}});
+  if(spec.pair){ // second shoe = mirror image across the shoe's width
+    const wrap=new THREE.Group();pivot.remove(turn);wrap.add(turn);
+    const twin=turn.clone();twin.scale.z*=-1;twin.position.z=-turn.position.z;
+    turn.position.z+=spec.pair/2;twin.position.z-=spec.pair/2;twin.position.x+=.02;
+    wrap.add(twin);pivot.add(wrap);
+  }
+  const fb=new THREE.Box3().setFromObject(pivot);
+  pivot.userData.radius=fb.getSize(new THREE.Vector3()).length()/2;pivot.userData.height=fb.max.y;
+  return pivot;
+}
+
+// read a vertex, undoing glTF quantization (three r128's getX returns raw integers for normalized attributes)
+function vtx(p,i,v){v.fromBufferAttribute(p,i);if(p.normalized){const a=p.array,m=a instanceof Int8Array?127:a instanceof Uint8Array?255:a instanceof Int16Array?32767:a instanceof Uint16Array?65535:1;
+  v.divideScalar(m);if(m===127||m===32767){v.x=Math.max(v.x,-1);v.y=Math.max(v.y,-1);v.z=Math.max(v.z,-1)}}return v}
+// lay a sheet-like model flat: find its thinnest direction (smallest spread of vertices) and point it up
+function layFlat(model,turn){
+  const pts=[];model.updateMatrixWorld(true);
+  model.traverse(o=>{if(!o.isMesh)return;const p=o.geometry.attributes.position,v=new THREE.Vector3(),st=Math.max(1,Math.floor(p.count/4000));
+    for(let i=0;i<p.count;i+=st){vtx(p,i,v).applyMatrix4(o.matrixWorld);pts.push(v.clone())}});
+  const m=new THREE.Vector3();pts.forEach(p=>m.add(p));m.divideScalar(pts.length);
+  const C=[[0,0,0],[0,0,0],[0,0,0]];
+  pts.forEach(p=>{const d=[p.x-m.x,p.y-m.y,p.z-m.z];for(let i=0;i<3;i++)for(let j=0;j<3;j++)C[i][j]+=d[i]*d[j]});
+  // smallest eigenvector: power iteration on (trace*I - C)
+  const tr=C[0][0]+C[1][1]+C[2][2];let n=new THREE.Vector3(.3,1,.2).normalize();
+  for(let k=0;k<60;k++){const x=[n.x,n.y,n.z],y=[0,1,2].map(i=>tr*x[i]-(C[i][0]*x[0]+C[i][1]*x[1]+C[i][2]*x[2]));n.set(...y).normalize()}
+  if(n.y<0)n.negate();
+  turn.quaternion.premultiply(new THREE.Quaternion().setFromUnitVectors(n,new THREE.Vector3(0,1,0)));
+}
+// several models arranged as one piece: each part is fitted, placed at [x,z] (and lifted by y), then the set is centered
+function loadParts(parts){
+  return Promise.all(parts.map(pt=>loadGLB(pt.f).then(m=>{const g=fit(m,pt);g.position.set(pt.at[0],pt.y||0,pt.at[1]);g.rotation.y=pt.ry||0;return g}))).then(gs=>{
+    const grp=new THREE.Group();gs.forEach(g=>grp.add(g));const bb=new THREE.Box3().setFromObject(grp);const c=bb.getCenter(new THREE.Vector3());
+    gs.forEach(g=>{g.position.x-=c.x;g.position.z-=c.z});const fb=new THREE.Box3().setFromObject(grp);
+    grp.userData.radius=fb.getSize(new THREE.Vector3()).length()/2;grp.userData.height=fb.max.y;return grp});
+}
+/* ---------- item objects ---------- */
+const objs=[];   // {item, root, closed, open, hover, s(current scale), ...}
+ITEMS.forEach(item=>{
+  const root=new THREE.Group();root.position.set(item.pos[0],0,item.pos[1]);root.rotation.y=item.ry||0;root.scale.setScalar(.001);scene.add(root);
+  objs.push({item,root,closed:null,open:null,hover:0,hoverT:0,show:0,showT:1,openP:0,openT:0,spin:0,
+    home:new THREE.Vector3(item.pos[0],0,item.pos[1]),homeRy:item.ry||0});
+});
+let loaded=0;
+function setCount(){$('count').textContent=loaded<ITEMS.length?`Loading ${loaded}/${ITEMS.length}…`:`${ITEMS.length} items · ${ITEMS.filter(i=>i.owner==='sam').length} Sam's, ${ITEMS.filter(i=>i.owner==='ours').length} ours`}
+setCount();
+Promise.all(objs.map(o=>(o.item.closed.parts?loadParts(o.item.closed.parts):loadGLB(o.item.closed.f)).then(m=>{
+  o.closed=o.item.closed.parts?m:fit(m,o.item.closed);o.closed.traverse(x=>{if(x.isMesh)x.userData.obj=o});o.root.add(o.closed);
+  if(o.item.light)buildLamp(o);
+  loaded++;setCount();dirty=true;$('loading').hidden=true;
+}).catch(()=>{loaded++;setCount()}))).then(()=>{
+  // fetch the set-up versions in the background so unpacking is instant
+  // set-up versions load on demand (first hover or click), so the floor appears fast
+  if(mode!=='free')arrange(mode,false);
+});
+let _glow=null;function glowTex(){if(_glow)return _glow;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+  const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,240,210,.55)');gr.addColorStop(1,'rgba(255,220,170,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);_glow=new THREE.CanvasTexture(c);return _glow}
+/* headlamp: a lens glow, a soft beam and a real spotlight, all switched by o.lightP */
+function buildLamp(o){
+  if(o.item.light.glow){
+    const r=o.closed.userData.radius,c=new THREE.Vector3(0,o.closed.userData.height*.6,0);
+    const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xffe0a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false}));
+    halo.scale.setScalar(r*6);halo.position.copy(c);o.root.add(halo);
+    const pt=new THREE.PointLight(0xffd9a0,0,3.2,1.6);pt.position.copy(c);pt.position.y+=r*.4;o.root.add(pt);
+    const mats=[];o.closed.traverse(x=>{if(x.isMesh&&x.material){x.material.emissive=new THREE.Color(0xffd08a);x.material.emissiveMap=x.material.map||null;x.material.emissiveIntensity=0;x.material.needsUpdate=true;mats.push(x.material)}});
+    o.lamp={halo,pt,mats,glow:true};o.lightP=0;o.lightT=0;return;
+  }
+  const turn=o.closed.children[0],at=new THREE.Vector3(...o.item.light.at);
+  const g=new THREE.Group();g.position.copy(at);turn.add(g);
+  const lens=new THREE.Mesh(new THREE.CircleGeometry(.09,32),new THREE.MeshBasicMaterial({color:0xfff4d8,transparent:true,opacity:0}));
+  lens.position.z=.012;g.add(lens);
+  const halo=new THREE.Mesh(new THREE.CircleGeometry(.32,32),new THREE.MeshBasicMaterial({color:0xffe2a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));
+  halo.position.z=.02;g.add(halo);
+  const beam=new THREE.Mesh(new THREE.ConeGeometry(4.2,12,40,1,true),new THREE.MeshBasicMaterial({color:0xffe9b8,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+  beam.rotation.x=-Math.PI/2;beam.position.z=6.05;g.add(beam);
+  const spot=new THREE.SpotLight(0xfff1d2,0,5,.42,.55,1.2);spot.position.set(0,0,.05);
+  const tgt=new THREE.Object3D();tgt.position.set(0,-.6,10);g.add(spot,tgt);spot.target=tgt;
+  [lens,halo,beam].forEach(m=>m.userData.fx=true);o.lamp={lens,halo,beam,spot};o.lightP=0;o.lightT=0;
+}
+function ensureOpen(o){
+  if(o.openLoad)return o.openLoad;
+  const loadOpen=o.item.open.parts?loadParts(o.item.open.parts).then(g=>({multi:g})):loadGLB(o.item.open.f);
+  o.openLoad=loadOpen.then(m=>{o.open=m&&m.multi?m.multi:fit(m,o.item.open);o.open.traverse(x=>{if(x.isMesh)x.userData.obj=o});o.open.visible=false;o.root.add(o.open);dirty=true});
+  return o.openLoad;
+}
+
+
+/* ---------- arrange: laid out / by owner / by category ---------- */
+const CATS=[
+ ['Bags',['duffel','rinse']],
+ ['Kitchen',['board','pots','boiler','cooler','ktowel','filter','nalgene','nalgene2','soap','bronner','bearbag']],
+ ['Sleep & shelter',['tent','sleepbag','sleepbag2','nemo','pad','rumpl','lantern']],
+ ['Camp tools',['chair','tarp','saw','multitool','cord','headlamp','headlamp2','power','deet','towel']],
+ ['Excursions',['shoes','shoes2','bino','whistle']],
+];
+// biggest first, reading left to right then down; these lead their group in this order
+const LEAD=['duffel','tent','chair','rumpl','nemo','rinse','cooler','sleepbag'];
+// keep pairs together: the second item sorts right after the first
+const AFTER={shoes2:'shoes',headlamp2:'headlamp',nalgene2:'nalgene'};
+const CAT_OF={};CATS.forEach(([c,ids])=>ids.forEach(id=>CAT_OF[id]=c));
+let mode='free';try{mode=localStorage.getItem('gear-arrange')||'free'}catch(e){}
+const labelGroup=new THREE.Group();scene.add(labelGroup);
+function footprint(o){
+  if(o.fp)return o.fp;if(!o.closed)return{w:.3,d:.3};
+  const r=o.root,p=r.position.clone(),q=r.rotation.y,sc=r.scale.x;r.position.set(0,0,0);r.rotation.y=0;r.scale.setScalar(1);r.updateMatrixWorld(true);
+  const b=new THREE.Box3();o.closed.traverse(x=>{if(x.isMesh&&!x.userData.fx)b.expandByObject(x)});r.position.copy(p);r.rotation.y=q;r.scale.setScalar(sc);r.updateMatrixWorld(true);
+  const sz=b.getSize(new THREE.Vector3());o.fp={w:Math.max(.06,sz.x),d:Math.max(.06,sz.z),h:Math.max(.02,sz.y),cx:(b.min.x+b.max.x)/2,cz:(b.min.z+b.max.z)/2};return o.fp}
+function labelMesh(text,count){
+  const c=document.createElement('canvas'),g=c.getContext('2d');const F1='700 84px "Barlow Condensed","Arial Narrow",sans-serif',F2='500 52px "JetBrains Mono",monospace';
+  const t=text.toUpperCase();g.font=F1;const tw=g.measureText(t).width;g.font=F2;const nw=g.measureText(String(count)).width;
+  c.width=Math.ceil(tw+nw+50);c.height=128;g.font=F1;g.fillStyle=css('--ink')||'#22262a';g.textBaseline='middle';
+  g.fillText(t,6,66);g.font=F2;g.globalAlpha=.6;g.fillText(String(count),tw+30,70);
+  const tex=new THREE.CanvasTexture(c);tex.encoding=THREE.sRGBEncoding;tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  const LW=c.width/128*.15;const m=new THREE.Mesh(new THREE.PlaneGeometry(LW,.15),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false,opacity:.85}));
+  m.rotation.x=-PI/2;m.position.y=.003;m.renderOrder=10;m.userData.w=LW;return m}
+function packGroup(items,maxW){ // shelf-pack items (largest first) into rows no wider than maxW
+  const vol=o=>{const f=footprint(o);return f.w*f.d*Math.sqrt(f.h)};
+  const key=o=>{const id=o.item.id,li=LEAD.indexOf(id);if(li>=0)return 1e6-li;if(AFTER[id]){const p=items.find(x=>x.item.id===AFTER[id]);if(p)return key(p)-1e-9}return vol(o)};
+  const it=items.map(o=>({o,f:footprint(o),k:key(o)})).sort((a,b)=>b.k-a.k);const gap=.07;
+  let x=0,z=0,row=0,W=0;const out=[];
+  it.forEach(({o,f})=>{if(x>0&&x+f.w>maxW){z+=row+gap;x=0;row=0}out.push({o,x:x+f.w/2-f.cx,z:z+f.d/2-f.cz});x+=f.w+gap;row=Math.max(row,f.d);W=Math.max(W,x-gap)});
+  return{out,w:W,d:z+row}}
+function arrange(m,instant){
+  mode=m;try{localStorage.setItem('gear-arrange',m)}catch(e){}
+  ['free','owner','cat'].forEach(k=>$('ar-'+k).setAttribute('aria-pressed',k===m?'true':'false'));
+  while(labelGroup.children.length){const l=labelGroup.children.pop();l.material.map.dispose();l.material.dispose();l.geometry.dispose()}
+  if(m==='free'){
+    objs.forEach(o=>{o.home.set(o.item.pos[0],0,o.item.pos[1]);o.homeRy=o.item.ry||0});
+    floor.scale.set(1,1,1);floor.position.set(0,0,.4);FL={cx:.08,cz:.45,k:1};
+  }else{
+    const groups=m==='owner'
+      ?[["Sam's",objs.filter(o=>o.item.owner==='sam')],['Ours',objs.filter(o=>o.item.owner==='ours')]]
+      :CATS.map(([c])=>[c,objs.filter(o=>(CAT_OF[o.item.id]||'Camp tools')===c)]).filter(g=>g[1].length);
+    const packed=groups.map(([name,items])=>{const area=items.reduce((a,o)=>{const f=footprint(o);return a+(f.w+.07)*(f.d+.07)},0);
+      const maxW=m==='owner'?1.75:Math.min(2.2,Math.max(...items.map(o=>footprint(o).w),Math.sqrt(area)*1.35));
+      const lab=labelMesh(name,items.length),pg=packGroup(items,Math.max(maxW,lab.userData.w));
+      return{name,n:items.length,lab,...pg,w:Math.max(pg.w,lab.userData.w)}});
+    // place the groups themselves in shelves across the floor
+    const FW=m==='owner'?3.9:3.6,G=.3,LH=.2;let x=0,z=0,row=0,W=0;
+    packed.forEach(g=>{if(x>0&&x+g.w>FW){z+=row+G;x=0;row=0}g.x0=x;g.z0=z;x+=g.w+G;row=Math.max(row,g.d+LH);W=Math.max(W,x-G)});
+    const D=z+row,ox=-W/2,oz=-D/2+.45;
+    packed.forEach(g=>{g.out.forEach(p=>{p.o.home.set(ox+g.x0+p.x,0,oz+g.z0+p.z);p.o.homeRy=0});
+      const l=g.lab;l.position.x=ox+g.x0+l.userData.w/2;l.position.z=oz+g.z0+g.d+LH*.5;labelGroup.add(l)});
+    const fw=W+.5,fd=D+.6;floor.scale.set(fw/3.7,fd/3.5,1);floor.position.set(0,0,.45);
+    FL={cx:0,cz:.45,k:Math.max(.55,fw/3.7,fd/3.5)};
+  }
+  if(focus)focusOn(null);else goCam(floorView(),instant);dirty=true;
+}
+['free','owner','cat'].forEach(k=>$('ar-'+k).onclick=()=>arrange(k));
+/* ---------- list below the stage ---------- */
+const list=$('list');
+['sam','ours'].forEach(ow=>{
+  const g=document.createElement('div');g.className='group';
+  const lab=document.createElement('span');lab.className='eyebrow';lab.textContent=OWNER[ow];g.append(lab);
+  ITEMS.filter(i=>i.owner===ow).forEach(i=>{
+    const b=document.createElement('button');b.className='chip';b.id='chip-'+i.id;b.setAttribute('aria-pressed','false');
+    const d=document.createElement('i');d.className='dot-'+ow;b.append(d,i.name);
+    if(i.open){const t=document.createElement('span');t.className='two';t.textContent='unpacks';b.append(t)}
+    b.onclick=()=>{const o=objs.find(x=>x.item===i);focusOn(focus===o?null:o)};
+    g.append(b)});
+  list.append(g)});
+
+/* ---------- camera ---------- */
+const FLOOR_DIR=new THREE.Vector3(0,1.35,1.05).normalize();
+let camGoal=null;
+let FL={cx:.08,cz:.45,k:1};
+function floorView(){const w=stage.clientWidth,h=stage.clientHeight;const d=(w/h<1?7.4:w/h<1.4?5.5:4.7)*FL.k;return{t:new THREE.Vector3(FL.cx,0,FL.cz),d,dir:FLOOR_DIR.clone()}}
+function itemView(o){
+  const piece=(o.openT&&o.open)?o.open:o.closed;const r=piece?piece.userData.radius:.5,hgt=piece?piece.userData.height:.3;
+  const fov=camera.fov*PI/180,aspect=camera.aspect;const fit=r/Math.sin(Math.min(fov,fov*aspect)/2)*1.15;
+  const dir=camera.position.clone().sub(controls.target).normalize();
+  if(dir.y<.25){dir.y=.25;dir.normalize()}
+  return{t:new THREE.Vector3(0,hgt*.45,0),d:Math.max(.2,fit),dir:new THREE.Vector3(.75,.62,1).normalize()};
+}
+function goCam(v,instant){camGoal=v;if(instant||reduce){controls.target.copy(v.t);camera.position.copy(v.dir).multiplyScalar(v.d).add(v.t);camGoal=null;dirty=true}}
+controls.addEventListener('start',()=>{camGoal=null});
+controls.addEventListener('change',()=>{dirty=true});
+
+/* ---------- focus / unpack ---------- */
+let focus=null;
+function focusOn(o){
+  focus=o;
+  objs.forEach(x=>{x.showT=(!o||x===o)?1:0;if(!o){x.openT=0}});
+  document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',o&&c.id==='chip-'+o.item.id?'true':'false'));
+  objs.forEach(x=>{if(x.lamp&&x!==o)x.lightT=0});
+  $('title').hidden=!o;$('back').hidden=!o;$('toggle').hidden=!(o&&(o.item.open||o.item.light));
+  if(o){$('tName').textContent=o.item.name;$('tSub').textContent=OWNER[o.item.owner]+(o.item.sub?' · '+o.item.sub:'');
+    $('toggle').textContent=o.item.light?'Turn on':'Unpack';
+    $('hint').textContent=(o.item.open?'Click it to unpack':o.item.light?'Click it to switch it on':'Click it to spin')+' · drag to orbit · scroll or pinch to zoom';
+    if(o.item.open)ensureOpen(o);
+    goCam(itemView(o));
+  }else{$('hint').textContent='Click any item to pick it up · hover to see its name · drag to look around';goCam(floorView())}
+  tip.classList.remove('on');dirty=true;
+}
+function toggleOpen(o){
+  if(o.item.light){o.lightT=o.lightT?0:1;$('toggle').textContent=o.lightT?'Turn off':'Turn on';
+    $('hint').textContent=(o.lightT?'Click it to switch it off':'Click it to switch it on')+' · drag to orbit · scroll or pinch to zoom';dirty=true;return}
+  if(!o.item.open){o.spin=1;return}
+  ensureOpen(o).then(()=>{o.openT=o.openT?0:1;$('toggle').textContent=o.openT?'Pack up':'Unpack';
+    $('hint').textContent=(o.openT?'Click it to pack up':'Click it to unpack')+' · drag to orbit · scroll or pinch to zoom';
+    setTimeout(()=>{if(focus===o)goCam(itemView(o))},reduce?0:350)});
+}
+$('back').onclick=()=>focusOn(null);
+$('toggle').onclick=()=>focus&&toggleOpen(focus);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&focus)focusOn(null)});
+
+/* ---------- picking / hover ---------- */
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
+let hovered=null;
+function pick(e){
+  const r=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(mouse,camera);
+  const meshes=[];objs.forEach(o=>{if(o.show<.05)return;[o.closed,o.open].forEach(p=>{if(p&&p.visible)p.traverse(x=>{if(x.isMesh&&x.userData.obj&&!x.userData.fx)meshes.push(x)})})});
+  const h=ray.intersectObjects(meshes,false)[0];if(h)return h.object.userData.obj;
+  // forgiving pick: nearest item whose center is within ~50px of the pointer
+  let best=null,bd=Math.max(36,Math.min(64,r.width*.05));const v=new THREE.Vector3();
+  objs.forEach(o=>{if(o.show<.05||!o.closed)return;const piece=(o.openT&&o.open)?o.open:o.closed;
+    v.set(0,(piece.userData.height||.1)*.5,0);o.root.localToWorld(v);v.project(camera);
+    const d=Math.hypot((v.x+1)/2*r.width-(e.clientX-r.left),(1-v.y)/2*r.height-(e.clientY-r.top));if(d<bd){bd=d;best=o}});
+  return best}
+function showTip(o,e){
+  const r=stage.getBoundingClientRect();tip.innerHTML='';tip.append(o.item.name);
+  const s=document.createElement('small');s.textContent=OWNER[o.item.owner]+(focus?(o.item.open?(o.openT?' · click to pack up':' · click to unpack'):o.item.light?(o.lightT?' · click to switch off':' · click to switch on'):''):' · click to pick up');tip.append(s);
+  tip.style.left=(e.clientX-r.left)+'px';tip.style.top=(e.clientY-r.top)+'px';tip.classList.add('on')}
+function setHover(o){if(hovered===o)return;if(o&&o.item.open)ensureOpen(o);if(hovered)hovered.hoverT=0;hovered=o;if(o&&!focus)o.hoverT=1;renderer.domElement.classList.toggle('hot',!!o);dirty=true}
+let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY,e.pointerType]},true);
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse')return;
+  if(e.buttons){tip.classList.remove('on');return}
+  const o=pick(e);setHover(o);if(o)showTip(o,e);else tip.classList.remove('on')});
+renderer.domElement.addEventListener('pointerleave',()=>{setHover(null);tip.classList.remove('on')});
+addEventListener('pointerup',e=>{if(e.target!==renderer.domElement&&!down)return;
+  if(!down)return;const moved=Math.hypot(e.clientX-down[0],e.clientY-down[1]),touch=down[2]!=='mouse';down=null;if(moved>(touch?12:6))return;
+  const o=pick(e);
+  if(!o){if(touch){setHover(null);tip.classList.remove('on')}return}
+  if(focus){if(o===focus)toggleOpen(o);return}
+  setHover(null);focusOn(o)});
+
+/* ---------- animation ---------- */
+const easeOut=t=>1-Math.pow(1-t,3);
+const back=t=>{const c1=1.5,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
+const approach=(v,t,dt,s)=>v+(t-v)*Math.min(1,dt*s);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(!focus&&!camGoal)goCam(floorView(),true);dirty=true}
+new ResizeObserver(resize).observe(stage);resize();
+let last=performance.now(),intro=0;
+function loop(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;let busy=false;
+  const sp=reduce?1e3:1;
+  objs.forEach((o,i)=>{
+    if(!o.closed)return;
+    // appear on the floor one after another
+    const prevShow=o.show;o.show=approach(o.show,o.showT,dt,6*sp);
+    o.hover=approach(o.hover,o.hoverT,dt,10*sp);
+    const target=focus===o?new THREE.Vector3(0,0,0):o.home;
+    o.root.position.lerp(target,Math.min(1,dt*5*sp));
+    const ryT=focus===o?(o.item.focusRy||0):o.homeRy;o.root.rotation.y+=(ryT-o.root.rotation.y)*Math.min(1,dt*5*sp);
+    if(o.spin>0){o.spin=Math.max(0,o.spin-dt/1.4);o.root.rotation.y=ryT+(1-easeOut(1-o.spin))*PI*2;busy=true}
+    const s=Math.max(.001,o.show)*(1+.35*o.hover);
+    o.root.scale.setScalar(s);o.root.position.y=.04*o.hover*(o.closed.userData.height>.3?.5:1);
+    o.root.visible=o.show>.01;
+    // unpack: packed version shrinks away, set-up version springs up
+    if(o.open){
+      o.openP=approach(o.openP,o.openT,dt,(o.openT?2.2:3)*sp);
+      const p=o.openP;
+      o.closed.visible=p<.45;o.closed.scale.setScalar(Math.max(.001,1-easeOut(Math.min(1,p/.4))));
+      o.open.visible=p>.25;
+      const q=Math.min(1,Math.max(0,(p-.25)/.75));
+      const xz=.15+.85*easeOut(q),y=Math.max(.02,back(q));
+      o.open.scale.set(xz,y,xz);
+      if(Math.abs(o.openP-o.openT)>.001)busy=true;
+    }
+    if(o.lamp){
+      o.lightP=approach(o.lightP,o.lightT,dt,7*sp);const L=o.lightP,f=L*(0.96+0.04*Math.sin(now/90));
+      if(o.lamp.glow){o.lamp.halo.material.opacity=f;o.lamp.halo.visible=L>.01;o.lamp.pt.intensity=4.5*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=2.6*f)}
+      else{o.lamp.lens.material.opacity=L;o.lamp.halo.material.opacity=.55*f;o.lamp.beam.material.opacity=.07*f;o.lamp.spot.intensity=3.2*f;
+      o.lamp.beam.visible=o.lamp.halo.visible=L>.01;}
+      if(Math.abs(o.lightP-o.lightT)>.001)busy=true;
+    }
+    if(Math.abs(o.show-o.showT)>.001||Math.abs(o.hover-o.hoverT)>.001||o.root.position.distanceTo(target)>.001)busy=true;
+  });
+  {const lit=objs.reduce((m,o)=>Math.max(m,o.lightP||0),0);hemi.intensity=.65-.38*lit;sun.intensity=.85-.55*lit;fill.intensity=.3-.18*lit}
+  if(camGoal){
+    controls.target.lerp(camGoal.t,Math.min(1,dt*4));
+    const curDir=camera.position.clone().sub(controls.target).normalize();
+    curDir.lerp(camGoal.dir,Math.min(1,dt*3)).normalize();
+    const d=camera.position.distanceTo(controls.target);const nd=d+(camGoal.d-d)*Math.min(1,dt*4);
+    camera.position.copy(controls.target).add(curDir.multiplyScalar(nd));
+    if(Math.abs(nd-camGoal.d)<.005&&controls.target.distanceTo(camGoal.t)<.005)camGoal=null;busy=true}
+  if(controls.update())busy=true;
+  if(busy||dirty){renderer.render(scene,camera);dirty=false}
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+window.__gear={focus:id=>focusOn(id?objs.find(o=>o.item.id===id):null),open:()=>focus&&toggleOpen(focus),hover:id=>{const o=objs.find(x=>x.item.id===id);setHover(o)},ready:()=>loaded===ITEMS.length};
+})();
+</script>
+
+</body>
+</html>

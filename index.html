@@ -20,6 +20,7 @@
     --red: #ef4444;
     --amber: #eab308;
     --emerald: #10b981;
+    --camp: #e2a62b;
   }
 
   body {
@@ -141,6 +142,7 @@
   .card.reads .brand { color: rgba(234,179,8,0.6); }
   .card.subways .brand { color: rgba(234,179,8,0.6); }
   .card.burrow .brand { color: rgba(16,185,129,0.6); }
+  .card.camp .brand { color: rgba(226,166,43,0.6); }
 
   .card p {
     font-size: 13px;
@@ -174,6 +176,7 @@
   .card.reads .card-stat .val { color: var(--amber); }
   .card.subways .card-stat .val { color: var(--amber); }
   .card.burrow .card-stat .val { color: var(--emerald); }
+  .card.camp .card-stat .val { color: var(--camp); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -203,6 +206,7 @@
   .card.reads .card-links a:hover { color: var(--amber); }
   .card.subways .card-links a:hover { color: var(--amber); }
   .card.burrow .card-links a:hover { color: var(--emerald); }
+  .card.camp .card-links a:hover { color: var(--camp); }
 
   .jobs {
     margin-top: 40px;
@@ -427,6 +431,23 @@
       </div>
       <div class="card-links">
         <a href="books/index.html" onclick="event.stopPropagation()">Book Stack</a>
+      </div>
+    </div>
+    <div onclick="location.href='gear/'" class="card camp">
+      <div class="card-top">
+        <div class="icon">⛺</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofCamp</h2>
+      <div class="brand">Shared camp kit</div>
+      <p>Every piece of camping gear Sam and I have, laid out on the floor in 3D. Click to unpack it.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">34</div><div class="lbl">Items</div></div>
+        <div class="card-stat"><div class="val">20</div><div class="lbl">Unpack</div></div>
+        <div class="card-stat"><div class="val">5</div><div class="lbl">Categories</div></div>
+      </div>
+      <div class="card-links">
+        <a href="gear/" onclick="event.stopPropagation()">Gear Floor</a>
       </div>
     </div>
   </div>
