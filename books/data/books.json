@@ -1,12 +1,12 @@
 {
- "generated": "2026-10-24T13:43:15.439601+00:00",
+ "generated": "2026-10-26T16:22:03.766268+00:00",
  "source": "goodreads rss user 142098266",
  "summary": {
   "totalBooks": 58,
   "totalPages": 17930,
   "avgRating": 3.5,
   "fiveStars": 6,
-  "toRead": 83,
+  "toRead": 84,
   "currentlyReading": 0
  },
  "books": [
@@ -942,6 +942,24 @@
  "currentlyReading": [],
  "toRead": [
   {
+   "id": 77197,
+   "title": "Assassin's Apprentice (Farseer Trilogy, #1)",
+   "author": "Robin Hobb",
+   "pages": 435,
+   "isbn": "055357339X",
+   "rating": 0,
+   "review": null,
+   "dateRead": null,
+   "dateAdded": "2026-10-26",
+   "yearPublished": 1995,
+   "avgRating": 4.21,
+   "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1673728072l/77197._SY475_.jpg",
+   "link": "https://www.goodreads.com/review/show/9055219574?utm_medium=api&utm_source=rss",
+   "shelves": [
+    "to-read"
+   ]
+  },
+  {
    "id": 21853621,
    "title": "The Nightingale",
    "author": "Kristin Hannah",
@@ -1259,7 +1277,7 @@
    "dateRead": null,
    "dateAdded": "2026-08-09",
    "yearPublished": 2012,
-   "avgRating": 4.22,
+   "avgRating": 4.21,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1349614200l/13453029.jpg",
    "link": "https://www.goodreads.com/review/show/8846048017?utm_medium=api&utm_source=rss",
    "shelves": [
@@ -2159,7 +2177,7 @@
    "dateRead": null,
    "dateAdded": "2024-03-17",
    "yearPublished": 2021,
-   "avgRating": 3.64,
+   "avgRating": 3.65,
    "cover": "https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1617709587l/55339408.jpg",
    "link": "https://www.goodreads.com/review/show/6353019011?utm_medium=api&utm_source=rss",
    "shelves": [
