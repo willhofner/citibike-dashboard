@@ -51,6 +51,7 @@ h1{font:700 clamp(2rem,6vw,3rem)/1 var(--display);margin:6px 0 0;text-wrap:balan
 .btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start}
 .cue{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .3s}
 .cue.on{opacity:1}
+.cue.pin{transform:translate(-50%,-23px)}
 .cue .finger{position:relative;width:46px;height:46px}
 .cue .finger i{position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:ping 1.4s ease-out infinite}
 .cue .finger i+i{animation-delay:.7s}
@@ -342,10 +343,10 @@ function buildLamp(o){
     // only the frosted globe glows (the bottom ~third of the model); the plastic cap above stays dark.
     // A per-vertex mask feeds the emissive term, and the glow is a flat warm white (no texture, so no specks).
     const H=o.closed.userData.height,G=H*.33,inv=new THREE.Matrix4();o.closed.updateMatrixWorld(true);inv.copy(o.closed.matrixWorld).invert();
-    const mats=[],v=new THREE.Vector3();let R=0;
+    const mats=[],meshes=[],v=new THREE.Vector3();let R=0;
     o.closed.traverse(x=>{if(!x.isMesh||!x.material)return;const pos=x.geometry.attributes.position,mask=new Float32Array(pos.count),M=new THREE.Matrix4().multiplyMatrices(inv,x.matrixWorld);
       for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(M);const k=1-Math.min(1,Math.max(0,(v.y-G*.85)/(G*.25)));mask[i]=k;if(k>.5)R=Math.max(R,Math.hypot(v.x,v.z))}
-      x.geometry.setAttribute('glowMask',new THREE.BufferAttribute(mask,1));
+      meshes.push(x);x.geometry.setAttribute('glowMask',new THREE.BufferAttribute(mask,1));
       const m=x.material=x.material.clone();m.emissive=new THREE.Color(0xfff1d6);m.emissiveMap=null;m.emissiveIntensity=0;
       m.onBeforeCompile=sh=>{sh.vertexShader='attribute float glowMask;\nvarying float vGlow;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvGlow=glowMask;');
         sh.fragmentShader='varying float vGlow;\n'+sh.fragmentShader.replace('vec3 totalEmissiveRadiance = emissive;','vec3 totalEmissiveRadiance = emissive*vGlow;')};
@@ -358,7 +359,7 @@ function buildLamp(o){
     const beam=new THREE.Mesh(beamGeo,new THREE.MeshBasicMaterial({color:0xffe9c0,map:new THREE.CanvasTexture(c),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
     beam.position.y=G*.5;beam.userData.fx=true;beam.visible=false;o.root.add(beam);
     const spot=new THREE.SpotLight(0xfff0d0,0,3,.62,.45,1.6);spot.position.set(0,G*.5,0);const tgt=new THREE.Object3D();tgt.position.set(0,-1,0);o.root.add(spot,tgt);spot.target=tgt;
-    o.lamp={beam,spot,mats,glow:true};o.lightP=0;o.lightT=0;return;
+    o.lamp={beam,spot,mats,meshes,glow:true};o.lightP=0;o.lightT=0;return;
   }
   const turn=o.closed.children[0],at=new THREE.Vector3(...o.item.light.at);
   const g=new THREE.Group();g.position.copy(at);turn.add(g);
@@ -484,11 +485,15 @@ controls.addEventListener('change',()=>{dirty=true});
 /* ---------- focus / unpack ---------- */
 let focus=null;
 let cueShown=false,cueTimer=0,floorCue=null,floorCueDone=false;
-function hideCue(){clearTimeout(cueTimer);floorCue=null;const c=$('cue');c.classList.remove('on');c.style.left='';c.style.top='';$('cueText').style.transform=''}
+function hideCue(){clearTimeout(cueTimer);floorCue=null;const c=$('cue');c.classList.remove('on','pin');c.style.left='';c.style.top='';$('cueText').style.transform=''}
 // first visit hint: point at the chair (it unpacks nicely) and invite a tap
 function startFloorCue(){if(floorCueDone||focus)return;floorCueDone=true;floorCue=objs.find(o=>o.item.id==='chair')||objs[0];
   $('cueText').textContent='Tap any item to see it in action';$('cue').classList.add('on')}
-function placeFloorCue(){if(!floorCue)return;const v=new THREE.Vector3(0,(floorCue.closed?floorCue.closed.userData.height:.2)*.2,0);floorCue.root.localToWorld(v);v.project(camera);
+const _cb=new THREE.Box3();
+// keeps the tap dot on the item's body: a point a third of the way up its current on-screen bounding box
+function placeFloorCue(){if(!floorCue)return;const t=floorCue.open&&floorCue.open.visible?floorCue.open:floorCue.closed;if(!t)return;
+  _cb.setFromObject(t);const v=new THREE.Vector3((_cb.min.x+_cb.max.x)/2,_cb.min.y+(_cb.max.y-_cb.min.y)*.35,(_cb.min.z+_cb.max.z)/2);v.project(camera);
+  $('cue').classList.add('pin');
   const c=$('cue'),W=stage.clientWidth,x=(v.x+1)/2*W,lab=$('cueText'),half=lab.offsetWidth/2+10;
   c.style.left=x+'px';c.style.top=((1-v.y)/2*100)+'%';lab.style.transform='translateX('+(Math.min(W-half,Math.max(half,x))-x)+'px)'}
 function focusOn(o){
@@ -497,7 +502,7 @@ function focusOn(o){
   document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',o&&c.id==='chip-'+o.item.id?'true':'false'));
   objs.forEach(x=>{if(x.lamp&&x!==o)x.lightT=0});
   $('title').hidden=!o;$('back').hidden=!o;$('toggle').hidden=true;hideCue();
-  if(o&&!cueShown){cueShown=true;cueTimer=setTimeout(()=>{if(focus!==o)return;$('cueText').textContent=o.item.open?'Tap it to unpack':o.item.light?'Tap it to switch it on':'Tap it to spin it';$('cue').classList.add('on')},1100)}
+  if(o&&!cueShown){cueShown=true;cueTimer=setTimeout(()=>{if(focus!==o)return;floorCue=o;$('cueText').textContent=o.item.open?'Tap it to unpack':o.item.light?'Tap it to switch it on':'Tap it to spin it';$('cue').classList.add('on')},1100)}
   if(o){$('tName').textContent=o.item.name;$('tSub').textContent=OWNER[o.item.owner]+(o.item.sub?' · '+o.item.sub:'');
     $('toggle').textContent=o.item.light?'Turn on':'Unpack';
     $('hint').textContent=(o.item.open?'Tap it to unpack':o.item.light?'Tap it to switch it on':'Tap it to spin')+' · drag to orbit · pinch to zoom';
@@ -586,7 +591,7 @@ function loop(now){
     }
     if(o.lamp){
       o.lightP=approach(o.lightP,o.lightT,dt,7*sp);const L=o.lightP,f=L;
-      if(o.lamp.glow){const hy=o.root.position.y/Math.max(.001,o.root.scale.y);o.lamp.beam.scale.y=Math.max(.001,hy);o.lamp.beam.material.opacity=.3*f;o.lamp.beam.visible=L>.01&&hy>.03;o.lamp.spot.intensity=2.2*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=1.6*f)}
+      if(o.lamp.glow){const hy=o.root.position.y/Math.max(.001,o.root.scale.y);o.lamp.beam.scale.y=Math.max(.001,hy);o.lamp.beam.material.opacity=.3*f;o.lamp.beam.visible=L>.01&&hy>.03;o.lamp.spot.intensity=3*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=1.6*f);const cs=L<.3;if(o.lamp.cs!==cs){o.lamp.cs=cs;o.lamp.meshes.forEach(m=>m.castShadow=cs)}}
       else{o.lamp.lens.material.opacity=L;o.lamp.halo.material.opacity=0;o.lamp.halo.visible=false;o.lamp.beam.material.opacity=.07*f;o.lamp.spot.intensity=3.2*f;
       o.lamp.beam.visible=L>.01;}
       if(Math.abs(o.lightP-o.lightT)>.001)busy=true;
