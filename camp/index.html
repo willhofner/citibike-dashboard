@@ -42,7 +42,7 @@ h1{font:700 clamp(2rem,6vw,3rem)/1 var(--display);margin:6px 0 0;text-wrap:balan
 .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:600 .85rem/1.3 var(--body);padding:7px 11px;border-radius:8px;white-space:nowrap;transform:translate(-50%,calc(-100% - 16px));opacity:0;transition:opacity .12s}
 .tip.on{opacity:1}
 .tip small{display:block;font:400 .7rem var(--mono);opacity:.75}
-.hint{position:absolute;left:14px;bottom:12px;right:14px;font:400 .72rem var(--mono);color:var(--muted);pointer-events:none}
+.hint{font:400 .7rem/1.4 var(--mono);color:var(--muted);margin:0;text-align:center}
 .bar{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none}
 .bar>*{pointer-events:auto}
 .title{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:8px 12px;max-width:min(360px,100%)}
@@ -63,7 +63,7 @@ button{font:600 .85rem var(--body);border-radius:999px;padding:8px 14px;cursor:p
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .loading[hidden]{display:none}
-@media (max-width:640px){.stage{height:calc(100svh - 150px);min-height:460px}}
+@media (max-width:640px){.stage{height:calc(100svh - 205px);min-height:440px}.wrap{padding-block:14px 12px;gap:10px}}
 .loading{position:absolute;inset:0;display:grid;place-items:center;font:500 .9rem var(--mono);color:var(--muted);pointer-events:none}
 .list{display:flex;flex-direction:column;gap:10px}
 .arrange{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -106,8 +106,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <div class="tip" id="tip"></div>
     <div class="cue" id="cue" aria-live="polite"><div class="finger"><i></i><i></i><b></b></div><span id="cueText">Tap it to unpack</span></div>
     <div class="loading" id="loading">Laying out the gear…</div>
-    <div class="hint" id="hint">Click any item to pick it up · hover to see its name · drag to look around</div>
   </div>
+  <p class="hint" id="hint">Tap any item to pick it up · drag to look around</p>
 
 </div>
 
@@ -168,7 +168,7 @@ const ITEMS=[
  {id:'nalgene2',name:'Nalgene 32 oz wide-mouth',owner:'ours',sub:'',
   closed:{f:'nalgene',size:.235,axis:'y'},pos:[1.78,1.08],ry:.3},
  {id:'lantern',name:'Black Diamond Moji lantern',owner:'them',sub:'',
-  closed:{f:'lantern',rot:[PI,0,0],size:.085},light:{glow:true},pos:[1.16,.6],ry:0},
+  closed:{f:'lantern',size:.085},light:{glow:true},lift:.32,pos:[1.16,.6],ry:0},
  {id:'whistle',name:'Emergency whistle',owner:'them',sub:'on a lanyard',
   closed:{f:'whistle',size:.36},pos:[1.48,.62],ry:.5},
  /* fourth row */
@@ -322,7 +322,7 @@ function loadParts(parts){
 const objs=[];   // {item, root, closed, open, hover, s(current scale), ...}
 ITEMS.forEach(item=>{
   const root=new THREE.Group();root.position.set(item.pos[0],0,item.pos[1]);root.rotation.y=item.ry||0;root.scale.setScalar(.001);scene.add(root);
-  objs.push({item,root,closed:null,open:null,hover:0,hoverT:0,show:0,showT:1,openP:0,openT:0,spin:0,
+  objs.push({item,root,closed:null,open:null,hover:0,hoverT:0,show:0,showT:0,openP:0,openT:0,spin:0,
     home:new THREE.Vector3(item.pos[0],0,item.pos[1]),homeRy:item.ry||0});
 });
 let loaded=0;
@@ -331,18 +331,18 @@ setCount();
 Promise.all(objs.map(o=>(o.item.closed.parts?loadParts(o.item.closed.parts):loadGLB(o.item.closed.f)).then(m=>{
   o.closed=o.item.closed.parts?m:fit(m,o.item.closed);o.closed.traverse(x=>{if(x.isMesh)x.userData.obj=o});o.root.add(o.closed);
   if(o.item.light)buildLamp(o);
-  loaded++;setCount();dirty=true;$('loading').hidden=true;
+  loaded++;setCount();dirty=true;
 }).catch(()=>{loaded++;setCount()}))).then(()=>{
   // fetch the set-up versions in the background so unpacking is instant
   // set-up versions load on demand (first hover or click), so the floor appears fast
-  arrange(mode,true);startIntro();
+  $('loading').hidden=true;arrange(mode,true);objs.forEach(o=>{o.root.position.copy(o.home);o.root.rotation.y=o.homeRy;o.showT=1});startIntro();
 });
 let _glow=null;function glowTex(){if(_glow)return _glow;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
   const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,240,210,.55)');gr.addColorStop(1,'rgba(255,220,170,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);_glow=new THREE.CanvasTexture(c);return _glow}
 /* headlamp: a lens glow, a soft beam and a real spotlight, all switched by o.lightP */
 function buildLamp(o){
   if(o.item.light.glow){
-    const r=o.closed.userData.radius,c=new THREE.Vector3(0,o.closed.userData.height*.6,0);
+    const r=o.closed.userData.radius,c=new THREE.Vector3(0,o.closed.userData.height*.4,0);
     const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xffe0a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false}));
     halo.scale.setScalar(r*6);halo.position.copy(c);o.root.add(halo);
     const pt=new THREE.PointLight(0xffd9a0,0,3.2,1.6);pt.position.copy(c);pt.position.y+=r*.4;o.root.add(pt);
@@ -456,7 +456,7 @@ let FL={cx:.08,cz:.45,k:1};
 function floorView(){const t=new THREE.Vector3(FL.cx,0,FL.cz);return{t,d:fitDist(floorDir(),t),dir:floorDir()}}
 /* opening shot: a low, ground-level lap around the gear that rises into the resting diagonal */
 let flyby=null;
-function startIntro(){if(reduce||focus){goCam(floorView(),true);return}
+function startIntro(){if(reduce||focus){goCam(floorView(),true);startFloorCue();return}
   const t=new THREE.Vector3(FL.cx,0,FL.cz);flyby={t0:performance.now(),dur:7000,t,dEnd:fitDist(floorDir(),t),dLow:fitDist(dirFrom(viewAz(),.14),t)*.82};camGoal=null}
 function stopIntro(){if(!flyby)return;flyby=null;if(!focus)goCam(floorView())}
 function itemView(o){
@@ -464,7 +464,7 @@ function itemView(o){
   const fov=camera.fov*PI/180,aspect=camera.aspect;const fit=r/Math.sin(Math.min(fov,fov*aspect)/2)*1.15;
   const dir=camera.position.clone().sub(controls.target).normalize();
   if(dir.y<.25){dir.y=.25;dir.normalize()}
-  return{t:new THREE.Vector3(FL.cx,hgt*.45,FL.cz),d:Math.max(.2,fit),dir:new THREE.Vector3(.75,.62,1).normalize()};
+  const lift=o.item.lift||0;return{t:new THREE.Vector3(FL.cx,lift*.55+hgt*.45,FL.cz),d:Math.max(.2,fit,lift*2.4),dir:new THREE.Vector3(.75,.62,1).normalize()};
 }
 function goCam(v,instant){camGoal=v;if(instant||reduce){controls.target.copy(v.t);camera.position.copy(v.dir).multiplyScalar(v.d).add(v.t);camGoal=null;dirty=true}}
 controls.addEventListener('start',()=>{camGoal=null;flyby=null});
@@ -472,7 +472,14 @@ controls.addEventListener('change',()=>{dirty=true});
 
 /* ---------- focus / unpack ---------- */
 let focus=null;
-let cueShown=false,cueTimer=0;function hideCue(){clearTimeout(cueTimer);$('cue').classList.remove('on')}
+let cueShown=false,cueTimer=0,floorCue=null,floorCueDone=false;
+function hideCue(){clearTimeout(cueTimer);floorCue=null;const c=$('cue');c.classList.remove('on');c.style.left='';c.style.top='';$('cueText').style.transform=''}
+// first visit hint: point at the chair (it unpacks nicely) and invite a tap
+function startFloorCue(){if(floorCueDone||focus)return;floorCueDone=true;floorCue=objs.find(o=>o.item.id==='chair')||objs[0];
+  $('cueText').textContent='Tap any item to see it in action';$('cue').classList.add('on')}
+function placeFloorCue(){if(!floorCue)return;const v=new THREE.Vector3(0,(floorCue.closed?floorCue.closed.userData.height:.2)*.5,0);floorCue.root.localToWorld(v);v.project(camera);
+  const c=$('cue'),W=stage.clientWidth,x=(v.x+1)/2*W,lab=$('cueText'),half=lab.offsetWidth/2+10;
+  c.style.left=x+'px';c.style.top=((1-v.y)/2*100)+'%';lab.style.transform='translateX('+(Math.min(W-half,Math.max(half,x))-x)+'px)'}
 function focusOn(o){
   focus=o;
   objs.forEach(x=>{x.showT=(!o||x===o)?1:0;if(!o){x.openT=0}});
@@ -482,18 +489,18 @@ function focusOn(o){
   if(o&&!cueShown){cueShown=true;cueTimer=setTimeout(()=>{if(focus!==o)return;$('cueText').textContent=o.item.open?'Tap it to unpack':o.item.light?'Tap it to switch it on':'Tap it to spin it';$('cue').classList.add('on')},1100)}
   if(o){$('tName').textContent=o.item.name;$('tSub').textContent=OWNER[o.item.owner]+(o.item.sub?' · '+o.item.sub:'');
     $('toggle').textContent=o.item.light?'Turn on':'Unpack';
-    $('hint').textContent=(o.item.open?'Click it to unpack':o.item.light?'Click it to switch it on':'Click it to spin')+' · drag to orbit · scroll or pinch to zoom';
+    $('hint').textContent=(o.item.open?'Tap it to unpack':o.item.light?'Tap it to switch it on':'Tap it to spin')+' · drag to orbit · pinch to zoom';
     if(o.item.open)ensureOpen(o);
     goCam(itemView(o));
-  }else{$('hint').textContent='Click any item to pick it up · hover to see its name · drag to look around';goCam(floorView())}
+  }else{$('hint').textContent='Tap any item to pick it up · drag to look around';goCam(floorView())}
   tip.classList.remove('on');dirty=true;
 }
 function toggleOpen(o){hideCue();
   if(o.item.light){o.lightT=o.lightT?0:1;$('toggle').textContent=o.lightT?'Turn off':'Turn on';
-    $('hint').textContent=(o.lightT?'Click it to switch it off':'Click it to switch it on')+' · drag to orbit · scroll or pinch to zoom';dirty=true;return}
+    $('hint').textContent=(o.lightT?'Tap it to switch it off':'Tap it to switch it on')+' · drag to orbit · pinch to zoom';dirty=true;return}
   if(!o.item.open){o.spin=1;return}
   ensureOpen(o).then(()=>{o.openT=o.openT?0:1;$('toggle').textContent=o.openT?'Pack up':'Unpack';
-    $('hint').textContent=(o.openT?'Click it to pack up':'Click it to unpack')+' · drag to orbit · scroll or pinch to zoom';
+    $('hint').textContent=(o.openT?'Tap it to pack up':'Tap it to unpack')+' · drag to orbit · pinch to zoom';
     setTimeout(()=>{if(focus===o)goCam(itemView(o))},reduce?0:350)});
 }
 $('back').onclick=()=>focusOn(null);
@@ -519,7 +526,7 @@ function showTip(o,e){
   tip.style.left=(e.clientX-r.left)+'px';tip.style.top=(e.clientY-r.top)+'px';tip.classList.add('on')}
 function setHover(o){if(hovered===o)return;if(o&&o.item.open)ensureOpen(o);if(hovered)hovered.hoverT=0;hovered=o;if(o&&!focus)o.hoverT=1;renderer.domElement.classList.toggle('hot',!!o);dirty=true}
 let down=null;
-renderer.domElement.addEventListener('pointerdown',e=>{flyby=null;down=[e.clientX,e.clientY,e.pointerType]},true);
+renderer.domElement.addEventListener('pointerdown',e=>{if(flyby){flyby=null;startFloorCue()}if(floorCue&&!focus){/* keep it until they pick something */}down=[e.clientX,e.clientY,e.pointerType]},true);
 renderer.domElement.addEventListener('pointermove',e=>{
   if(e.pointerType!=='mouse')return;
   if(e.buttons){tip.classList.remove('on');return}
@@ -552,7 +559,7 @@ function loop(now){
     const ryT=focus===o?(o.item.focusRy||0):o.homeRy;o.root.rotation.y+=(ryT-o.root.rotation.y)*Math.min(1,dt*5*sp);
     if(o.spin>0){o.spin=Math.max(0,o.spin-dt/1.4);o.root.rotation.y=ryT+(1-easeOut(1-o.spin))*PI*2;busy=true}
     const s=Math.max(.001,o.show)*(1+.35*o.hover);
-    o.root.scale.setScalar(s);o.root.position.y=.04*o.hover*(o.closed.userData.height>.3?.5:1);
+    o.root.scale.setScalar(s);o.root.position.y=(o.item.lift||0)+.04*o.hover*(o.closed.userData.height>.3?.5:1);
     o.root.visible=o.show>.01;
     // unpack: packed version shrinks away, set-up version springs up
     if(o.open){
@@ -567,9 +574,9 @@ function loop(now){
     }
     if(o.lamp){
       o.lightP=approach(o.lightP,o.lightT,dt,7*sp);const L=o.lightP,f=L*(0.96+0.04*Math.sin(now/90));
-      if(o.lamp.glow){o.lamp.halo.material.opacity=f;o.lamp.halo.visible=L>.01;o.lamp.pt.intensity=4.5*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=2.6*f)}
-      else{o.lamp.lens.material.opacity=L;o.lamp.halo.material.opacity=.55*f;o.lamp.beam.material.opacity=.07*f;o.lamp.spot.intensity=3.2*f;
-      o.lamp.beam.visible=o.lamp.halo.visible=L>.01;}
+      if(o.lamp.glow){o.lamp.halo.material.opacity=f;o.lamp.halo.visible=L>.01;o.lamp.pt.intensity=2.4*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=2.6*f)}
+      else{o.lamp.lens.material.opacity=L;o.lamp.halo.material.opacity=0;o.lamp.halo.visible=false;o.lamp.beam.material.opacity=.07*f;o.lamp.spot.intensity=3.2*f;
+      o.lamp.beam.visible=L>.01;}
       if(Math.abs(o.lightP-o.lightT)>.001)busy=true;
     }
     if(Math.abs(o.show-o.showT)>.001||Math.abs(o.hover-o.hoverT)>.001||o.root.position.distanceTo(target)>.001)busy=true;
@@ -580,7 +587,7 @@ function loop(now){
     const az=viewAz()-Math.PI*2*(1-e),lift=Math.max(0,(p-.55)/.45),le=lift*lift*(3-2*lift);
     const el=.14+(viewEl()-.14)*le,d=flyby.dLow+(flyby.dEnd-flyby.dLow)*le;
     controls.target.copy(flyby.t);camera.position.copy(dirFrom(az,el)).multiplyScalar(d).add(flyby.t);camera.lookAt(flyby.t);
-    if(p>=1)flyby=null;busy=true}
+    if(p>=1){flyby=null;startFloorCue()}busy=true}
   if(camGoal){
     controls.target.lerp(camGoal.t,Math.min(1,dt*4));
     const curDir=camera.position.clone().sub(controls.target).normalize();
@@ -589,6 +596,7 @@ function loop(now){
     camera.position.copy(controls.target).add(curDir.multiplyScalar(nd));
     if(Math.abs(nd-camGoal.d)<.005&&controls.target.distanceTo(camGoal.t)<.005)camGoal=null;busy=true}
   if(controls.update())busy=true;
+  placeFloorCue();
   if(scene.fog){const cd=camera.position.distanceTo(controls.target);scene.fog.near=cd*1.05;scene.fog.far=cd*2.1+2}
   if(busy||dirty){renderer.render(scene,camera);dirty=false}
   requestAnimationFrame(loop);

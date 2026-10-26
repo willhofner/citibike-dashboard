@@ -815,10 +815,12 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - 20 items unpack on click (packed model swaps to its set-up model); both headlamps and the Moji lantern switch on
    - Arrange toggle: Laid out (one size-sorted grid, duffels first) / By owner / By category (Bags, Kitchen, Sleep & shelter, Camp tools, Excursions), biggest items first. On portrait screens groups stack vertically
    - Opens with a ~7s ground-level 360° fly-around that rises into a front-left diagonal view fitted to the items (steeper, ~60°, on portrait phones); any touch ends it
-   - Picked-up item: name card top-left with Back to floor underneath; no action button. The first pick-up per visit shows an animated "Tap it to unpack / switch on / spin" cue
+   - Walkthrough: after the fly-around, a pulsing cue sits on the chair ("Tap any item to see it in action"); the first pick-up then shows "Tap it to unpack / switch on / spin". Items stay hidden until the first layout so nothing snaps on load
+   - Picked-up item: name card top-left with Back to floor underneath; no action button. Usage hint is small print under the stage
+   - Headlamps: lens glow + beam + spotlight (no halo disc). Moji lantern hangs 32 cm up (`lift`), glows and pools light below
    - Built in a Claude conversation as an artifact, then copied here. Models are Meshy AI GLBs simplified to ~25k tris, 512–768 px textures, meshopt-compressed and stored as `{format:'glb-base64',data}` JSON in `camp/m/`
    - Owner and category lists live in the `ITEMS` and `CATS` arrays at the top of the script. Owners are `ours` / `them` and show as Ours / Borrowed: **never put the friend's name on the page or in this repo** (it is public)
-   - Page is just the header (Home link, title, item count, Arrange toggle) and the floor; nothing below the stage
+   - Page is the header (Home link, title, item count, Arrange toggle), the floor, and one line of small print; fits one phone screen
    - Accent color: amber #e2a62b (the page keeps its own light/dark theme, pinned dark here)
 
 ## Landing Page
