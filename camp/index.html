@@ -62,9 +62,7 @@ h1{font:700 clamp(2rem,6vw,3rem)/1 var(--display);margin:6px 0 0;text-wrap:balan
 button{font:600 .85rem var(--body);border-radius:999px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--chip);color:var(--ink)}
 button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.loading[hidden]{display:none}
 @media (max-width:640px){.stage{height:calc(100svh - 205px);min-height:440px}.wrap{padding-block:14px 12px;gap:10px}}
-.loading{position:absolute;inset:0;display:grid;place-items:center;font:500 .9rem var(--mono);color:var(--muted);pointer-events:none}
 .list{display:flex;flex-direction:column;gap:10px}
 .arrange{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--chip)}
@@ -105,7 +103,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     </div>
     <div class="tip" id="tip"></div>
     <div class="cue" id="cue" aria-live="polite"><div class="finger"><i></i><i></i><b></b></div><span id="cueText">Tap it to unpack</span></div>
-    <div class="loading" id="loading">Laying out the gear…</div>
   </div>
   <p class="hint" id="hint">Tap any item to pick it up · drag to look around</p>
 
@@ -335,19 +332,33 @@ Promise.all(objs.map(o=>(o.item.closed.parts?loadParts(o.item.closed.parts):load
 }).catch(()=>{loaded++;setCount()}))).then(()=>{
   // fetch the set-up versions in the background so unpacking is instant
   // set-up versions load on demand (first hover or click), so the floor appears fast
-  $('loading').hidden=true;arrange(mode,true);objs.forEach(o=>{o.root.position.copy(o.home);o.root.rotation.y=o.homeRy;o.showT=1});startIntro();
+  arrange(mode,true);objs.forEach(o=>{o.root.position.copy(o.home);o.root.rotation.y=o.homeRy;o.showT=1});startIntro();
 });
 let _glow=null;function glowTex(){if(_glow)return _glow;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
   const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,240,210,.55)');gr.addColorStop(1,'rgba(255,220,170,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);_glow=new THREE.CanvasTexture(c);return _glow}
 /* headlamp: a lens glow, a soft beam and a real spotlight, all switched by o.lightP */
 function buildLamp(o){
   if(o.item.light.glow){
-    const r=o.closed.userData.radius,c=new THREE.Vector3(0,o.closed.userData.height*.4,0);
-    const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xffe0a0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,depthTest:false}));
-    halo.scale.setScalar(r*6);halo.position.copy(c);o.root.add(halo);
-    const pt=new THREE.PointLight(0xffd9a0,0,3.2,1.6);pt.position.copy(c);pt.position.y+=r*.4;o.root.add(pt);
-    const mats=[];o.closed.traverse(x=>{if(x.isMesh&&x.material){x.material.emissive=new THREE.Color(0xffd08a);x.material.emissiveMap=x.material.map||null;x.material.emissiveIntensity=0;x.material.needsUpdate=true;mats.push(x.material)}});
-    o.lamp={halo,pt,mats,glow:true};o.lightP=0;o.lightT=0;return;
+    // only the frosted globe glows (the bottom ~third of the model); the plastic cap above stays dark.
+    // A per-vertex mask feeds the emissive term, and the glow is a flat warm white (no texture, so no specks).
+    const H=o.closed.userData.height,G=H*.33,inv=new THREE.Matrix4();o.closed.updateMatrixWorld(true);inv.copy(o.closed.matrixWorld).invert();
+    const mats=[],v=new THREE.Vector3();let R=0;
+    o.closed.traverse(x=>{if(!x.isMesh||!x.material)return;const pos=x.geometry.attributes.position,mask=new Float32Array(pos.count),M=new THREE.Matrix4().multiplyMatrices(inv,x.matrixWorld);
+      for(let i=0;i<pos.count;i++){v.fromBufferAttribute(pos,i).applyMatrix4(M);const k=1-Math.min(1,Math.max(0,(v.y-G*.85)/(G*.25)));mask[i]=k;if(k>.5)R=Math.max(R,Math.hypot(v.x,v.z))}
+      x.geometry.setAttribute('glowMask',new THREE.BufferAttribute(mask,1));
+      const m=x.material=x.material.clone();m.emissive=new THREE.Color(0xfff1d6);m.emissiveMap=null;m.emissiveIntensity=0;
+      m.onBeforeCompile=sh=>{sh.vertexShader='attribute float glowMask;\nvarying float vGlow;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvGlow=glowMask;');
+        sh.fragmentShader='varying float vGlow;\n'+sh.fragmentShader.replace('vec3 totalEmissiveRadiance = emissive;','vec3 totalEmissiveRadiance = emissive*vGlow;')};
+      m.customProgramCacheKey=()=>'glowmask';m.needsUpdate=true;mats.push(m)});
+    R=R||o.closed.userData.radius*.6;
+    // beam: starts as wide as the globe and spreads out to the floor; drawn 1 m tall and scaled to the current height
+    const c=document.createElement('canvas');c.width=4;c.height=128;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,0,128);
+    gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.6,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,4,128);
+    const beamGeo=new THREE.CylinderGeometry(R,R+.5,1,48,1,true);beamGeo.translate(0,-.5,0);
+    const beam=new THREE.Mesh(beamGeo,new THREE.MeshBasicMaterial({color:0xffe9c0,map:new THREE.CanvasTexture(c),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+    beam.position.y=G*.5;beam.userData.fx=true;beam.visible=false;o.root.add(beam);
+    const spot=new THREE.SpotLight(0xfff0d0,0,3,.62,.45,1.6);spot.position.set(0,G*.5,0);const tgt=new THREE.Object3D();tgt.position.set(0,-1,0);o.root.add(spot,tgt);spot.target=tgt;
+    o.lamp={beam,spot,mats,glow:true};o.lightP=0;o.lightT=0;return;
   }
   const turn=o.closed.children[0],at=new THREE.Vector3(...o.item.light.at);
   const g=new THREE.Group();g.position.copy(at);turn.add(g);
@@ -391,9 +402,9 @@ function footprint(o){
   const sz=b.getSize(new THREE.Vector3());o.fp={w:Math.max(.06,sz.x),d:Math.max(.06,sz.z),h:Math.max(.02,sz.y),cx:(b.min.x+b.max.x)/2,cz:(b.min.z+b.max.z)/2};return o.fp}
 function labelMesh(text,count){
   const c=document.createElement('canvas'),g=c.getContext('2d');const F1='700 84px "Barlow Condensed","Arial Narrow",sans-serif',F2='500 52px "JetBrains Mono",monospace';
-  const t=text.toUpperCase();g.font=F1;const tw=g.measureText(t).width;g.font=F2;const nw=g.measureText(String(count)).width;
-  c.width=Math.ceil(tw+nw+50);c.height=128;g.font=F1;g.fillStyle=css('--ink')||'#22262a';g.textBaseline='middle';
-  g.fillText(t,6,66);g.font=F2;g.globalAlpha=.6;g.fillText(String(count),tw+30,70);
+  const t=text.toUpperCase();g.font=F1;const tw=g.measureText(t).width;
+  c.width=Math.ceil(tw+20);c.height=128;g.font=F1;g.fillStyle=css('--ink')||'#22262a';g.textBaseline='middle';
+  g.fillText(t,6,66);
   const tex=new THREE.CanvasTexture(c);tex.encoding=THREE.sRGBEncoding;tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
   const LW=c.width/128*.15;const m=new THREE.Mesh(new THREE.PlaneGeometry(LW,.15),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,depthTest:false,opacity:.85}));
   m.rotation.x=-PI/2;m.position.y=.003;m.renderOrder=10;m.userData.w=LW;return m}
@@ -464,7 +475,7 @@ function itemView(o){
   const fov=camera.fov*PI/180,aspect=camera.aspect;const fit=r/Math.sin(Math.min(fov,fov*aspect)/2)*1.15;
   const dir=camera.position.clone().sub(controls.target).normalize();
   if(dir.y<.25){dir.y=.25;dir.normalize()}
-  const lift=o.item.lift||0;return{t:new THREE.Vector3(FL.cx,lift*.55+hgt*.45,FL.cz),d:Math.max(.2,fit,lift*2.4),dir:new THREE.Vector3(.75,.62,1).normalize()};
+  const lift=o.item.lift||0;return{t:new THREE.Vector3(FL.cx,lift*.45+hgt*.45,FL.cz),d:Math.max(.2,fit,lift*3.2),dir:new THREE.Vector3(.75,.62,1).normalize()};
 }
 function goCam(v,instant){camGoal=v;if(instant||reduce){controls.target.copy(v.t);camera.position.copy(v.dir).multiplyScalar(v.d).add(v.t);camGoal=null;dirty=true}}
 controls.addEventListener('start',()=>{camGoal=null;flyby=null});
@@ -477,7 +488,7 @@ function hideCue(){clearTimeout(cueTimer);floorCue=null;const c=$('cue');c.class
 // first visit hint: point at the chair (it unpacks nicely) and invite a tap
 function startFloorCue(){if(floorCueDone||focus)return;floorCueDone=true;floorCue=objs.find(o=>o.item.id==='chair')||objs[0];
   $('cueText').textContent='Tap any item to see it in action';$('cue').classList.add('on')}
-function placeFloorCue(){if(!floorCue)return;const v=new THREE.Vector3(0,(floorCue.closed?floorCue.closed.userData.height:.2)*.5,0);floorCue.root.localToWorld(v);v.project(camera);
+function placeFloorCue(){if(!floorCue)return;const v=new THREE.Vector3(0,(floorCue.closed?floorCue.closed.userData.height:.2)*.2,0);floorCue.root.localToWorld(v);v.project(camera);
   const c=$('cue'),W=stage.clientWidth,x=(v.x+1)/2*W,lab=$('cueText'),half=lab.offsetWidth/2+10;
   c.style.left=x+'px';c.style.top=((1-v.y)/2*100)+'%';lab.style.transform='translateX('+(Math.min(W-half,Math.max(half,x))-x)+'px)'}
 function focusOn(o){
@@ -559,7 +570,8 @@ function loop(now){
     const ryT=focus===o?(o.item.focusRy||0):o.homeRy;o.root.rotation.y+=(ryT-o.root.rotation.y)*Math.min(1,dt*5*sp);
     if(o.spin>0){o.spin=Math.max(0,o.spin-dt/1.4);o.root.rotation.y=ryT+(1-easeOut(1-o.spin))*PI*2;busy=true}
     const s=Math.max(.001,o.show)*(1+.35*o.hover);
-    o.root.scale.setScalar(s);o.root.position.y=(o.item.lift||0)+.04*o.hover*(o.closed.userData.height>.3?.5:1);
+    o.root.scale.setScalar(s);o.liftP=approach(o.liftP||0,focus===o?1:0,dt,2.5*sp);if(o.item.lift&&Math.abs(o.liftP-(focus===o?1:0))>.001)busy=true;
+    o.root.position.y=(o.item.lift||0)*easeOut(o.liftP)+.04*o.hover*(o.closed.userData.height>.3?.5:1);
     o.root.visible=o.show>.01;
     // unpack: packed version shrinks away, set-up version springs up
     if(o.open){
@@ -573,8 +585,8 @@ function loop(now){
       if(Math.abs(o.openP-o.openT)>.001)busy=true;
     }
     if(o.lamp){
-      o.lightP=approach(o.lightP,o.lightT,dt,7*sp);const L=o.lightP,f=L*(0.96+0.04*Math.sin(now/90));
-      if(o.lamp.glow){o.lamp.halo.material.opacity=f;o.lamp.halo.visible=L>.01;o.lamp.pt.intensity=2.4*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=2.6*f)}
+      o.lightP=approach(o.lightP,o.lightT,dt,7*sp);const L=o.lightP,f=L;
+      if(o.lamp.glow){const hy=o.root.position.y/Math.max(.001,o.root.scale.y);o.lamp.beam.scale.y=Math.max(.001,hy);o.lamp.beam.material.opacity=.3*f;o.lamp.beam.visible=L>.01&&hy>.03;o.lamp.spot.intensity=2.2*f;o.lamp.mats.forEach(m=>m.emissiveIntensity=1.6*f)}
       else{o.lamp.lens.material.opacity=L;o.lamp.halo.material.opacity=0;o.lamp.halo.visible=false;o.lamp.beam.material.opacity=.07*f;o.lamp.spot.intensity=3.2*f;
       o.lamp.beam.visible=L>.01;}
       if(Math.abs(o.lightP-o.lightT)>.001)busy=true;
@@ -602,7 +614,7 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-window.__gear={focus:id=>focusOn(id?objs.find(o=>o.item.id===id):null),open:()=>focus&&toggleOpen(focus),hover:id=>{const o=objs.find(x=>x.item.id===id);setHover(o)},ready:()=>loaded===ITEMS.length};
+window.__gear={focus:id=>focusOn(id?objs.find(o=>o.item.id===id):null),open:()=>focus&&toggleOpen(focus),hover:id=>{const o=objs.find(x=>x.item.id===id);setHover(o)},ready:()=>loaded===ITEMS.length,objs:()=>objs};
 })();
 </script>
 
