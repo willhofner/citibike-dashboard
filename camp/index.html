@@ -197,7 +197,7 @@ const ITEMS=[
  {id:'bino',name:'Nocs Standard Issue 8×25 binoculars',owner:'them',sub:'in their drawstring pouch',
   closed:{f:'bino-packed',size:.15},open:{f:'bino',size:.42},pos:[1.48,1.56],ry:.3},
 ];
-const OWNER={them:'Theirs',ours:'Ours'};
+const OWNER={them:'Borrowed',ours:'Ours'};
 
 /* ---------- DOM ---------- */
 const $=id=>document.getElementById(id);
@@ -219,7 +219,7 @@ controls.enableDamping=true;controls.dampingFactor=.08;controls.minDistance=.25;
 const hemi=new THREE.HemisphereLight(0xfffaf0,0x7a6a58,.65);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xffffff,.85);
 sun.position.set(2,5,3);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
-Object.assign(sun.shadow.camera,{left:-3,right:3,top:3,bottom:-3,near:.5,far:14});sun.shadow.bias=-.0005;sun.shadow.radius=3;
+Object.assign(sun.shadow.camera,{left:-4.5,right:4.5,top:4.5,bottom:-4.5,near:.5,far:14});sun.shadow.bias=-.0005;sun.shadow.radius=3;
 scene.add(sun);
 const fill=new THREE.DirectionalLight(0xdfe8ff,.3);fill.position.set(-3,2,-2);scene.add(fill);
 
@@ -235,13 +235,13 @@ const wood=tex(1024,1024,(g,w,h)=>{
       g.globalAlpha=1;g.fillStyle='rgba(60,32,12,.55)';g.fillRect(x,r*rh,2,rh);x+=len}
     g.fillStyle='rgba(60,32,12,.6)';g.fillRect(0,r*rh,w,2)}
 });
-wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(1.85,1.75);
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(3.7,3.5),new THREE.MeshStandardMaterial({map:wood,roughness:.62,metalness:0}));
-floor.rotation.x=-PI/2;floor.position.z=.4;floor.receiveShadow=true;scene.add(floor);
+wood.wrapS=wood.wrapT=THREE.RepeatWrapping;wood.repeat.set(40,40);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.MeshStandardMaterial({map:wood,roughness:.62,metalness:0}));
+floor.rotation.x=-PI/2;floor.receiveShadow=true;scene.add(floor);
 const groundMat=new THREE.MeshLambertMaterial();
 const ground=new THREE.Mesh(new THREE.CircleGeometry(30,48),groundMat);ground.rotation.x=-PI/2;ground.position.y=-.002;ground.receiveShadow=true;scene.add(ground);
 let dirty=true;
-function applyTheme(){const bg=new THREE.Color(css('--stage')||'#e4e1d9').convertSRGBToLinear();scene.background=bg;scene.fog=new THREE.Fog(bg,8,20);groundMat.color=bg.clone().multiplyScalar(.9);dirty=true}
+function applyTheme(){const bg=new THREE.Color(css('--stage')||'#e4e1d9').convertSRGBToLinear();scene.background=bg;scene.fog=new THREE.Fog(bg,6,16);groundMat.color=bg.clone().multiplyScalar(.9);dirty=true}
 applyTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
 new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
@@ -410,13 +410,13 @@ function arrange(m,instant){
   while(labelGroup.children.length){const l=labelGroup.children.pop();l.material.map.dispose();l.material.dispose();l.geometry.dispose()}
   const narrow=isNarrow();
   if(m==='free'){
-    const pg=packGroup(objs,narrow?1.75:3.5,['duffel','rinse']);const ox=-pg.w/2,oz=-pg.d/2+.45;
+    const pg=packGroup(objs,narrow?1.45:3.5,['duffel','rinse']);const ox=-pg.w/2,oz=-pg.d/2+.45;
     pg.out.forEach(p=>{p.o.home.set(ox+p.x,0,oz+p.z);p.o.homeRy=0});
-    const fw=Math.max(narrow?2.1:3.7,pg.w+.5),fd=pg.d+.6;floor.scale.set(fw/3.7,fd/3.5,1);floor.position.set(0,0,.45);
+    const fw=Math.max(narrow?2.1:3.7,pg.w+.5),fd=pg.d+.6;
     FL={cx:0,cz:.45,k:1};
   }else{
     const groups=m==='owner'
-      ?[['Ours',objs.filter(o=>o.item.owner==='ours')],['Theirs',objs.filter(o=>o.item.owner==='them')]]
+      ?[['Ours',objs.filter(o=>o.item.owner==='ours')],['Borrowed',objs.filter(o=>o.item.owner==='them')]]
       :CATS.map(([c])=>[c,objs.filter(o=>(CAT_OF[o.item.id]||'Camp tools')===c)]).filter(g=>g[1].length);
     const packed=groups.map(([name,items])=>{const area=items.reduce((a,o)=>{const f=footprint(o);return a+(f.w+.07)*(f.d+.07)},0);
       const maxW=m==='owner'?1.75:Math.min(narrow?1.9:2.2,Math.max(...items.map(o=>footprint(o).w),Math.sqrt(area)*1.35));
@@ -428,7 +428,7 @@ function arrange(m,instant){
     const D=z+row,ox=-W/2,oz=-D/2+.45;
     packed.forEach(g=>{g.out.forEach(p=>{p.o.home.set(ox+g.x0+p.x,0,oz+g.z0+p.z);p.o.homeRy=0});
       const l=g.lab;l.position.x=ox+g.x0+l.userData.w/2;l.position.z=oz+g.z0+g.d+LH*.5;labelGroup.add(l)});
-    const fw=W+.5,fd=D+.6;floor.scale.set(fw/3.7,fd/3.5,1);floor.position.set(0,0,.45);
+    const fw=W+.5,fd=D+.6;
     FL={cx:0,cz:.45,k:Math.max(.55,fw/3.7,fd/3.5)};
   }
   if(focus)focusOn(null);else goCam(floorView(),instant);dirty=true;
@@ -438,16 +438,18 @@ function arrange(m,instant){
 /* ---------- camera ---------- */
 const isNarrow=()=>stage.clientWidth/stage.clientHeight<1;
 // resting view: front-left diagonal, about 30° up; steeper on a phone so the tall floor fills the screen
-const viewAz=()=>isNarrow()?-.38:-.62,viewEl=()=>isNarrow()?.9:.52;
+const viewAz=()=>isNarrow()?-.3:-.62,viewEl=()=>isNarrow()?1.08:.6;
 const dirFrom=(az,el)=>new THREE.Vector3(Math.sin(az)*Math.cos(el),Math.sin(el),Math.cos(az)*Math.cos(el));
 const floorDir=()=>dirFrom(viewAz(),viewEl());
 // distance at which the whole floor (plus item height) fits in the frame from a direction
 function fitDist(dir,t){
-  const hw=1.85*floor.scale.x,hd=1.75*floor.scale.y,fx=floor.position.x,fz=floor.position.z,pts=[];
-  [-1,1].forEach(a=>[-1,1].forEach(b=>[0,.35].forEach(y=>pts.push(new THREE.Vector3(fx+a*hw,y,fz+b*hd)))));
+  const pts=[];objs.forEach(o=>{if(!o.closed)return;const f=footprint(o),h=o.home;
+    [-1,1].forEach(a=>[-1,1].forEach(b=>[0,Math.min(.45,f.h)].forEach(y=>pts.push(new THREE.Vector3(h.x+a*f.w/2,y,h.z+b*f.d/2)))))});
+  labelGroup.children.forEach(l=>pts.push(l.position.clone()));
+  if(!pts.length)return 5;
   const cam=camera.clone();let lo=.5,hi=40;
   for(let i=0;i<24;i++){const d=(lo+hi)/2;cam.position.copy(dir).multiplyScalar(d).add(t);cam.lookAt(t);cam.updateMatrixWorld();
-    const ok=pts.every(p=>{const v=p.clone().project(cam);return Math.abs(v.x)<.86&&Math.abs(v.y)<.86&&v.z<1});if(ok)hi=d;else lo=d}
+    const ok=pts.every(p=>{const v=p.clone().project(cam);return Math.abs(v.x)<.97&&Math.abs(v.y)<.9&&v.z<1});if(ok)hi=d;else lo=d}
   return hi}
 let camGoal=null;
 let FL={cx:.08,cz:.45,k:1};
@@ -587,6 +589,7 @@ function loop(now){
     camera.position.copy(controls.target).add(curDir.multiplyScalar(nd));
     if(Math.abs(nd-camGoal.d)<.005&&controls.target.distanceTo(camGoal.t)<.005)camGoal=null;busy=true}
   if(controls.update())busy=true;
+  if(scene.fog){const cd=camera.position.distanceTo(controls.target);scene.fog.near=cd*1.05;scene.fog.far=cd*2.1+2}
   if(busy||dirty){renderer.render(scene,camera);dirty=false}
   requestAnimationFrame(loop);
 }
