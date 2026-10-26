@@ -6,27 +6,29 @@
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<title>HofCamp — Gear Floor</title>
+<title>HofCamps — Gear Floor</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: the gear laid out on the floor fills one big stage; a slim header above, a jump list of every item below */
 :root{
   --bg:#eceae4;--stage:#e4e1d9;--ink:#22262a;--muted:#686c6e;--line:#cfcabd;--chip:#f6f4ef;
-  --accent:#b97c0e;--accent-ink:#fff;--sam:#2f6f8f;--ours:#8a5a1a;
+  --accent:#b97c0e;--accent-ink:#fff;--ours:#8a5a1a;
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Barlow",system-ui,-apple-system,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#16191b;--stage:#1d2124;--ink:#e9e7e1;--muted:#9aa09f;--line:#30363a;--chip:#22272a;
-  --accent:#e2a62b;--accent-ink:#1a1306;--sam:#7fb8d6;--ours:#e0a866;color-scheme:dark}}
+  --accent:#e2a62b;--accent-ink:#1a1306;--ours:#e0a866;color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#16191b;--stage:#1d2124;--ink:#e9e7e1;--muted:#9aa09f;--line:#30363a;--chip:#22272a;
-  --accent:#e2a62b;--accent-ink:#1a1306;--sam:#7fb8d6;--ours:#e0a866;color-scheme:dark}
+  --accent:#e2a62b;--accent-ink:#1a1306;--ours:#e0a866;color-scheme:dark}
 html,body{background:var(--bg);color:var(--ink)}
 body{font:15px/1.5 var(--body)}
 .wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px;display:flex;flex-direction:column;gap:14px}
+.side{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+@media (max-width:560px){.side{align-items:flex-start}}
 .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px 20px}
 .eyebrow{font:600 .72rem/1 var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
 h1 span{color:var(--accent)}
@@ -63,7 +65,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .chip{font:500 .85rem var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--chip);color:var(--ink);display:inline-flex;gap:6px;align-items:center}
 .chip i{width:8px;height:8px;border-radius:50%;display:inline-block}
 .chip[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
-.dot-sam{background:var(--sam)}.dot-ours{background:var(--ours)}
+.dot-ours{background:var(--ours)}
 .chip .two{font:400 .68rem var(--mono);color:var(--muted)}
 .note{font-size:.82rem;color:var(--muted);margin:0;max-width:72ch}
 </style>
@@ -71,10 +73,15 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 <div class="wrap">
   <div class="head">
     <div>
-      <div class="eyebrow"><a class="home" href="../">Home</a> · Will, Ri &amp; Sam · shared camp kit</div>
-      <h1>Hof<span>Camp</span></h1>
+      <div class="eyebrow"><a class="home" href="../">Home</a></div>
+      <h1>Hof<span>Camps</span></h1>
     </div>
-    <div class="count" id="count">Loading gear…</div>
+    <div class="side">
+      <div class="count" id="count">Loading gear…</div>
+      <div class="seg" role="group" aria-label="Arrange the floor">
+        <button id="ar-free" aria-pressed="true">Laid out</button><button id="ar-owner" aria-pressed="false">By owner</button><button id="ar-cat" aria-pressed="false">By category</button>
+      </div>
+    </div>
   </div>
 
   <div class="stage" id="stage">
@@ -90,12 +97,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <div class="hint" id="hint">Click any item to pick it up · hover to see its name · drag to look around</div>
   </div>
 
-  <div class="arrange"><span class="eyebrow">Arrange</span>
-    <div class="seg" role="group" aria-label="Arrange the floor">
-      <button id="ar-free" aria-pressed="true">Laid out</button><button id="ar-owner" aria-pressed="false">By owner</button><button id="ar-cat" aria-pressed="false">By category</button>
-    </div></div>
-  <div class="list" id="list"></div>
-  <p class="note">Each item is a 3D model generated with Meshy AI from the product photos and scaled to its real size. Packed items unpack when you pick them up: the Patagonia duffel, the bear bag kit, the tent, Rumpl, both sleeping pads, sleeping bag, chair, tarp, both towels, cooler, cutting board and tools, cookware, saw, paracord, binoculars, the stove kit inside the GSI pot, water filter and multi-tool holster. Both headlamps and the lantern switch on. Each second water shoe is a mirror image of the first.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -110,58 +111,58 @@ const PI=Math.PI;
    rot  = how the Meshy model is turned to lie the way it would on a floor. */
 const ITEMS=[
  /* back row: the big stuff */
- {id:'duffel',name:'Patagonia Black Hole Duffel 55L',owner:'sam',sub:'carries most of the kit',
+ {id:'duffel',name:'Patagonia Black Hole Duffel 55L',owner:'them',sub:'carries most of the kit',
   closed:{f:'duffel',size:.58},open:{f:'duffel-open',size:.58},pos:[-1.3,-.62],ry:-.2},
- {id:'tent',name:'Coleman Peak1 2P tent',owner:'sam',sub:'88 × 52 in floor · 42 in peak',
+ {id:'tent',name:'Coleman Peak1 2P tent',owner:'them',sub:'88 × 52 in floor · 42 in peak',
   closed:{f:'tent-packed',rot:[0,0,PI/2],size:.50},open:{f:'tent',size:1.10,axis:'y'},pos:[-.62,-.6],ry:-.35},
- {id:'nemo',name:'NEMO Switchback foam pad',owner:'sam',sub:'72 in, folds like an accordion',
+ {id:'nemo',name:'NEMO Switchback foam pad',owner:'them',sub:'72 in, folds like an accordion',
   closed:{f:'nemo-packed',size:.51},open:{f:'nemo',size:1.83},pos:[.02,-.62],ry:.1},
  {id:'sleepbag',name:'Green sleeping bag',owner:'ours',sub:'mummy bag',
   closed:{f:'sleepbag-packed',size:.40},open:{f:'sleepbag',size:2.0},pos:[.62,-.6],ry:.3},
  {id:'bearbag',name:'Bear bag hanging kit',owner:'ours',sub:'20 L dry bag, rope, carabiners · packs into a mesh cube',
   closed:{f:'bearbag-packed',size:.34},open:{f:'bearbag',rot:[-PI/2,0,0],size:.48},pos:[1.27,-.6],ry:.05},
  /* middle row */
- {id:'rumpl',name:'Rumpl Backcountry Puffy',owner:'sam',sub:'1-person blanket',
+ {id:'rumpl',name:'Rumpl Backcountry Puffy',owner:'them',sub:'1-person blanket',
   closed:{f:'rumpl-packed',rot:[0,0,PI/2],size:.38},open:{f:'rumpl',rot:[-PI/2,0,0],size:1.90},pos:[-1.32,.02],ry:.3},
- {id:'chair',name:'REI Flexlite Camp Dreamer chair',owner:'sam',sub:'packs into its own sack',
+ {id:'chair',name:'REI Flexlite Camp Dreamer chair',owner:'them',sub:'packs into its own sack',
   closed:{f:'chair-packed',size:.38},open:{f:'chair',size:.95,axis:'y'},pos:[-.8,.04],ry:-.2},
  {id:'tarp',name:'CARTMAN 6 × 8 ft tarp',owner:'ours',sub:'waterproof, grommeted',
   closed:{f:'tarp-packed',size:.34},open:{f:'tarp',size:2.44,flat:true},pos:[-.28,.03],ry:.15},
  {id:'pad',name:'Overmont ultralight sleeping pad',owner:'ours',sub:'inflatable, built-in pillow',
   closed:{f:'pad-packed',rot:[0,0,PI/2],size:.30},open:{f:'pad',size:1.90},pos:[.2,.04],ry:.4},
- {id:'filter',name:'Katadyn gravity water filter',owner:'sam',sub:'hang it and let it drip',
+ {id:'filter',name:'Katadyn gravity water filter',owner:'them',sub:'hang it and let it drip',
   closed:{f:'filter-packed',rot:[-PI/2,0,0],size:.25},open:{f:'filter',rot:[-PI/2,0,0],size:.52},pos:[.66,.03],ry:-.15},
- {id:'boiler',name:'GSI Halulite Boiler 1.1 L',owner:'sam',sub:'stove kit nests inside',
+ {id:'boiler',name:'GSI Halulite Boiler 1.1 L',owner:'them',sub:'stove kit nests inside',
   closed:{f:'boiler',size:.15},open:{parts:[{f:'stove',size:.27,axis:'y',at:[0,0]},{f:'ferro',size:.24,flat:true,at:[.24,.05],ry:.5}]},pos:[1.1,.04],ry:.6},
  {id:'shoes',name:'Quick-dry water shoes',owner:'ours',sub:'black pair',
   closed:{f:'shoe',size:.27,pair:.115},pos:[1.5,.06],ry:-.35},
  /* front row: the small stuff */
  {id:'shoes2',name:'Beige water shoes',owner:'ours',sub:"men's 6",
   closed:{f:'shoe2',size:.25,pair:.105},pos:[-1.32,.6],ry:.3},
- {id:'headlamp',name:'Black Diamond Cosmo headlamp',owner:'sam',sub:'',
+ {id:'headlamp',name:'Black Diamond Cosmo headlamp',owner:'them',sub:'',
   closed:{f:'headlamp',size:.19},light:{at:[0,.02,.975]},focusRy:-1.3,pos:[-.85,.62],ry:.4},
  {id:'headlamp2',name:'Energizer headlamp',owner:'ours',sub:'',
   closed:{f:'headlamp2',size:.19},light:{at:[0,0,.95]},focusRy:-1.3,pos:[-.45,.62],ry:-.3},
- {id:'multitool',name:'Coast Mackenzie MT400C multi-tool',owner:'sam',sub:'18-in-1, in its nylon holster',
+ {id:'multitool',name:'Coast Mackenzie MT400C multi-tool',owner:'them',sub:'18-in-1, in its nylon holster',
   closed:{f:'holster',size:.14,axis:'y'},open:{f:'multitool',rot:[-PI/2,0,0],size:.17},pos:[-.05,.62],ry:.2},
  {id:'soap',name:'Biodegradable camp soap',owner:'ours',sub:'citrus',
   closed:{f:'soap',size:.15,axis:'y'},pos:[.62,.6],ry:.2},
- {id:'deet',name:"Ben's 30% DEET repellent",owner:'sam',sub:'3.4 oz pump',
+ {id:'deet',name:"Ben's 30% DEET repellent",owner:'them',sub:'3.4 oz pump',
   closed:{f:'deet',size:.15,axis:'y'},pos:[-1.62,1.08],ry:.3},
- {id:'bronner',name:"Dr. Bronner's peppermint soap",owner:'sam',sub:'2 oz',
+ {id:'bronner',name:"Dr. Bronner's peppermint soap",owner:'them',sub:'2 oz',
   closed:{f:'bronner',size:.11,axis:'y'},pos:[-1.62,1.5],ry:-.2},
- {id:'nalgene',name:'Nalgene 32 oz wide-mouth',owner:'sam',sub:'',
+ {id:'nalgene',name:'Nalgene 32 oz wide-mouth',owner:'them',sub:'',
   closed:{f:'nalgene',size:.235,axis:'y'},pos:[.9,.6],ry:-.4},
  {id:'nalgene2',name:'Nalgene 32 oz wide-mouth',owner:'ours',sub:'',
   closed:{f:'nalgene',size:.235,axis:'y'},pos:[1.78,1.08],ry:.3},
- {id:'lantern',name:'Black Diamond Moji lantern',owner:'sam',sub:'',
+ {id:'lantern',name:'Black Diamond Moji lantern',owner:'them',sub:'',
   closed:{f:'lantern',rot:[PI,0,0],size:.085},light:{glow:true},pos:[1.16,.6],ry:0},
- {id:'whistle',name:'Emergency whistle',owner:'sam',sub:'on a lanyard',
+ {id:'whistle',name:'Emergency whistle',owner:'them',sub:'on a lanyard',
   closed:{f:'whistle',size:.36},pos:[1.48,.62],ry:.5},
  /* fourth row */
- {id:'towel',name:'REI Co-op Multi Towel',owner:'sam',sub:'quick-dry',
+ {id:'towel',name:'REI Co-op Multi Towel',owner:'them',sub:'quick-dry',
   closed:{f:'towel-packed',size:.30},open:{f:'towel',size:.92,flat:true},pos:[-1.05,1.05],ry:.15},
- {id:'sleepbag2',name:'Second sleeping bag',owner:'sam',sub:'packed in its stuff sack',
+ {id:'sleepbag2',name:'Second sleeping bag',owner:'them',sub:'packed in its stuff sack',
   closed:{f:'sleepbag2-packed',size:.34,axis:'y'},pos:[-.5,1.05],ry:-.2},
  {id:'rinse',name:'Rinse Wash & Fold bag',owner:'ours',sub:'the second duffel',
   closed:{f:'rinse',size:.66},pos:[.18,1.08],ry:.1},
@@ -179,12 +180,12 @@ const ITEMS=[
   open:{parts:[{f:'board',size:.34,at:[0,0]},{f:'tools',size:.26,flat:true,at:[.31,0],ry:1.57}]},pos:[-.02,1.56],ry:-.15},
  {id:'ktowel',name:'Kitchen towel',owner:'ours',sub:'',
   closed:{f:'ktowel-packed',size:.22},open:{f:'ktowel',size:.6,flat:true},pos:[.55,1.56],ry:.2},
- {id:'cord',name:'Paracord kit',owner:'sam',sub:'four hanks and cord tensioners',
+ {id:'cord',name:'Paracord kit',owner:'them',sub:'four hanks and cord tensioners',
   closed:{f:'cord-packed',size:.26},open:{f:'cord',size:.5},pos:[1.05,1.56],ry:-.2},
- {id:'bino',name:'Nocs Standard Issue 8×25 binoculars',owner:'sam',sub:'in their drawstring pouch',
+ {id:'bino',name:'Nocs Standard Issue 8×25 binoculars',owner:'them',sub:'in their drawstring pouch',
   closed:{f:'bino-packed',size:.15},open:{f:'bino',size:.42},pos:[1.48,1.56],ry:.3},
 ];
-const OWNER={sam:"Sam's",ours:'Ours'};
+const OWNER={them:'Theirs',ours:'Ours'};
 
 /* ---------- DOM ---------- */
 const $=id=>document.getElementById(id);
@@ -313,7 +314,7 @@ ITEMS.forEach(item=>{
     home:new THREE.Vector3(item.pos[0],0,item.pos[1]),homeRy:item.ry||0});
 });
 let loaded=0;
-function setCount(){$('count').textContent=loaded<ITEMS.length?`Loading ${loaded}/${ITEMS.length}…`:`${ITEMS.length} items · ${ITEMS.filter(i=>i.owner==='sam').length} Sam's, ${ITEMS.filter(i=>i.owner==='ours').length} ours`}
+function setCount(){$('count').textContent=loaded<ITEMS.length?`Loading ${loaded}/${ITEMS.length}…`:`${ITEMS.length} items`}
 setCount();
 Promise.all(objs.map(o=>(o.item.closed.parts?loadParts(o.item.closed.parts):loadGLB(o.item.closed.f)).then(m=>{
   o.closed=o.item.closed.parts?m:fit(m,o.item.closed);o.closed.traverse(x=>{if(x.isMesh)x.userData.obj=o});o.root.add(o.closed);
@@ -322,7 +323,7 @@ Promise.all(objs.map(o=>(o.item.closed.parts?loadParts(o.item.closed.parts):load
 }).catch(()=>{loaded++;setCount()}))).then(()=>{
   // fetch the set-up versions in the background so unpacking is instant
   // set-up versions load on demand (first hover or click), so the floor appears fast
-  if(mode!=='free')arrange(mode,false);
+  arrange(mode,false);
 });
 let _glow=null;function glowTex(){if(_glow)return _glow;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
   const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.25,'rgba(255,240,210,.55)');gr.addColorStop(1,'rgba(255,220,170,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);_glow=new THREE.CanvasTexture(c);return _glow}
@@ -397,10 +398,13 @@ function arrange(m,instant){
   while(labelGroup.children.length){const l=labelGroup.children.pop();l.material.map.dispose();l.material.dispose();l.geometry.dispose()}
   if(m==='free'){
     objs.forEach(o=>{o.home.set(o.item.pos[0],0,o.item.pos[1]);o.homeRy=o.item.ry||0});
-    floor.scale.set(1,1,1);floor.position.set(0,0,.4);FL={cx:.08,cz:.45,k:1};
+    const bb=new THREE.Box2();objs.forEach(o=>{const f=footprint(o);bb.expandByPoint(new THREE.Vector2(o.home.x-f.w/2,o.home.z-f.d/2));bb.expandByPoint(new THREE.Vector2(o.home.x+f.w/2,o.home.z+f.d/2))});
+    const c=bb.getCenter(new THREE.Vector2()),sz=bb.getSize(new THREE.Vector2());
+    const fw=Math.max(3.7,sz.x+.6),fd=Math.max(3.5,sz.y+.6);floor.scale.set(fw/3.7,fd/3.5,1);floor.position.set(c.x,0,c.y);
+    FL={cx:c.x,cz:c.y,k:Math.max(fw/3.7,fd/3.5)};
   }else{
     const groups=m==='owner'
-      ?[["Sam's",objs.filter(o=>o.item.owner==='sam')],['Ours',objs.filter(o=>o.item.owner==='ours')]]
+      ?[['Ours',objs.filter(o=>o.item.owner==='ours')],['Theirs',objs.filter(o=>o.item.owner==='them')]]
       :CATS.map(([c])=>[c,objs.filter(o=>(CAT_OF[o.item.id]||'Camp tools')===c)]).filter(g=>g[1].length);
     const packed=groups.map(([name,items])=>{const area=items.reduce((a,o)=>{const f=footprint(o);return a+(f.w+.07)*(f.d+.07)},0);
       const maxW=m==='owner'?1.75:Math.min(2.2,Math.max(...items.map(o=>footprint(o).w),Math.sqrt(area)*1.35));
@@ -418,18 +422,6 @@ function arrange(m,instant){
   if(focus)focusOn(null);else goCam(floorView(),instant);dirty=true;
 }
 ['free','owner','cat'].forEach(k=>$('ar-'+k).onclick=()=>arrange(k));
-/* ---------- list below the stage ---------- */
-const list=$('list');
-['sam','ours'].forEach(ow=>{
-  const g=document.createElement('div');g.className='group';
-  const lab=document.createElement('span');lab.className='eyebrow';lab.textContent=OWNER[ow];g.append(lab);
-  ITEMS.filter(i=>i.owner===ow).forEach(i=>{
-    const b=document.createElement('button');b.className='chip';b.id='chip-'+i.id;b.setAttribute('aria-pressed','false');
-    const d=document.createElement('i');d.className='dot-'+ow;b.append(d,i.name);
-    if(i.open){const t=document.createElement('span');t.className='two';t.textContent='unpacks';b.append(t)}
-    b.onclick=()=>{const o=objs.find(x=>x.item===i);focusOn(focus===o?null:o)};
-    g.append(b)});
-  list.append(g)});
 
 /* ---------- camera ---------- */
 const FLOOR_DIR=new THREE.Vector3(0,1.35,1.05).normalize();
@@ -441,7 +433,7 @@ function itemView(o){
   const fov=camera.fov*PI/180,aspect=camera.aspect;const fit=r/Math.sin(Math.min(fov,fov*aspect)/2)*1.15;
   const dir=camera.position.clone().sub(controls.target).normalize();
   if(dir.y<.25){dir.y=.25;dir.normalize()}
-  return{t:new THREE.Vector3(0,hgt*.45,0),d:Math.max(.2,fit),dir:new THREE.Vector3(.75,.62,1).normalize()};
+  return{t:new THREE.Vector3(FL.cx,hgt*.45,FL.cz),d:Math.max(.2,fit),dir:new THREE.Vector3(.75,.62,1).normalize()};
 }
 function goCam(v,instant){camGoal=v;if(instant||reduce){controls.target.copy(v.t);camera.position.copy(v.dir).multiplyScalar(v.d).add(v.t);camGoal=null;dirty=true}}
 controls.addEventListener('start',()=>{camGoal=null});
@@ -522,7 +514,7 @@ function loop(now){
     // appear on the floor one after another
     const prevShow=o.show;o.show=approach(o.show,o.showT,dt,6*sp);
     o.hover=approach(o.hover,o.hoverT,dt,10*sp);
-    const target=focus===o?new THREE.Vector3(0,0,0):o.home;
+    const target=focus===o?new THREE.Vector3(FL.cx,0,FL.cz):o.home;
     o.root.position.lerp(target,Math.min(1,dt*5*sp));
     const ryT=focus===o?(o.item.focusRy||0):o.homeRy;o.root.rotation.y+=(ryT-o.root.rotation.y)*Math.min(1,dt*5*sp);
     if(o.spin>0){o.spin=Math.max(0,o.spin-dt/1.4);o.root.rotation.y=ryT+(1-easeOut(1-o.spin))*PI*2;busy=true}

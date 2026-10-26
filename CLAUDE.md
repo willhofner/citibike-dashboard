@@ -145,7 +145,7 @@ citibike-bot/
 │       │   └── Assets.xcassets/        # App icons and colors
 │       └── Info.plist                  # Privacy descriptions + background modes
 ├── gear/
-│   ├── index.html              # HofCamp — 3D gear floor (three.js r128), Will's and Sam's shared camping kit
+│   ├── index.html              # HofCamps — 3D gear floor (three.js r128), shared camping kit
 │   └── m/                      # 37 Meshy AI models, meshopt-compressed GLB wrapped as base64 JSON (~32 MB); fetched at runtime
 ├── timelapse/
 │   ├── index.html              # HofLapse — unified timelapse of every mode (play, scrub, step by day)
@@ -806,7 +806,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Times are local wall-clock seconds so all modes sort together (Strava's local-time-with-Z quirk is handled here)
    - **Run after any data refresh**, then the page picks it up at load (fetched at runtime, not baked in)
 
-## HofCamp (Gear Floor)
+## HofCamps (Gear Floor)
 
 ### What's Built (2026-10-25)
 
@@ -815,14 +815,15 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - 20 items unpack on click (packed model swaps to its set-up model); both headlamps and the Moji lantern switch on
    - Arrange toggle: Laid out / By owner / By category (Bags, Kitchen, Sleep & shelter, Camp tools, Excursions), biggest items first
    - Built in a Claude conversation as an artifact, then copied here. Models are Meshy AI GLBs simplified to ~25k tris, 512–768 px textures, meshopt-compressed and stored as `{format:'glb-base64',data}` JSON in `gear/m/`
-   - Owner and category lists live in the `ITEMS` and `CATS` arrays at the top of the script
+   - Owner and category lists live in the `ITEMS` and `CATS` arrays at the top of the script. Owners are `ours` / `them` and show as Ours / Theirs: **never put the friend's name on the page or in this repo** (it is public)
+   - Page is just the header (Home link, title, item count, Arrange toggle) and the floor; nothing below the stage
    - Accent color: amber #e2a62b (the page keeps its own light/dark theme, pinned dark here)
 
 ## Landing Page
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, and HofCamp. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, and HofCamps. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 
