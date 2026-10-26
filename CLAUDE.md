@@ -144,7 +144,7 @@ citibike-bot/
 │       │   ├── ContentView.swift       # Main SwiftUI view (map + coverage %)
 │       │   └── Assets.xcassets/        # App icons and colors
 │       └── Info.plist                  # Privacy descriptions + background modes
-├── gear/
+├── camp/                       # HofCamps (moved from gear/ 2026-10-26; server.js 301s /gear → /camp)
 │   ├── index.html              # HofCamps — 3D gear floor (three.js r128), shared camping kit
 │   └── m/                      # 37 Meshy AI models, meshopt-compressed GLB wrapped as base64 JSON (~32 MB); fetched at runtime
 ├── timelapse/
@@ -810,11 +810,13 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 ### What's Built (2026-10-25)
 
-1. **Gear floor** (`gear/index.html`)
+1. **Gear floor** (`camp/index.html`, live at /camp)
    - 34 items laid out on a wood floor in 3D; hover to lift and name, click to pick up and orbit
    - 20 items unpack on click (packed model swaps to its set-up model); both headlamps and the Moji lantern switch on
-   - Arrange toggle: Laid out / By owner / By category (Bags, Kitchen, Sleep & shelter, Camp tools, Excursions), biggest items first
-   - Built in a Claude conversation as an artifact, then copied here. Models are Meshy AI GLBs simplified to ~25k tris, 512–768 px textures, meshopt-compressed and stored as `{format:'glb-base64',data}` JSON in `gear/m/`
+   - Arrange toggle: Laid out (one size-sorted grid, duffels first) / By owner / By category (Bags, Kitchen, Sleep & shelter, Camp tools, Excursions), biggest items first. On portrait screens groups stack vertically
+   - Opens with a ~7s ground-level 360° fly-around that rises into a front-left diagonal view fitted to the floor; any touch ends it
+   - Picked-up item: name card top-left with Back to floor underneath; no action button. The first pick-up per visit shows an animated "Tap it to unpack / switch on / spin" cue
+   - Built in a Claude conversation as an artifact, then copied here. Models are Meshy AI GLBs simplified to ~25k tris, 512–768 px textures, meshopt-compressed and stored as `{format:'glb-base64',data}` JSON in `camp/m/`
    - Owner and category lists live in the `ITEMS` and `CATS` arrays at the top of the script. Owners are `ours` / `them` and show as Ours / Theirs: **never put the friend's name on the page or in this repo** (it is public)
    - Page is just the header (Home link, title, item count, Arrange toggle) and the floor; nothing below the stage
    - Accent color: amber #e2a62b (the page keeps its own light/dark theme, pinned dark here)

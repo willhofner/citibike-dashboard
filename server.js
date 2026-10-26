@@ -50,6 +50,11 @@ const server = http.createServer((req, res) => {
     });
     return res.end("This site is private.");
   }
+  // HofCamps moved from /gear to /camp; keep old links working.
+  if (pathname === "/gear" || pathname.startsWith("/gear/")) {
+    res.writeHead(301, { Location: "/camp" + pathname.slice(5) + url.search });
+    return res.end();
+  }
   if (HIDDEN.test(pathname) || pathname.includes("..")) return notFound(res);
 
   // Resolve directory requests to their index.html ourselves; never list directories.
