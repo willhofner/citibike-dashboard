@@ -55,6 +55,11 @@ const server = http.createServer((req, res) => {
     res.writeHead(301, { Location: "/camp" + pathname.slice(5) + url.search });
     return res.end();
   }
+  // Know Your New York lives at /nyc; these are friendlier aliases.
+  if (/^\/(knowyournewyork|nyc\.game)\/?$/i.test(pathname)) {
+    res.writeHead(301, { Location: "/nyc/" + url.search });
+    return res.end();
+  }
   if (HIDDEN.test(pathname) || pathname.includes("..")) return notFound(res);
 
   // Resolve directory requests to their index.html ourselves; never list directories.

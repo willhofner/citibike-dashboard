@@ -22,6 +22,7 @@
     --emerald: #10b981;
     --camp: #e2a62b;
     --dose: #ffbf1a;
+    --nyc: #2f7bff;
   }
 
   body {
@@ -89,6 +90,7 @@
   .card.burrow { grid-column: 1 / -1; }
   .card.lapse { grid-column: 1 / -1; }
   .card.dose { grid-column: 1 / -1; }
+  .card.nyc { grid-column: 1 / -1; }
   .card.lapse:hover { border-color: var(--orange); box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
   .card.lapse .card-stat .val { color: var(--orange); }
 
@@ -146,6 +148,7 @@
   .card.burrow .brand { color: rgba(16,185,129,0.6); }
   .card.camp .brand { color: rgba(226,166,43,0.6); }
   .card.dose .brand { color: rgba(255,191,26,0.6); }
+  .card.nyc .brand { color: rgba(47,123,255,0.75); }
 
   .card p {
     font-size: 13px;
@@ -181,6 +184,7 @@
   .card.burrow .card-stat .val { color: var(--emerald); }
   .card.camp .card-stat .val { color: var(--camp); }
   .card.dose .card-stat .val { color: var(--dose); }
+  .card.nyc .card-stat .val { color: var(--nyc); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -213,6 +217,8 @@
   .card.camp .card-links a:hover { color: var(--camp); }
   .card.dose .card-links a:hover { color: var(--dose); }
   .card.dose:hover { border-color: var(--dose); box-shadow: 0 8px 24px rgba(255,191,26,0.15); }
+  .card.nyc .card-links a:hover { color: var(--nyc); }
+  .card.nyc:hover { border-color: var(--nyc); box-shadow: 0 8px 24px rgba(47,123,255,0.15); }
 
   .jobs {
     margin-top: 40px;
@@ -471,6 +477,23 @@
       </div>
       <div class="card-links">
         <a href="dose/" onclick="event.stopPropagation()">Spin a Day</a>
+      </div>
+    </div>
+    <div onclick="location.href='nyc/'" class="card nyc">
+      <div class="card-top">
+        <div class="icon">🗽</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>Know Your New York</h2>
+      <div class="brand">The neighborhood map game</div>
+      <p>Find every neighborhood in all five boroughs on the map, with the subway drawn in and a few fun facts about each one while you look. Brooklyn, Queens and the Bronx split into smaller sections.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">203</div><div class="lbl">Neighborhoods</div></div>
+        <div class="card-stat"><div class="val">5</div><div class="lbl">Boroughs</div></div>
+        <div class="card-stat"><div class="val">608</div><div class="lbl">Fun facts</div></div>
+      </div>
+      <div class="card-links">
+        <a href="nyc/" onclick="event.stopPropagation()">Play</a>
       </div>
     </div>
   </div>

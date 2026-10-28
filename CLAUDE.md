@@ -149,6 +149,8 @@ citibike-bot/
 │   └── m/                      # 37 Meshy AI models, meshopt-compressed GLB wrapped as base64 JSON (~32 MB); fetched at runtime
 ├── dose/
 │   └── index.html              # HofDose — neighborhood roulette (spin a Brooklyn/Manhattan map, 5 stops a day, Explore view); built in Claude, data baked in
+├── nyc/
+│   └── index.html              # Know Your New York — neighborhood map game for all five boroughs; built in Claude, data baked in (server.js 301s /knowyournewyork and /nyc.game → /nyc/)
 ├── timelapse/
 │   ├── index.html              # HofLapse — unified timelapse of every mode (play, scrub, step by day)
 │   ├── build_events.py         # Builds the compact event feed from every mode's enriched data
@@ -808,6 +810,23 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Built in a Claude conversation as an artifact, then copied here with the brand changed to HofDose; venue research is from Oct 2026, and many Manhattan picks were not individually re-verified as open
    - Accent: #ffbf1a. The page keeps its own map theme, pinned dark
 
+## Know Your New York (Neighborhood Map Game)
+
+### What's Built (2026-10-28)
+
+1. **Game page** (`nyc/index.html`, live at /nyc; `/knowyournewyork` and `/nyc.game` redirect there)
+   - A map quiz for learning neighborhoods: Manhattan (35), Brooklyn (51, split Shallow 22 / Deep 29 / All), Queens (62, Western / Northeast / South / All), the Bronx (54, South / Northwest / East / All) and Staten Island as a joke (one neighborhood, the whole borough)
+   - Modes: Find it (tap the named neighborhood), Name it (pick the name of the blue one from 4 nearby options), Study (labels on, tap to learn)
+   - Scoring is correct / attempted, where correct means first try with no hint. Colors: green first try, yellow second try or hint, light red third try, dark red missed (the missed answer flashes red). Streak chime rises in pitch as the streak grows; SFX toggle
+   - Fun facts card: 3 facts per neighborhood (608 total, 4 for Staten Island), tap to cycle, "Photos ↗" opens an image search. Shown while you search in Find it, after answering in Name it, on tap in Study
+   - Hint names bordering neighborhoods (computed from the shapes); islands get custom lines
+   - Touch: pinch zooms only the map, one-finger drag pans, a tap counts only if the finger barely moved, no hover highlight on touch. Desktop: wheel zoom at cursor, drag to pan, keys 1-4 / H / S / F / Enter
+   - Subway lines and stations from MTA GTFS (via the nycroutes package) drawn muted under the borders; toggle with Sub
+   - Boundaries: Brooklyn traced from the Wikivoyage Brooklyn district map; Manhattan, Queens, Bronx and Staten Island from click_that_hood (Manhattan is rotated 29° so avenues run vertical). Bronx skips its five small islands
+   - Best scores per borough/section/mode in localStorage (`kyn-<board>-best4-<mode>-<scope>`)
+   - Built in a Claude conversation as an artifact, then copied here as a standalone page pinned dark. Facts were written Oct 2026 and spot-checked; some restaurants and bars were not re-verified as still open
+   - Accent: blue #2f7bff on the landing card
+
 ## HofLapse (Unified Timelapse)
 
 ### What's Built (2026-09-20)
@@ -845,7 +864,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, and HofDose (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, HofDose (full width), and Know Your New York (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 
