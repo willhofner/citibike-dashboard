@@ -150,7 +150,7 @@ citibike-bot/
 ├── explore/                    # NYC.explore (was HofDose at /dose until 2026-10-28; server.js 301s /dose → /explore)
 │   └── index.html              # NYC.explore — neighborhood roulette (spin a Brooklyn/Manhattan map, 5 stops a day, Explore view); built in Claude, data baked in
 ├── nyc/
-│   └── index.html              # Know Your New York — neighborhood map game for all five boroughs; built in Claude, data baked in (server.js 301s /knowyournewyork and /nyc.game → /nyc/)
+│   └── index.html              # NYC.game — neighborhood map game for all five boroughs; built in Claude, data baked in (server.js 301s /knowyournewyork and /nyc.game → /nyc/)
 ├── subway.game/
 │   └── index.html              # SUBWAY.game — NYC subway quiz (6 modes); built in Claude, MTA timetable data baked in (server.js 301s /SUBWAY.game, /subway.game and /knowyoursubway → /subway.game/)
 ├── timelapse/
@@ -803,7 +803,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 1. **Game page** (`explore/index.html`, live at /explore)
    - Named NYC.explore at Will's request; it breaks the Hof<span>Brand</span> pattern on purpose. First shipped as HofDose at /dose the same day
    - Idea from a friend: pick a random neighborhood and spend the day there. Each neighborhood has five stops in walking order: coffee, the thing it's known for, a park, a bite, a bar
-   - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods) and Manhattan (all 35), using the same boundary shapes and subway lines as the Know Your New York map game
+   - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods) and Manhattan (all 35), using the same boundary shapes and subway lines as the NYC.game map game (/nyc)
    - Pick my day: the map bounces a blue highlight between neighborhoods, slows down, lands, fires confetti and opens the plan. Tap any neighborhood to see its plan instead
    - Pick for me (one random option per stop) or Choose my own (swipe up to 3 options per stop). Bars are typed dive / cocktail / live music, or plain "Bar" where a neighborhood has no real one of that type
    - Gluten-free bites switch (never remembered; every visit starts with all restaurants)
@@ -813,7 +813,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Built in a Claude conversation as an artifact, then copied here with the brand changed to NYC.explore; venue research is from Oct 2026, and many Manhattan picks were not individually re-verified as open
    - Accent: #ffbf1a. The page keeps its own map theme, pinned dark
 
-## Know Your New York (Neighborhood Map Game)
+## NYC.game (Neighborhood Map Game)
 
 ### What's Built (2026-10-28)
 
@@ -827,7 +827,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Subway lines and stations from MTA GTFS (via the nycroutes package) drawn muted under the borders; toggle with Sub
    - Boundaries: Brooklyn traced from the Wikivoyage Brooklyn district map; Manhattan, Queens, Bronx and Staten Island from click_that_hood (Manhattan is rotated 29° so avenues run vertical). Bronx skips its five small islands
    - Best scores per borough/section/mode in localStorage (`kyn-<board>-best4-<mode>-<scope>`)
-   - Built in a Claude conversation as an artifact, then copied here as a standalone page pinned dark. Facts were written Oct 2026 and spot-checked; some restaurants and bars were not re-verified as still open
+   - Named Know Your New York until 2026-10-28, renamed NYC.game. Built in a Claude conversation as an artifact, then copied here as a standalone page pinned dark. Facts were written Oct 2026 and spot-checked; some restaurants and bars were not re-verified as still open
    - Accent: blue #2f7bff on the landing card
 
 ## SUBWAY.game (Subway Quiz)
@@ -835,7 +835,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 ### What's Built (2026-10-28)
 
 1. **Game page** (`subway.game/index.html`, live at /subway.game/; any capitalization of /subway.game and /knowyoursubway redirect there). Lives in its own folder because /subway is HofSubways
-   - "Just how well do you know the subway?" Same signage-console-over-map look as Know Your New York, Manhattan / All boroughs toggle, 3/2/1/0 scoring, streaks, SFX, best scores in localStorage (`kys-best-*`)
+   - "Just how well do you know the subway?" Same signage-console-over-map look as NYC.game, Manhattan / All boroughs toggle, 3/2/1/0 scoring, streaks, SFX, best scores in localStorage (`kys-best-*`)
    - Modes, in this order: **Fill the Line** (default, Will's favorite: name every stop on a line or branch, any order, each lands in its numbered slot), Which Trains (tap every line stopping at the pinned station, weekdays), Fastest Route (4 real options between two stations, weekday midday, waits + transfer walks included), After Hours (same as Which Trains at a given day/time: late night, weekend, Saturday, Sunday, rush hour), Next Stop, Odd One Out
    - Fill the Line matching only happens on Submit / Enter, never while typing (Will's explicit ask). Accepts ordinals and abbreviations ("8th ave", "Sixth Avenue"), names in the same station complex ("times sq" for 42 St–Port Authority), name pieces ("port authority", "jfk"), first words when unique, and one or two typos ("bleeker street"); numbers must match exactly. "Another line" picks a different line; "Play again" repeats it
    - Data: MTA subway GTFS (npm `mta-gtfs-static`, feed published 2026-10-20, valid through 2026-10-31) processed into per-station hour-of-week service masks for every route, canonical weekday stop patterns per line/branch, route shapes, and 320 precomputed fastest-route questions (Dijkstra over median midday segment times). Borough outlines from dwillis/nyc-maps, nearby NJ/Westchester/Nassau from us-atlas. Planned weekend construction is not modeled. The processing script lived in the Claude session and is not in this repo
@@ -879,7 +879,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, HofDose (full width), Know Your New York (full width), and SUBWAY.game (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, HofDose (full width), NYC.game (full width), and SUBWAY.game (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 

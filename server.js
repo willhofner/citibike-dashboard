@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(301, { Location: "/camp" + pathname.slice(5) + url.search });
     return res.end();
   }
-  // Know Your New York lives at /nyc; these are friendlier aliases.
+  // NYC.game lives at /nyc; these are friendlier aliases.
   if (/^\/(knowyournewyork|nyc\.game)\/?$/i.test(pathname)) {
     res.writeHead(301, { Location: "/nyc/" + url.search });
     return res.end();
