@@ -60,6 +60,11 @@ const server = http.createServer((req, res) => {
     res.writeHead(301, { Location: "/nyc/" + url.search });
     return res.end();
   }
+  // SUBWAY.game lives at /subway.game/; accept any capitalization and a longer alias.
+  if (/^\/(subway\.game|knowyoursubway)\/?$/i.test(pathname) && pathname !== "/subway.game/") {
+    res.writeHead(301, { Location: "/subway.game/" + url.search });
+    return res.end();
+  }
   if (HIDDEN.test(pathname) || pathname.includes("..")) return notFound(res);
 
   // Resolve directory requests to their index.html ourselves; never list directories.
