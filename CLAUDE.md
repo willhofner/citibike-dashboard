@@ -147,8 +147,8 @@ citibike-bot/
 ├── camp/                       # HofCamps (moved from gear/ 2026-10-26; server.js 301s /gear → /camp)
 │   ├── index.html              # HofCamps — 3D gear floor (three.js r128), shared camping kit
 │   └── m/                      # 37 Meshy AI models, meshopt-compressed GLB wrapped as base64 JSON (~32 MB); fetched at runtime
-├── dose/
-│   └── index.html              # HofDose — neighborhood roulette (spin a Brooklyn/Manhattan map, 5 stops a day, Explore view); built in Claude, data baked in
+├── explore/                    # NYC.explore (was HofDose at /dose until 2026-10-28; server.js 301s /dose → /explore)
+│   └── index.html              # NYC.explore — neighborhood roulette (spin a Brooklyn/Manhattan map, 5 stops a day, Explore view); built in Claude, data baked in
 ├── nyc/
 │   └── index.html              # Know Your New York — neighborhood map game for all five boroughs; built in Claude, data baked in (server.js 301s /knowyournewyork and /nyc.game → /nyc/)
 ├── subway.game/
@@ -796,20 +796,21 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 ---
 
-## HofDose (Neighborhood Roulette)
+## NYC.explore (Neighborhood Roulette)
 
 ### What's Built (2026-10-28)
 
-1. **Game page** (`dose/index.html`, live at /dose)
+1. **Game page** (`explore/index.html`, live at /explore)
+   - Named NYC.explore at Will's request; it breaks the Hof<span>Brand</span> pattern on purpose. First shipped as HofDose at /dose the same day
    - Idea from a friend: pick a random neighborhood and spend the day there. Each neighborhood has five stops in walking order: coffee, the thing it's known for, a park, a bite, a bar
    - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods) and Manhattan (all 35), using the same boundary shapes and subway lines as the Know Your New York map game
    - Pick my day: the map bounces a blue highlight between neighborhoods, slows down, lands, fires confetti and opens the plan. Tap any neighborhood to see its plan instead
    - Pick for me (one random option per stop) or Choose my own (swipe up to 3 options per stop). Bars are typed dive / cocktail / live music, or plain "Bar" where a neighborhood has no real one of that type
    - Gluten-free bites switch (never remembered; every visit starts with all restaurants)
    - Explore tab: every bar, bite, coffee, landmark or park in the borough as pins plus a list; bars filter by type; "Plan a day in…" jumps to that neighborhood with the pick selected
-   - Progress (stops checked off) lives in localStorage under `hofdose-v1`
+   - Progress (stops checked off) lives in localStorage under `hofdose-v1` (kept from the HofDose name so progress survives the rename)
    - Pins: addresses geocoded offline against NYC's CSCL street centerline (house-number ranges) and projected onto the game's map coordinates; ~75 park/island landmarks use estimated coordinates, 11 low-confidence ones render dashed
-   - Built in a Claude conversation as an artifact, then copied here with the brand changed to HofDose; venue research is from Oct 2026, and many Manhattan picks were not individually re-verified as open
+   - Built in a Claude conversation as an artifact, then copied here with the brand changed to NYC.explore; venue research is from Oct 2026, and many Manhattan picks were not individually re-verified as open
    - Accent: #ffbf1a. The page keeps its own map theme, pinned dark
 
 ## Know Your New York (Neighborhood Map Game)

@@ -65,6 +65,11 @@ const server = http.createServer((req, res) => {
     res.writeHead(301, { Location: "/subway.game/" + url.search });
     return res.end();
   }
+  // HofDose was renamed NYC.explore and moved from /dose to /explore; keep old links working.
+  if (pathname === "/dose" || pathname.startsWith("/dose/")) {
+    res.writeHead(301, { Location: "/explore" + pathname.slice(5) + url.search });
+    return res.end();
+  }
   if (HIDDEN.test(pathname) || pathname.includes("..")) return notFound(res);
 
   // Resolve directory requests to their index.html ourselves; never list directories.
