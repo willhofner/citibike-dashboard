@@ -21,6 +21,7 @@
     --amber: #eab308;
     --emerald: #10b981;
     --camp: #e2a62b;
+    --dose: #ffbf1a;
   }
 
   body {
@@ -87,6 +88,7 @@
 
   .card.burrow { grid-column: 1 / -1; }
   .card.lapse { grid-column: 1 / -1; }
+  .card.dose { grid-column: 1 / -1; }
   .card.lapse:hover { border-color: var(--orange); box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
   .card.lapse .card-stat .val { color: var(--orange); }
 
@@ -143,6 +145,7 @@
   .card.subways .brand { color: rgba(234,179,8,0.6); }
   .card.burrow .brand { color: rgba(16,185,129,0.6); }
   .card.camp .brand { color: rgba(226,166,43,0.6); }
+  .card.dose .brand { color: rgba(255,191,26,0.6); }
 
   .card p {
     font-size: 13px;
@@ -177,6 +180,7 @@
   .card.subways .card-stat .val { color: var(--amber); }
   .card.burrow .card-stat .val { color: var(--emerald); }
   .card.camp .card-stat .val { color: var(--camp); }
+  .card.dose .card-stat .val { color: var(--dose); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -207,6 +211,8 @@
   .card.subways .card-links a:hover { color: var(--amber); }
   .card.burrow .card-links a:hover { color: var(--emerald); }
   .card.camp .card-links a:hover { color: var(--camp); }
+  .card.dose .card-links a:hover { color: var(--dose); }
+  .card.dose:hover { border-color: var(--dose); box-shadow: 0 8px 24px rgba(255,191,26,0.15); }
 
   .jobs {
     margin-top: 40px;
@@ -448,6 +454,23 @@
       </div>
       <div class="card-links">
         <a href="camp/" onclick="event.stopPropagation()">Gear Floor</a>
+      </div>
+    </div>
+    <div onclick="location.href='dose/'" class="card dose">
+      <div class="card-top">
+        <div class="icon">🎲</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>HofDose</h2>
+      <div class="brand">A new neighborhood a day</div>
+      <p>Spin the map, land on a neighborhood, and spend the day there: a coffee, the thing it's known for, a park, a bite and a bar. Explore every pick on the map.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">57</div><div class="lbl">Neighborhoods</div></div>
+        <div class="card-stat"><div class="val">2</div><div class="lbl">Boroughs</div></div>
+        <div class="card-stat"><div class="val">5</div><div class="lbl">Stops a day</div></div>
+      </div>
+      <div class="card-links">
+        <a href="dose/" onclick="event.stopPropagation()">Spin a Day</a>
       </div>
     </div>
   </div>

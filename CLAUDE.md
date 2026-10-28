@@ -147,6 +147,8 @@ citibike-bot/
 ├── camp/                       # HofCamps (moved from gear/ 2026-10-26; server.js 301s /gear → /camp)
 │   ├── index.html              # HofCamps — 3D gear floor (three.js r128), shared camping kit
 │   └── m/                      # 37 Meshy AI models, meshopt-compressed GLB wrapped as base64 JSON (~32 MB); fetched at runtime
+├── dose/
+│   └── index.html              # HofDose — neighborhood roulette (spin a Brooklyn/Manhattan map, 5 stops a day, Explore view); built in Claude, data baked in
 ├── timelapse/
 │   ├── index.html              # HofLapse — unified timelapse of every mode (play, scrub, step by day)
 │   ├── build_events.py         # Builds the compact event feed from every mode's enriched data
@@ -790,6 +792,22 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 ---
 
+## HofDose (Neighborhood Roulette)
+
+### What's Built (2026-10-28)
+
+1. **Game page** (`dose/index.html`, live at /dose)
+   - Idea from a friend: pick a random neighborhood and spend the day there. Each neighborhood has five stops in walking order: coffee, the thing it's known for, a park, a bite, a bar
+   - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods) and Manhattan (all 35), using the same boundary shapes and subway lines as the Know Your New York map game
+   - Pick my day: the map bounces a blue highlight between neighborhoods, slows down, lands, fires confetti and opens the plan. Tap any neighborhood to see its plan instead
+   - Pick for me (one random option per stop) or Choose my own (swipe up to 3 options per stop). Bars are typed dive / cocktail / live music, or plain "Bar" where a neighborhood has no real one of that type
+   - Gluten-free bites switch (never remembered; every visit starts with all restaurants)
+   - Explore tab: every bar, bite, coffee, landmark or park in the borough as pins plus a list; bars filter by type; "Plan a day in…" jumps to that neighborhood with the pick selected
+   - Progress (stops checked off) lives in localStorage under `hofdose-v1`
+   - Pins: addresses geocoded offline against NYC's CSCL street centerline (house-number ranges) and projected onto the game's map coordinates; ~75 park/island landmarks use estimated coordinates, 11 low-confidence ones render dashed
+   - Built in a Claude conversation as an artifact, then copied here with the brand changed to HofDose; venue research is from Oct 2026, and many Manhattan picks were not individually re-verified as open
+   - Accent: #ffbf1a. The page keeps its own map theme, pinned dark
+
 ## HofLapse (Unified Timelapse)
 
 ### What's Built (2026-09-20)
@@ -827,7 +845,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, and HofCamps. Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, and HofDose (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 
