@@ -153,6 +153,8 @@ citibike-bot/
 │   └── index.html              # NYC.game — neighborhood map game for all five boroughs; built in Claude, data baked in (server.js 301s /knowyournewyork and /nyc.game → /nyc/)
 ├── subway.game/
 │   └── index.html              # SUBWAY.game — NYC subway quiz (6 modes); built in Claude, MTA timetable data baked in (server.js 301s /SUBWAY.game, /subway.game and /knowyoursubway → /subway.game/)
+├── marathon/
+│   └── index.html              # NYC Marathon — 3D course, elevation profile, 3:55 race plan, gels, family viewing guide; built in Claude, Strava route GPX + NYC open data baked in
 ├── timelapse/
 │   ├── index.html              # HofLapse — unified timelapse of every mode (play, scrub, step by day)
 │   ├── build_events.py         # Builds the compact event feed from every mode's enriched data
@@ -842,6 +844,21 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Built in a Claude conversation as an artifact, then copied here pinned dark
    - Accent: #ffbf1a on the landing card
 
+## NYC Marathon (Race Plan)
+
+### What's Built (2026-10-29)
+
+1. **Race page** (`marathon/index.html`, live at /marathon)
+   - 3D course (three.js r128 + OrbitControls from CDN): raised road surface colored on a gradient by grade (orange up, blue down, full color at ±6%), height ×1–100 (default 60) and road width 20–800 m (default 400 m) sliders, Space+drag to pan, Play flyover with a chase camera that rides above the highest road ahead (walls go see-through while playing), 1×/2×/4×
+   - Flat map tab: drag to pan, wheel/pinch zoom, double-click reset. Neither map moves the runner; only dragging the elevation profile does (Will's explicit ask)
+   - Elevation profile with to-go markers (half, 10K, 5K, 1 mile), gel (G) and family (F) markers, plan elapsed/clock time in the readout
+   - Race plan: the 12 segments from nycmarathonguide.com with grade-adjusted paces (uphill +3.3%/1% grade, downhill −1.2%/1%) and a linear negative-split ramp solved to the chosen half split; goal, start time and second-half margin are editable
+   - Pocket plan, 6 gels (corral, then the water station nearest each 45 min mark, mile 14 before the Queensboro), family viewing guide (Lafayette Ave, First Ave low 70s, East Drive ~E 72nd, reunion on Central Park West), race-morning timeline (R from 8 St–NYU, 6:45 ferry, Orange Wave 3 Corral E), weather as of Oct 27
+   - Data: Strava route GPX (Mark Dredge's 2026 route, 636 points, scaled from 26.48 to 26.2 mi; bridge-deck glitches smoothed), borough shorelines from dwillis/nyc-maps, parks + neighborhood labels from click_that_hood, major streets/highways from the NYC Digital City Map (via kjhealy/nycdcm). All baked in (~170 KB)
+   - Built in a Claude conversation as an artifact, then copied here pinned dark (`data-theme="dark"` on `<html>`; the page keeps its own light/dark tokens)
+   - Contains Will's bib number and family's viewing plan; the repo is public
+   - Accent: #ff8436 on the landing card
+
 ## HofLapse (Unified Timelapse)
 
 ### What's Built (2026-09-20)
@@ -879,7 +896,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 The landing page (`index.html`) has two sections:
 
-1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, HofDose (full width), NYC.game (full width), and SUBWAY.game (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
+1. **Activity cards**: 2-column grid with Burrow, HofLapse (full width), HofBikes, HofRuns, HofRides, HofSubways, HofWalks, HofBeats, HofReads, HofCamps, HofDose (full width), NYC.game (full width), SUBWAY.game (full width), and NYC Marathon (full width). Each card has icon, badge (Live/New), brand, description, key stats, and links to explorer + dashboard. Stats are currently hardcoded — not auto-updated by the sync pipeline. Burrow is the first card — it's the unified view that ties everything together.
 
 2. **Scheduled Jobs**: A footer section listing all recurring automated jobs (Goodreads Sync — daily 6 AM ET via GitHub Action; Strava Sync is retired, see Strava section). Green dot = active. Update this section when new scheduled jobs are added.
 

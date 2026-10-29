@@ -24,6 +24,7 @@
     --dose: #ffbf1a;
     --nyc: #2f7bff;
     --sub: #ffbf1a;
+    --mara: #ff8436;
   }
 
   body {
@@ -93,6 +94,7 @@
   .card.dose { grid-column: 1 / -1; }
   .card.nyc { grid-column: 1 / -1; }
   .card.sub { grid-column: 1 / -1; }
+  .card.mara { grid-column: 1 / -1; }
   .card.lapse:hover { border-color: var(--orange); box-shadow: 0 8px 24px rgba(249,115,22,0.15); }
   .card.lapse .card-stat .val { color: var(--orange); }
 
@@ -152,6 +154,7 @@
   .card.dose .brand { color: rgba(255,191,26,0.6); }
   .card.nyc .brand { color: rgba(47,123,255,0.75); }
   .card.sub .brand { color: rgba(255,191,26,0.6); }
+  .card.mara .brand { color: rgba(255,132,54,0.7); }
 
   .card p {
     font-size: 13px;
@@ -189,6 +192,7 @@
   .card.dose .card-stat .val { color: var(--dose); }
   .card.nyc .card-stat .val { color: var(--nyc); }
   .card.sub .card-stat .val { color: var(--sub); }
+  .card.mara .card-stat .val { color: var(--mara); }
 
   .card-stat .lbl {
     font-size: 9px;
@@ -225,6 +229,8 @@
   .card.nyc:hover { border-color: var(--nyc); box-shadow: 0 8px 24px rgba(47,123,255,0.15); }
   .card.sub .card-links a:hover { color: var(--sub); }
   .card.sub:hover { border-color: var(--sub); box-shadow: 0 8px 24px rgba(255,191,26,0.15); }
+  .card.mara .card-links a:hover { color: var(--mara); }
+  .card.mara:hover { border-color: var(--mara); box-shadow: 0 8px 24px rgba(255,132,54,0.15); }
 
   .jobs {
     margin-top: 40px;
@@ -517,6 +523,23 @@
       </div>
       <div class="card-links">
         <a href="subway.game/" onclick="event.stopPropagation()">Play</a>
+      </div>
+    </div>
+    <div onclick="location.href='marathon/'" class="card mara">
+      <div class="card-top">
+        <div class="icon">🏅</div>
+        <span class="badge badge-new">New</span>
+      </div>
+      <h2>NYC Marathon</h2>
+      <div class="brand">Five boroughs, five bridges · Nov 1, 2026</div>
+      <p>The course in 3D, colored by grade, with a flyover that rides behind the runner. Grade-adjusted 3:55 splits with a negative split, gel timing, the family viewing route, race morning and weather.</p>
+      <div class="card-stat-row">
+        <div class="card-stat"><div class="val">26.2</div><div class="lbl">Miles</div></div>
+        <div class="card-stat"><div class="val">911</div><div class="lbl">Ft climbed</div></div>
+        <div class="card-stat"><div class="val">3:55</div><div class="lbl">Goal</div></div>
+      </div>
+      <div class="card-links">
+        <a href="marathon/" onclick="event.stopPropagation()">Race plan</a>
       </div>
     </div>
   </div>
