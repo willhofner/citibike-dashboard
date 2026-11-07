@@ -807,7 +807,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 1. **Game page** (`explore/index.html`, live at /explore)
    - Named NYC.explore at Will's request; it breaks the Hof<span>Brand</span> pattern on purpose. First shipped as HofDose at /dose the same day
    - Idea from a friend: pick a random neighborhood and spend the day there. Each neighborhood has five stops in walking order: coffee, the thing it's known for, a park, a bite, a bar
-   - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods) and Manhattan (all 35), using the same boundary shapes and subway lines as the NYC.game map game (/nyc)
+   - Brooklyn (the 22 "Shallow Brooklyn" neighborhoods plus Sunset Park, added 2026-11-07; Kensington, Prospect Park South and Flatbush are next) and Manhattan (all 35), using the same boundary shapes and subway lines as the NYC.game map game (/nyc)
    - Pick my day: the map bounces a blue highlight between neighborhoods, slows down, lands, fires confetti and opens the plan. Tap any neighborhood to see its plan instead
    - Pick for me (one random option per stop) or Choose my own (swipe up to 3 options per stop). Bars are typed dive / cocktail / live music, or plain "Bar" where a neighborhood has no real one of that type
    - Gluten-free bites switch (never remembered; every visit starts with all restaurants)
