@@ -59,6 +59,7 @@ The name is a double entendre — Borough + burrow. *Breadth yields depth. By fa
 ```
 citibike-bot/
 ├── index.html                  # Landing page (links to all dashboards)
+├── overworld.js                # Walkable pixel-art overworld layered over the landing page
 ├── CLAUDE.md                   # Project context (you are here)
 ├── ROADMAP.md                  # Product roadmap
 ├── .gitignore
@@ -895,6 +896,19 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
    - Accent color: amber #e2a62b (the page keeps its own light/dark theme, pinned dark here)
 
 ## Landing Page
+
+### Overworld (2026-11-07)
+
+`overworld.js` turns the landing page into a walkable night-time pixel map of the East Village (2nd Ave / 1st Ave / Ave A, E 10th / St Marks / E 7th, Tompkins Sq, East River promenade). Each landing card becomes an object you walk up to; the dialog shows that card's name, brand, blurb, stats and links. **The cards stay the source of truth**: the script reads `.cards > .card` at load, so editing a card updates the map. Spots and sprites per card class live in `PLACES`; a card with no entry lands on a spare spot as a generic sign.
+
+- Desktop: arrows / WASD walk, Space or Enter opens, 1-3 picks a specific link, click to walk somewhere, Esc for the classic view
+- Touch: joystick bottom-left, A button bottom-right, tap anywhere (or on an item) to walk there via BFS pathfinding
+- The player is an original pixel avatar of Will, not a licensed character (keep it that way; the site is public-facing)
+- View choice persists in `localStorage['hof:view']`; `?view=classic` / `?view=world` override; reduced-motion users default to classic. Map position persists in `sessionStorage['hof:pos']` so Back returns you to the same spot
+- Ambient: traffic that stops if you stand in front of it, pigeons that scatter, Con Ed steam stack (Burrow), water shimmer, streetlamp glow
+- Font: Press Start 2P from Google Fonts (linked in `index.html`)
+
+### Classic view
 
 The landing page (`index.html`) has two sections:
 
