@@ -8,7 +8,7 @@ embeddable shelf widget still works:
 
 It returns JS that writes HTML. Per book it has: review link (review id), title, author,
 cover (book id is in the cover URL), and your star rating. It does NOT have read dates,
-page counts, ISBN, publish year or your review text. So this script merges:
+page counts, ISBN or publish year (with show_review=1 it does carry your review text). So this script merges:
 
   - books already in books.json keep every field; only rating/title/author/cover refresh
   - a book that moves between shelves keeps its old record (to-read entries already have pages)
@@ -43,7 +43,7 @@ OUT = os.path.join(DATA_DIR, "books.json")
 LANDING = os.path.join(ROOT, "index.html")
 
 WIDGET = ("https://www.goodreads.com/review/custom_widget/{uid}?shelf={shelf}&sort=date_read"
-          "&order=d&num_books=500&widget_id={wid}")
+          "&order=d&num_books=500&show_review=1&review_length=5000&widget_id={wid}")
 BOOK_PAGE = "https://www.goodreads.com/book/show/{bid}"
 SHELVES = {"read": "books", "currently-reading": "currentlyReading", "to-read": "toRead"}
 RATINGS = {"did not like it": 1, "it was ok": 2, "liked it": 3, "really liked it": 4, "it was amazing": 5}
@@ -103,12 +103,15 @@ def fetch_shelf(uid, shelf):
         stars = re.search(r'staticStars[^"]*" title="([^"]*)"', chunk)
         title = re.search(r'class="gr_custom_title_\d+">\s*<a[^>]*>(.*?)</a>', chunk, re.S)
         author = re.search(r'class="gr_custom_author_\d+">\s*by\s*<a[^>]*>(.*?)</a>', chunk, re.S)
+        review = re.search(r'class="gr_custom_review_\d+">(.*?)</div>', chunk, re.S)
+        review = text(re.sub(r"<br\s*/?>", "\n", review.group(1))) if review else None
         out.append({
             "reviewId": rid,
             "id": int(bid.group(1)) if bid else None,
             "title": text(title.group(1)) if title else "Untitled",
             "author": text(author.group(1)) if author else "Unknown",
             "rating": RATINGS.get((stars.group(1) if stars else "").strip(), 0),
+            "review": review,
             "cover": cover,
             "link": f"https://www.goodreads.com/review/show/{rid}",
         })
@@ -153,11 +156,15 @@ def merge(shelf, key, fresh, old_by_rid, old_order, today):
             # Keep stored title/author/cover: the widget drops series suffixes and uses a
             # different cover size, which would churn the file for no visible change.
             rec["rating"] = w["rating"]
+            # Review text: take the widget's unless it is just a cut-off start of the stored one.
+            stored = rec.get("review") or ""
+            if w["review"] and not (len(stored) > len(w["review"]) and stored.startswith(w["review"].rstrip(".… "))):
+                rec["review"] = w["review"]
             if not rec.get("cover"):
                 rec["cover"] = w["cover"]
         else:
             rec = {"id": w["id"], "title": w["title"], "author": w["author"], "pages": None, "isbn": None,
-                   "rating": w["rating"], "review": None, "dateRead": None, "dateAdded": today,
+                   "rating": w["rating"], "review": w["review"], "dateRead": None, "dateAdded": today,
                    "yearPublished": None, "avgRating": None, "cover": w["cover"], "link": w["link"], "shelves": []}
             rec.update({k: v for k, v in book_details(w["id"]).items() if v is not None})
             time.sleep(1)
