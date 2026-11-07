@@ -114,7 +114,7 @@ citibike-bot/
 ├── books/
 │   ├── index.html              # HofReads — bookshelf dashboard
 │   ├── stack-of-books.jpg      # Dashboard hero image
-│   ├── fetch_goodreads.py      # Pulls read / currently-reading / to-read from Goodreads public shelf RSS → books.json + landing card
+│   ├── fetch_goodreads.py      # Pulls read / currently-reading / to-read from the Goodreads shelf widget, merges into books.json + landing card
 │   └── data/
 │       ├── goodreads_config.json        # {"user_id": "<digits>"} — not secret, committed
 │       ├── Goodreads_Library.csv        # Old manual export (gitignored, no longer used)
@@ -499,9 +499,11 @@ First web refresh 2026-09-20: 27 new runs since June 28 → 234 activities, 144 
    - **Reading now** row (face-out covers) and a second **Want to Read** shelf with quieter, desaturated spines that light up on hover (added 2026-09-21)
    - Detail card uses the Goodreads cover first, Open Library as fallback; shows Goodreads average and a link out
 
-2. **Data Pipeline (automatic since 2026-09-21)**
-   - Source: Goodreads public shelf RSS, no login: `https://www.goodreads.com/review/list_rss/<user_id>?shelf=<shelf>&per_page=200&page=N`. The `shelf` param is honored; 200 per page is the max. Fields used: `book_id`, `title`, `author_name`, `isbn`, `book/num_pages`, `user_rating`, `user_read_at`, `user_date_added`, `book_published`, `average_rating`, `book_large_image_url`, `user_review`, `link`
-   - `books/fetch_goodreads.py` pulls `read`, `currently-reading`, `to-read`, writes `books/data/books.json` (`books`, `currentlyReading`, `toRead`, `summary`), and updates the landing HofReads card. It only rewrites when something changed, so the daily job does not commit timestamps
+2. **Data Pipeline (automatic since 2026-09-21; widget-based since 2026-11-07)**
+   - Source: Goodreads' public embeddable shelf widget, no login: `https://www.goodreads.com/review/custom_widget/<user_id>?shelf=<shelf>&sort=date_read&order=d&num_books=500&widget_id=<random>`. Goodreads retired the shelf RSS feeds around 2026-10-28 (404 for every user), which broke the daily job until 2026-11-07. The widget caches by `widget_id`, so each run uses a random one
+   - The widget only gives review id, title, author, cover (book id is in the cover URL) and star rating. No read dates, pages, ISBN, year or review text. So `books/fetch_goodreads.py` **merges** into the existing `books.json`, keyed by review id: existing records keep every field (only the rating refreshes); a book that moves shelves keeps its record; a book new to the read shelf gets `dateRead` = the day the script first sees it (ET) plus pages / ISBN / original year / avg rating scraped from its public `/book/show/<id>` page (retries; that page sometimes returns an empty body); a book gone from a shelf is dropped. Stored order is kept, new books go on top
+   - **`books.json` is now the only record of read dates and reviews for older books.** Don't regenerate it from scratch. If the read shelf shrinks by more than 20% in one run the script refuses to write
+   - It writes `books/data/books.json` (`books`, `currentlyReading`, `toRead`, `summary`) and updates the landing HofReads card, and only rewrites when something changed, so the daily job does not commit timestamps
    - `.github/workflows/goodreads-sync.yml` runs it daily at 6 AM ET and pushes; Railway redeploys. **The profile must be public** and the user id must be in `books/data/goodreads_config.json`
    - The page fetches `data/books.json` at runtime (no longer baked in), so a data commit is all it takes
    - Custom exclusive shelves (e.g. `re-shelved`) are ignored
@@ -925,6 +927,7 @@ The landing page (`index.html`) has two sections:
 | Strava daily sync not running | launchd agent unloaded or laptop off | `launchctl list \| grep hofner` to check; `launchctl load ~/Library/LaunchAgents/com.hofner.strava-update.plist` to reload |
 | Landing page stats stale | Stats in `index.html` are hardcoded | HofBikes card is updated by `citibike/build_pages.py`; the others still need manual edits |
 | Site asks for a password | `SITE_USER` / `SITE_PASS` are set on Railway | Intended. Remove the variables to open the site |
+| Goodreads sync fails with HTTP 404 | Old RSS fetcher; Goodreads killed shelf RSS ~2026-10-28 | Fixed 2026-11-07: the script now reads the shelf widget |
 | `git push` rejected (non-fast-forward) | launchd and the GitHub Action both committed Strava data | Merge and take the union of activities; keep only the Action running |
 | Overland not sending data | Token mismatch or endpoint URL wrong | Check Overland app endpoint URL includes `?token=...`; verify Railway service is running |
 | Railway GPS data lost on redeploy | Volume not mounted | Ensure Railway volume is mounted at `/data` in service settings |

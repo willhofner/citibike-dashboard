@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
-"""Pull HofReads straight from Goodreads' public shelf RSS feeds. No login, no export.
+"""Pull HofReads from Goodreads' public shelf widget. No login, no export.
 
-    https://www.goodreads.com/review/list_rss/<user_id>?shelf=<shelf>&per_page=200&page=N
+Goodreads retired the shelf RSS feeds in late Oct 2026 (they 404 for every user). The
+embeddable shelf widget still works:
 
-Shelves pulled: read, currently-reading, to-read. Writes books/data/books.json and
-refreshes the HofReads card on the landing page. The profile must be public.
+    https://www.goodreads.com/review/custom_widget/<user_id>?shelf=<shelf>&num_books=N&widget_id=<random>
+
+It returns JS that writes HTML. Per book it has: review link (review id), title, author,
+cover (book id is in the cover URL), and your star rating. It does NOT have read dates,
+page counts, ISBN, publish year or your review text. So this script merges:
+
+  - books already in books.json keep every field; only rating/title/author/cover refresh
+  - a book that moves between shelves keeps its old record (to-read entries already have pages)
+  - a book new to the read shelf gets dateRead = the day this script first sees it there
+    (ET), and pages/isbn/year/avg rating from its public book page when available
+  - a book no longer on a shelf is dropped from that list
+
+Records are keyed by review id (stable per user + book).
 
 Config: books/data/goodreads_config.json -> {"user_id": "12345678"}   (or env GOODREADS_USER_ID)
 
@@ -15,13 +27,13 @@ Usage:
 import html
 import json
 import os
+import random
 import re
 import sys
 import time
 import urllib.request
-import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
-from email.utils import parsedate_to_datetime
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SCRIPT_DIR)
@@ -30,8 +42,12 @@ CONFIG = os.path.join(DATA_DIR, "goodreads_config.json")
 OUT = os.path.join(DATA_DIR, "books.json")
 LANDING = os.path.join(ROOT, "index.html")
 
-FEED = "https://www.goodreads.com/review/list_rss/{uid}?shelf={shelf}&per_page=200&page={page}"
+WIDGET = ("https://www.goodreads.com/review/custom_widget/{uid}?shelf={shelf}&sort=date_read"
+          "&order=d&num_books=500&widget_id={wid}")
+BOOK_PAGE = "https://www.goodreads.com/book/show/{bid}"
 SHELVES = {"read": "books", "currently-reading": "currentlyReading", "to-read": "toRead"}
+RATINGS = {"did not like it": 1, "it was ok": 2, "liked it": 3, "really liked it": 4, "it was amazing": 5}
+UA = {"User-Agent": "Mozilla/5.0 (HofReads personal dashboard)"}
 
 
 def user_id():
@@ -50,80 +66,113 @@ def user_id():
 
 
 def fetch(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (HofReads personal dashboard)"})
+    req = urllib.request.Request(url, headers=UA)
     with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read()
+        return resp.read().decode("utf-8", "replace")
 
 
-def iso_date(rfc822):
-    if not rfc822:
-        return None
-    try:
-        return parsedate_to_datetime(rfc822).date().isoformat()
-    except (TypeError, ValueError):
-        return None
+def text(s):
+    return html.unescape(re.sub(r"<[^>]+>", "", s or "")).strip() or None
 
 
-def clean(text):
-    if not text:
-        return None
-    text = re.sub(r"<br\s*/?>", "\n", text)
-    text = html.unescape(re.sub(r"<[^>]+>", "", text)).strip()
-    return text or None
-
-
-def to_int(v):
-    try:
-        return int(str(v).strip())
-    except (TypeError, ValueError):
-        return None
-
-
-def parse_item(it):
-    book = it.find("book")
-    pages = to_int(book.findtext("num_pages")) if book is not None else None
-    title = clean(it.findtext("title")) or "Untitled"
-    cover = (it.findtext("book_large_image_url") or it.findtext("book_medium_image_url") or "").strip() or None
-    if cover and "nophoto" in cover:
-        cover = None
-    return {
-        "id": to_int(it.findtext("book_id")),
-        "title": title,
-        "author": clean(it.findtext("author_name")) or "Unknown",
-        "pages": pages,
-        "isbn": (it.findtext("isbn") or "").strip() or None,
-        "rating": to_int(it.findtext("user_rating")) or 0,
-        "review": clean(it.findtext("user_review")),
-        "dateRead": iso_date(it.findtext("user_read_at")),
-        "dateAdded": iso_date(it.findtext("user_date_added")),
-        "yearPublished": to_int(it.findtext("book_published")),
-        "avgRating": float(it.findtext("average_rating") or 0) or None,
-        "cover": cover,
-        "link": (it.findtext("link") or "").strip() or None,
-        "shelves": [s.strip() for s in (it.findtext("user_shelves") or "").split(",") if s.strip()],
-    }
+def review_id(link):
+    m = re.search(r"review/show/(\d+)", link or "")
+    return m.group(1) if m else None
 
 
 def fetch_shelf(uid, shelf):
-    items, page = [], 1
-    max_pages = int(os.environ.get("GOODREADS_MAX_PAGES", "20"))
-    while page <= max_pages:
-        root = ET.fromstring(fetch(FEED.format(uid=uid, shelf=shelf, page=page)))
-        batch = root.findall("./channel/item")
-        if not batch:
-            break
-        items.extend(parse_item(it) for it in batch)
-        if len(batch) < 200:
-            break
-        page += 1
-        time.sleep(1)
-    # the feed can repeat a book across pages; keep the first
-    seen, out = set(), []
-    for b in items:
-        if b["id"] in seen:
+    """Books on one shelf, in widget order: [{reviewId, title, author, rating, cover, id, link}]."""
+    js = fetch(WIDGET.format(uid=uid, shelf=shelf, wid=random.randint(10**8, 10**9)))
+    # The widget is a JS string literal; unescape it back to HTML.
+    page = js.replace('\\"', '"').replace("\\/", "/").replace("\\n", "\n").replace("\\'", "'")
+    if "gr_custom_container" not in page:
+        raise RuntimeError(f"Widget for shelf '{shelf}' did not return a shelf. Is the profile public?")
+    out = []
+    for chunk in page.split('class="gr_custom_book_container')[1:]:
+        link = re.search(r'href="(https://www\.goodreads\.com/review/show/\d+[^"]*)"', chunk)
+        rid = review_id(link.group(1) if link else None)
+        if not rid:
             continue
-        seen.add(b["id"])
-        out.append(b)
+        cover = re.search(r'<img alt="[^"]*" border="0" src="([^"]+)"', chunk)
+        cover = cover.group(1) if cover else None
+        bid = re.search(r"/(\d+)(?:\.[^/]*)?\._S[XY]\d+_\.jpg", cover or "")
+        if cover and "nophoto" in cover:
+            cover = None
+        elif cover:
+            cover = re.sub(r"\._S[XY]\d+_\.", "._SY475_.", cover)   # match the old feed's size
+        stars = re.search(r'staticStars[^"]*" title="([^"]*)"', chunk)
+        title = re.search(r'class="gr_custom_title_\d+">\s*<a[^>]*>(.*?)</a>', chunk, re.S)
+        author = re.search(r'class="gr_custom_author_\d+">\s*by\s*<a[^>]*>(.*?)</a>', chunk, re.S)
+        out.append({
+            "reviewId": rid,
+            "id": int(bid.group(1)) if bid else None,
+            "title": text(title.group(1)) if title else "Untitled",
+            "author": text(author.group(1)) if author else "Unknown",
+            "rating": RATINGS.get((stars.group(1) if stars else "").strip(), 0),
+            "cover": cover,
+            "link": f"https://www.goodreads.com/review/show/{rid}",
+        })
+    return out
+
+
+def book_details(bid):
+    """Pages / ISBN / year / avg rating from the public book page. Best effort."""
+    if not bid:
+        return {}
+    page = ""
+    for attempt in range(3):   # Goodreads sometimes answers 200 with an empty body
+        try:
+            page = fetch(BOOK_PAGE.format(bid=bid))
+        except Exception as e:
+            print(f"  (book {bid} attempt {attempt + 1}: {e})")
+        if "numberOfPages" in page:
+            break
+        time.sleep(3)
+    if not page:
+        print(f"  (no details for book {bid}; pages will be blank)")
+        return {}
+    def num(pat, cast=int):
+        m = re.search(pat, page)
+        return cast(m.group(1)) if m else None
+    isbn = re.search(r'"isbn":"(\d{9}[\dX])"', page) or re.search(r'"isbn":"([\dX]{13})"', page)
+    year = None
+    # The page lists the work's first publication and this edition's; the earliest is the original.
+    times = [int(t) for t in re.findall(r'"publicationTime":(-?\d+)', page)]
+    if times:
+        year = (datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(milliseconds=min(times))).year
+    return {"pages": num(r'"numberOfPages":(\d+)'), "isbn": isbn.group(1) if isbn else None,
+            "yearPublished": year, "avgRating": num(r'"ratingValue":([\d.]+)', float)}
+
+
+def merge(shelf, key, fresh, old_by_rid, old_order, today):
+    out = []
+    for w in fresh:
+        old = old_by_rid.get(w["reviewId"])
+        if old:
+            rec = dict(old)
+            # Keep stored title/author/cover: the widget drops series suffixes and uses a
+            # different cover size, which would churn the file for no visible change.
+            rec["rating"] = w["rating"]
+            if not rec.get("cover"):
+                rec["cover"] = w["cover"]
+        else:
+            rec = {"id": w["id"], "title": w["title"], "author": w["author"], "pages": None, "isbn": None,
+                   "rating": w["rating"], "review": None, "dateRead": None, "dateAdded": today,
+                   "yearPublished": None, "avgRating": None, "cover": w["cover"], "link": w["link"], "shelves": []}
+            rec.update({k: v for k, v in book_details(w["id"]).items() if v is not None})
+            time.sleep(1)
+        if key == "books":
+            rec["shelves"] = []
+            was_read = old is not None and old.get("_shelf") == "books"
+            if not was_read:
+                rec["dateRead"] = today   # first day we see it on the read shelf
+        elif not (old and old.get("_shelf") == key):
+            rec["shelves"] = [shelf]
+        rec.pop("_shelf", None)
+        out.append(rec)
+    # Keep the stored order (so the file diff stays small); books new to this shelf go on top.
+    pos = {review_id(b.get("link")): i for i, b in enumerate(old_order.get(key, []))}
+    out.sort(key=lambda b: pos.get(review_id(b.get("link")), -1))
     return out
 
 
@@ -148,14 +197,32 @@ def update_landing(summary):
 
 def main():
     uid = user_id()
-    data = {}
+    today = datetime.now(ZoneInfo("America/New_York")).date().isoformat()
+
+    old = {}
+    if os.path.exists(OUT):
+        with open(OUT) as f:
+            old = json.load(f)
+    old_by_rid = {}
+    for key in SHELVES.values():
+        for b in old.get(key, []):
+            rid = review_id(b.get("link"))
+            if rid:
+                old_by_rid[rid] = {**b, "_shelf": key}
+
+    fresh = {}
     for shelf, key in SHELVES.items():
-        data[key] = fetch_shelf(uid, shelf)
-        print(f"  {shelf}: {len(data[key])} books")
+        fresh[key] = fetch_shelf(uid, shelf)
+        print(f"  {shelf}: {len(fresh[key])} books")
         time.sleep(1)
 
-    if not data["books"]:
+    if not fresh["books"]:
         sys.exit("The read shelf came back empty. Is the profile public and the user id right? Leaving books.json untouched.")
+    if old.get("books") and len(fresh["books"]) < len(old["books"]) * 0.8:
+        sys.exit(f"Read shelf dropped from {len(old['books'])} to {len(fresh['books'])}. That looks like a "
+                 "Goodreads hiccup, not real removals. Leaving books.json untouched.")
+
+    data = {key: merge(shelf, key, fresh[key], old_by_rid, old, today) for shelf, key in SHELVES.items()}
 
     read = data["books"]
     rated = [b["rating"] for b in read if b["rating"]]
@@ -170,13 +237,10 @@ def main():
 
     # Only rewrite when the books changed, so the daily job does not commit a new timestamp every run.
     payload = {"summary": summary, **data}
-    if os.path.exists(OUT):
-        with open(OUT) as f:
-            old = json.load(f)
-        if {k: old.get(k) for k in payload} == payload:
-            print("No changes.")
-            return
-    payload = {"generated": datetime.now(timezone.utc).isoformat(), "source": f"goodreads rss user {uid}", **payload}
+    if {k: old.get(k) for k in payload} == payload:
+        print("No changes.")
+        return
+    payload = {"generated": datetime.now(timezone.utc).isoformat(), "source": f"goodreads widget user {uid}", **payload}
     with open(OUT, "w") as f:
         json.dump(payload, f, indent=1, ensure_ascii=False)
     update_landing(summary)
