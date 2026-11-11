@@ -8,11 +8,11 @@
  * Controls
  *   Desktop: arrows / WASD to walk, Space or Enter to open, 1-3 for a
  *            specific link, Esc for the classic scroll view.
+ *            Switching skins (Walk / Glass / Classic) lives in views.js.
  *   Touch:   drag the stick to walk, A to open, or tap anywhere to walk there.
  *
- * The chosen view is remembered in localStorage ("hof:view"), and your spot on
+ * views.js remembers which skin was chosen; this file remembers your spot on
  * the map in sessionStorage, so the back button drops you where you were.
- * ?view=classic or ?view=world overrides the saved choice.
  */
 (() => {
   'use strict';
@@ -306,10 +306,7 @@
   .ow-fade{position:absolute;inset:0;background:#0a0a0f;opacity:0;pointer-events:none;transition:opacity .25s}
   .ow-fade.on{opacity:1}
   .ow-touch .ow-hint{display:none}
-  .ow-touch .ow-dialog{bottom:auto;top:calc(max(14px,env(safe-area-inset-top)) + 48px)}
-  #ow-play{position:fixed;right:18px;bottom:18px;z-index:999;font-family:'Press Start 2P',ui-monospace,monospace;font-size:10px;color:#0a0a0f;background:#e0e0e8;border:2px solid #000;box-shadow:4px 4px 0 #000;padding:12px 14px;cursor:pointer}
-  #ow-play:hover{background:#fff}
-  #ow-play[hidden]{display:none}
+  .ow-touch .ow-dialog{bottom:auto;top:calc(max(14px,env(safe-area-inset-top)) + 60px)}
   @media (prefers-reduced-motion: reduce){.ow-intro .blink{animation:none}.ow-dialog{transition:none}}
   `;
 
@@ -332,7 +329,6 @@
       <canvas id="ow-canvas"></canvas>
       <div class="ow-hud">
         <div class="ow-title ow-px">WILL HOFNER<small>walk up to anything</small></div>
-        <button class="ow-btn" id="ow-exit" type="button">Classic view</button>
       </div>
       <div class="ow-dialog" id="ow-dialog" aria-live="polite"></div>
       <div class="ow-hint ow-px" id="ow-hint">ARROWS / WASD walk &middot; SPACE open &middot; CLICK to walk there &middot; ESC classic</div>
@@ -345,12 +341,6 @@
       <div class="ow-fade" id="ow-fade"></div>`;
     document.body.appendChild(root);
 
-    const play = document.createElement('button');
-    play.id = 'ow-play';
-    play.type = 'button';
-    play.textContent = '▶ Walk the map';
-    play.hidden = true;
-    document.body.appendChild(play);
 
     const canvas = root.querySelector('#ow-canvas');
     const ctx = canvas.getContext('2d');
@@ -1044,7 +1034,7 @@
     const KEYMAP = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down', KeyA: 'left', KeyD: 'right', KeyW: 'up', KeyS: 'down' };
     window.addEventListener('keydown', (e) => {
       if (!active || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.code === 'Escape') { e.preventDefault(); showClassic(true); return; }
+      if (e.code === 'Escape') { e.preventDefault(); toClassic(); return; }
       if (!started) {
         if (e.code === 'Tab') return;
         e.preventDefault(); start(); return;
@@ -1100,8 +1090,6 @@
     }
     if (aBtn) aBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); interact(0); });
 
-    root.querySelector('#ow-exit').addEventListener('click', () => showClassic(true));
-    play.addEventListener('click', () => showWorld(true));
 
     // ------------------------------------------------------------- modes --
     function start() {
@@ -1112,21 +1100,22 @@
       try { sessionStorage.setItem('hof:intro', '1'); } catch (e) { /* ignore */ }
       setTimeout(() => intro.remove(), 700);
     }
-    function remember(view) { try { localStorage.setItem('hof:view', view); } catch (e) { /* ignore */ } }
-    function showWorld(save) {
-      if (save) remember('world');
+    // views.js owns which skin is showing; these are its show/hide hooks.
+    function toClassic() {
+      if (window.HofView) window.HofView.set('classic', true); else showClassic();
+    }
+    function showWorld() {
       active = true;
-      root.hidden = false; play.hidden = true;
+      root.hidden = false;
       document.documentElement.style.overflow = 'hidden';
       resize();
       last = 0;
       if (!raf) raf = requestAnimationFrame(frame);
       canvas.focus && canvas.focus();
     }
-    function showClassic(save) {
-      if (save) remember('classic');
+    function showClassic() {
       active = false; keys.clear();
-      root.hidden = true; play.hidden = false;
+      root.hidden = true;
       document.documentElement.style.overflow = '';
       if (raf) { cancelAnimationFrame(raf); raf = 0; }
     }
@@ -1137,12 +1126,9 @@
     try { seenIntro = sessionStorage.getItem('hof:intro') === '1'; } catch (e) { /* ignore */ }
     if (seenIntro) { started = true; intro.remove(); }
 
-    const q = new URLSearchParams(location.search).get('view');
-    let pref = null;
-    try { pref = localStorage.getItem('hof:view'); } catch (e) { /* ignore */ }
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const view = q === 'classic' || q === 'world' ? q : (pref || (reduced ? 'classic' : 'world'));
-    if (view === 'classic') showClassic(false); else showWorld(false);
+    root.hidden = true;
+    if (window.HofView) window.HofView.register('world', { label: 'Walk', show: showWorld, hide: showClassic });
+    else showWorld();
 
     // Redraw labels once the pixel font arrives.
     if (document.fonts && document.fonts.load) document.fonts.load('10px "Press Start 2P"').catch(() => {});

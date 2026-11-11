@@ -59,7 +59,9 @@ The name is a double entendre — Borough + burrow. *Breadth yields depth. By fa
 ```
 citibike-bot/
 ├── index.html                  # Landing page (links to all dashboards)
-├── overworld.js                # Walkable pixel-art overworld layered over the landing page
+├── views.js                    # Skin switcher for the landing page (Walk / Glass / Classic pill, top-right)
+├── overworld.js                # Walk skin: walkable pixel-art overworld layered over the landing page
+├── glass.js                    # Glass skin: sleek lead.bank-style scrolling page with 3D frosted glass (three.js)
 ├── CLAUDE.md                   # Project context (you are here)
 ├── ROADMAP.md                  # Product roadmap
 ├── .gitignore
@@ -897,6 +899,18 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 
 ## Landing Page
 
+The landing page has three skins over the same `.cards` markup: **Walk** (overworld.js), **Glass** (glass.js) and **Classic** (the card grid itself). `views.js` owns which one shows: each skin calls `HofView.register(name, { label, show, hide })`, a pill in the top-right switches between them and restyles itself per skin (`html[data-view]`), the choice persists in `localStorage['hof:view']`, and `?view=world|glass|classic` overrides it. With no saved choice visitors land in Walk (Classic if they prefer reduced motion). Load order in `index.html` matters: `views.js` before the skins.
+
+### Glass (2026-11-11)
+
+`glass.js` is a light, sleek, motion-heavy skin modeled on lead.bank: periwinkle gradient, frosted glass slabs and a ring rendered in three.js behind the page (`MeshPhysicalMaterial` transmission, a home-made PMREM studio for reflections, a blue glow behind the glass), Geist / Geist Mono from Google Fonts, blue→purple gradient type. Like the overworld, it reads the cards at load, so editing a card updates it.
+
+- Sections: hero (words rise in), project marquee, a sticky paragraph whose words light up as you scroll, big count-up numbers (`STATS`), projects grouped into Maps / Body / Games / Everything else (`GROUPS`; unknown cards go to the last group; `wide` cards span both columns), a build-log terminal that types itself (`LOG`, plus the Scheduled Jobs rows), giant wordmark footer listing every page
+- Motion: the glass eases between four poses tied to scroll progress (stacked hero, fanned out, drifting behind the cards, one puck at the footer) and tilts with the cursor; cards tilt and get a cursor-following accent glow; nav turns into a frosted pill after 30px, tucks away scrolling down, and underlines the section in view; Lenis smooth scroll on desktop only
+- three.js 0.160 and Lenis load from jsDelivr only the first time Glass is shown. No WebGL → drifting CSS gradient blobs instead. Render loop pauses when the skin is hidden or the tab is in the background; DPR is capped (1.5 phone, 1.75 desktop)
+- Reduced motion: no Lenis, no word/counter/typing animation, the glass renders a still pose
+- Lead Bank's own font (Lead Sans) and 3D assets are proprietary, so the look is rebuilt with Geist and generated geometry; keep it that way
+
 ### Overworld (2026-11-07)
 
 `overworld.js` turns the landing page into a walkable night-time pixel map of the East Village (2nd Ave / 1st Ave / Ave A, E 10th / St Marks / E 7th, Tompkins Sq, East River promenade). Each landing card becomes an object you walk up to; the dialog shows that card's name, brand, blurb, stats and links. **The cards stay the source of truth**: the script reads `.cards > .card` at load, so editing a card updates the map. Spots and sprites per card class live in `PLACES`; a card with no entry lands on a spare spot as a generic sign.
@@ -904,7 +918,7 @@ This is simpler than the web version's per-mode rules. The native app doesn't kn
 - Desktop: arrows / WASD walk, Space or Enter opens, 1-3 picks a specific link, click to walk somewhere, Esc for the classic view
 - Touch: joystick bottom-left, A button bottom-right, tap anywhere (or on an item) to walk there via BFS pathfinding
 - The player is an original pixel avatar of Will, not a licensed character (keep it that way; the site is public-facing)
-- View choice persists in `localStorage['hof:view']`; `?view=classic` / `?view=world` override; reduced-motion users default to classic. Map position persists in `sessionStorage['hof:pos']` so Back returns you to the same spot
+- Esc goes to Classic through `HofView`; view choice is handled by `views.js` (above). Map position persists in `sessionStorage['hof:pos']` so Back returns you to the same spot
 - Ambient: traffic that stops if you stand in front of it, pigeons that scatter, Con Ed steam stack (Burrow), water shimmer, streetlamp glow
 - Font: Press Start 2P from Google Fonts (linked in `index.html`)
 
